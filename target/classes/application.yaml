@@ -1,0 +1,22 @@
+spring:
+  # 数据源配置 DataSourceProperties
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://120.24.99.181:3306/patent_manage?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: password
+
+mybatis-plus:
+    # xml扫描，多个目录用逗号或者分号分隔(告诉 Mapper 所对应的 XML 文件位置)
+  mapper-locations: classpath:mapper/*.xml
+  global-config:
+    db-config:
+      table-prefix: t_
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: false
+  type-aliases-package: com.example.demo.entity
+
+logging:
+  level:
+    root: info
