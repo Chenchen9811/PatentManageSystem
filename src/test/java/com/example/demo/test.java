@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.sql.Timestamp;
 import java.util.Date;
 
 @SpringBootTest
@@ -26,7 +27,7 @@ public class test {
     @Test
     public void testMapper() {
         Proposal proposal = new Proposal();
-        proposal.setProposalDate(new Date(System.currentTimeMillis()));
+        proposal.setProposalDate(new Timestamp(System.currentTimeMillis()));
         proposal.setProposalType("a");
         proposal.setProposalName("test");
         proposal.setProposerId(111L);

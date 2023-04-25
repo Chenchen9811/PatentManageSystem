@@ -53,7 +53,7 @@ public class ProposalServiceImpl implements ProposalService {
             proposal.setProposalName(request.getProposalName());
             proposal.setProposalType(request.getPatentType());
             proposal.setProposerName(request.getProposerName());
-            proposal.setProposalDate(new Date(System.currentTimeMillis()));
+            proposal.setProposalDate(new Timestamp(System.currentTimeMillis()));
             proposal.setSubstance(request.getDetailText());
             proposal.setProposerId(userService.findUserByUserName(request.getProposerName()).getId());
             proposalMapper.insert(proposal);

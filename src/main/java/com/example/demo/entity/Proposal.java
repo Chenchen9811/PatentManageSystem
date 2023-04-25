@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Data
@@ -19,7 +20,7 @@ public class Proposal {
 
     private String proposerName;
 
-    private Date proposalDate;
+    private Timestamp proposalDate;
 
     private String proposalType;
 
