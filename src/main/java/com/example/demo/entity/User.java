@@ -7,27 +7,32 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 public class User {
-    @TableId(value = "F_ID")
-    private Integer F_ID;
-    @TableField(value = "F_UserCode")
-    private String F_UserCode;
-    @TableField(value = "F_UserName")
-    private String F_UserName;
-    @TableField(value = "F_UserSex")
-    private String F_UserSex;
-    @TableField(value = "F_DepartmentId")
-    private Integer F_DepartmentId;
-    @TableField(value = "F_UserPassword")
-    private String F_UserPassword;
+    @TableId(value = "id")
+    private Long id;
 
-    @TableField(value = "F_UserPhone")
-    private String F_UserPhone;
-    @TableField(value = "F_UserMail")
-    private String F_UserMail;
-    @TableField(value = "F_UserNote")
-    private String F_UserNote;
-    @TableField(value = "F_YL3")
-    private String F_YL3;
-    @TableField(value = "F_YL4")
-    private String F_YL4;
+    @TableField(value = "usercode")
+    private String userCode;
+
+    @TableField(value = "username")
+    private String userName;
+
+    private String sex;
+
+
+    private Integer departmentId;
+
+    private String password;
+
+
+    private String phone;
+
+    private String email;
+
+    private String note;
+
+    private Integer roleId;
+
+    private String reserve1;
+
+    private String reserve2;
 }

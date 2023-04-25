@@ -6,12 +6,12 @@ import lombok.Data;
 
 @Data
 public class Role {
-    @TableId(value = "F_ID")
-    private Integer F_ID;
-    @TableField(value = "F_RoleCode")
-    private String F_RoleCode;
-    @TableField(value = "F_RoleName")
-    private String F_RoleName;
-    @TableField(value = "F_RoleNote")
-    private String F_RoleNote;
+    @TableId(value = "id")
+    private Long id;
+
+    private String roleCode;
+
+    private String roleName;
+
+    private String roleNode;
 }

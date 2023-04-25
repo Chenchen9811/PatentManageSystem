@@ -4,7 +4,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://120.24.99.181:3306/patent_manage?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
-    password: password
+    password: qq58382157011
 
 mybatis-plus:
     # xml扫描，多个目录用逗号或者分号分隔(告诉 Mapper 所对应的 XML 文件位置)
@@ -14,9 +14,11 @@ mybatis-plus:
       table-prefix: t_
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: false
+    map-underscore-to-camel-case: true
   type-aliases-package: com.example.demo.entity
 
 logging:
   level:
     root: info
+server:
+  port: 8080

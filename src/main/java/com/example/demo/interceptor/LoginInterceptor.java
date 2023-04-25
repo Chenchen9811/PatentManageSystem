@@ -27,7 +27,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         String userId = request.getHeader("userId");
         String token = request.getHeader("token");
         // token不为空时验证
-        if (!StringUtils.isBlank(token) && !StringUtils.isBlank(userId)) {
+        if (!StringUtils.isBlank(token)) {
             boolean isValidToken = false;
             try {
                 isValidToken = TokenUtil.verify(token);
@@ -53,9 +53,9 @@ public class LoginInterceptor implements HandlerInterceptor {
                 response.sendRedirect(request.getContextPath() + "/user/login");
             }
         }
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        CommonResult.unauthorized(ResultCode.UNAUTHORIZED.getMessage());
-        response.sendRedirect(request.getContextPath() + "/user/login");
+//        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//        CommonResult.unauthorized(ResultCode.UNAUTHORIZED.getMessage());
+//        response.sendRedirect(request.getContextPath() + "/user/login");
         return false;
     }
 }

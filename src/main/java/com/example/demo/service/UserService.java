@@ -11,7 +11,7 @@ public interface UserService {
      * @param userId 用户id
      * @return
      */
-    public Collection<? extends GrantedAuthority> getAuthorities(Integer userId);
+    public Collection<? extends GrantedAuthority> getAuthorities(Long userId);
 
 
     User findUserByUserId(Integer userId);

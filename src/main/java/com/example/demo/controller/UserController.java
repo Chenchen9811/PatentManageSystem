@@ -31,28 +31,28 @@ public class UserController implements Constants, Message {
     private UserService userService;
 
     @ResponseBody
-    @PostMapping(path = "login")
+    @PostMapping(path = "/login")
     public CommonResult login(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             log.error(bindingResult.getFieldError().getDefaultMessage());
         }
         // 检索用户
-        User user = userService.findUserByUserName(loginRequest.getUsername());
+        User user = userService.findUserByUserName(loginRequest.getUserName());
         if (ObjectUtils.isEmpty(user)) {
             return CommonResult.failed("不存在当前用户");
         }
         // 验证密码
-        if (!user.getF_UserPassword().equals(loginRequest.getPassword())) {
+        if (!user.getPassword().equals(loginRequest.getPassword())) {
             return CommonResult.failed("密码错误!");
         }
         HashMap<String, Object> map = new HashMap<>();
         // 生成TOKEN
-        String token = TokenUtil.getToken(String.valueOf(user.getF_ID()));
+        String token = TokenUtil.getToken(String.valueOf(user.getId()));
         map.put(TOKEN, token);
-        map.put(USER_ID, String.valueOf(user.getF_ID()));
-        log.info("登录用户id:{}, 登录用户名:{}", String.valueOf(user.getF_ID()), loginRequest.getUsername());
+        map.put(USER_ID, String.valueOf(user.getId()));
+        log.info("登录用户id:{}, 登录用户名:{}", String.valueOf(user.getId()), loginRequest.getUserName());
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                user, user.getF_UserPassword(), userService.getAuthorities(user.getF_ID())
+                user, user.getPassword(), userService.getAuthorities(user.getId())
         );
         SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
         return CommonResult.success(map, MSG_S_LOG_001);

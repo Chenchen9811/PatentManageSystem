@@ -24,13 +24,13 @@ public class UserServiceImpl implements UserService {
     private RoleMapper roleMapper;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities(Integer userId) {
+    public Collection<? extends GrantedAuthority> getAuthorities(Long userId) {
         List<GrantedAuthority> list = new ArrayList<>();
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         list.add(new GrantedAuthority() {
             @Override
             public String getAuthority() {
-                return roleMapper.selectById(userId).getF_RoleName();
+                return roleMapper.selectById(userId).getRoleName();
             }
         });
         return list;
@@ -43,6 +43,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserByUserName(String userName) {
-        return userMapper.selectOne(new QueryWrapper<User>().eq("F_UserName", userName));
+        return userMapper.selectOne(new QueryWrapper<User>().eq("username", userName));
     }
 }
