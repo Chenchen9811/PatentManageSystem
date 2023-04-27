@@ -3,7 +3,10 @@ package com.example.demo.Utils;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
+import java.util.Random;
 
 public class CommonUtil {
     /**
@@ -40,6 +43,14 @@ public class CommonUtil {
             }
         }
         return json.toJSONString();
+    }
+
+    public static String generatePermissionCode() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String nowTime = sdf.format(new Date());
+        Random random = new Random();
+        int randomNum = random.nextInt(900) + 100;
+        return "PERMISSION" + nowTime + randomNum;
     }
 
     public static String getJSONString(int code, String message) {

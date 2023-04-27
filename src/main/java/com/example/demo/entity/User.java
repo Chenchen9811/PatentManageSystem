@@ -19,7 +19,7 @@ public class User {
     private String sex;
 
 
-    private Integer departmentId;
+    private Long departmentId;
 
     private String password;
 
@@ -30,7 +30,9 @@ public class User {
 
     private String note;
 
-    private Integer roleId;
+    private Long roleId;
+
+    private String delFlag;
 
     private String reserve1;
 

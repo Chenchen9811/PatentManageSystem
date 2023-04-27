@@ -1,15 +1,18 @@
 package com.example.demo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 @Data
 public class Department {
-    private Integer F_ID;
-    private String F_DepartmentCode;
-    private String F_DepartmentName;
-    private String F_DepartmentPhone;
-    private String F_DepartmentMail;
-    private String F_DepartmentNote;
-    private String F_YL1;
-    private String F_YL2;
+    @TableId(value = "id")
+    private Long id;
+
+    private String departmentCode;
+    private String departmentName;
+    private String departmentPhone;
+    private String departmentMail;
+    private String departmentNote;
+    private String reserve1;
+    private String reserve2;
 }

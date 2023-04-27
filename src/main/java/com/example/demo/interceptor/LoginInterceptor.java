@@ -38,7 +38,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             }
 
             if (isValidToken) {
-                User user = userService.findUserByUserId(Integer.valueOf(userId));
+                User user = userService.findUserByUserId(Long.valueOf(userId));
                 hostHolder.setUser(user);
                 // 构建用户认证结果并存入SecurityContext，以便于Security进行授权
 //                Authentication authentication = new UsernamePasswordAuthenticationToken(
