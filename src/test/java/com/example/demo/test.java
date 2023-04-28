@@ -28,7 +28,7 @@ public class test {
     public void testMapper() {
         Proposal proposal = new Proposal();
         proposal.setProposalDate(new Timestamp(System.currentTimeMillis()));
-        proposal.setProposalType("a");
+        proposal.setProposalType(1);
         proposal.setProposalName("test");
         proposal.setProposerId(111L);
         proposal.setProposalCode("test");

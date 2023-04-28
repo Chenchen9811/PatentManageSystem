@@ -20,13 +20,21 @@ public class Proposal {
 
     private String proposerName;
 
+    private String proposerCode;
+
+    private Long departmentId;
+
+    private Integer proposalState;
+
     private Timestamp proposalDate;
 
-    private String proposalType;
+    private Integer proposalType;
 
     private String referenceBook;
 
     private String substance;
 
     private String note;
+
+
 }

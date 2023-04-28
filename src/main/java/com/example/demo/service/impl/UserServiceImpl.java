@@ -96,6 +96,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Role findRoleByUserId(Long userId) {
+        UserRole userRole = userRoleMapper.selectOne(new QueryWrapper<UserRole>().eq("user_id", userId));
+        return roleMapper.selectById(userRole.getRoleId());
+    }
+
+    @Override
     public List<Permission> findPermissionByRoleId(Long roleId) {
         List<RolePermission> rolePermissionList = rolePermissionMapper.selectList(new QueryWrapper<RolePermission>().eq("role_id", roleId));
         List<Permission> list = new ArrayList<>();

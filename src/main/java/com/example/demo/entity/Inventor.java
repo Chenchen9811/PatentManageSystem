@@ -14,7 +14,11 @@ public class Inventor {
 
     private Long proposalId;
 
-    private Long userId;
+    private Long inventorId;
+
+    private String inventorCode;
+
+    private String inventorName;
 
     private Integer rate;
 

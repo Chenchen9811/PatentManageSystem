@@ -53,6 +53,8 @@ public class UserController implements Constants, Message {
         String token = TokenUtil.getToken(String.valueOf(user.getId()));
         map.put(TOKEN, token);
         map.put(USER_ID, String.valueOf(user.getId()));
+        // 获取用户角色
+        map.put(USER_ROLE, userService.findRoleByUserId(user.getId()).getRoleName());
         log.info("登录用户id:{}, 登录用户名:{}", String.valueOf(user.getId()), loginRequest.getUserName());
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 user, user.getPassword(), userService.getAuthorities(user.getId())

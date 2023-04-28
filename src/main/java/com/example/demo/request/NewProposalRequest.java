@@ -4,6 +4,7 @@ import com.example.demo.entity.Inventor;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -15,8 +16,8 @@ public class NewProposalRequest {
     @NotBlank(message = "提案人名字不能为空")
     private String proposerName;
     private String datePicker;
-    @NotBlank(message = "知识产权类型不能为空")
-    private String patentType;
+    @NotNull(message = "知识产权类型不能为空")
+    private Integer patentType;
     private List<InventorVo> listOfInventor;
     private String detailText;
 

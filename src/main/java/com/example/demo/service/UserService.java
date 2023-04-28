@@ -29,6 +29,8 @@ public interface UserService {
 
     Role findRoleByRoleName(String roleName);
 
+    Role findRoleByUserId(Long userId);
+
     List<Permission> findPermissionByRoleId(Long roleId);
 
     CommonResult addUser(AddUserRequest request) throws Exception;
