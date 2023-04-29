@@ -2,12 +2,14 @@ package com.example.demo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.demo.Utils.CommonUtil;
 import com.example.demo.Utils.HostHolder;
 import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.Inventor;
 import com.example.demo.entity.Proposal;
 import com.example.demo.entity.User;
+import com.example.demo.entity.vo.ProposalVo1;
 import com.example.demo.mapper.InventorMapper;
 import com.example.demo.mapper.ProposalMapper;
 import com.example.demo.request.GetProposalRequest1;
@@ -19,6 +21,7 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +49,7 @@ public class ProposalServiceImpl implements ProposalService {
 
     @Resource
     private ProposalManager proposalManager;
+
 
 
     @Transactional
@@ -122,8 +126,22 @@ public class ProposalServiceImpl implements ProposalService {
                     proposalList.add(proposalMapper.selectOne(new LambdaQueryWrapper<Proposal>().eq(Proposal::getId, inventor.getProposalId())));
                 }
             }
-            PageInfo<Proposal> pageInfo = PageInfoUtil.getPageInfo(proposalList, request.getPageIndex(), request.getPageSize());
-            return CommonResult.success(pageInfo, "查找成功!");
+//            PageInfo<Proposal> pageInfo = PageInfoUtil.getPageInfo(proposalList, request.getPageIndex(), request.getPageSize());
+            log.info("pageIndex:{}, pageSize:{}", request.getPageIndex(), request.getPageSize());
+            // Proposal和Inventor转ProposalVo
+            List<ProposalVo1> vo1List = new ArrayList<>();
+            for (Proposal proposal : proposalList) {
+                ProposalVo1 vo = new ProposalVo1();
+                Inventor i = inventorMapper.selectOne(new LambdaQueryWrapper<Inventor>().eq(Inventor::getProposalId, proposal.getId()));
+                vo.setProposalCode(proposal.getProposalCode());
+                vo.setProposalName(proposal.getProposalName());
+                vo.setProposalType(proposal.getProposalType());
+                vo.setProposerName(proposal.getProposerName());
+                vo.setProposalDate(proposal.getProposalDate().toString());
+                vo.setInventorName(i.getInventorName());
+                vo1List.add(vo);
+            }
+            return CommonResult.success(PageInfoUtil.getPageInfo(vo1List, request.getPageIndex(), request.getPageSize()), "查找成功!");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

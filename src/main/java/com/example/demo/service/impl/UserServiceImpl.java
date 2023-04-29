@@ -239,7 +239,7 @@ public class UserServiceImpl implements UserService {
             rolePermission.setCreateTime(new Timestamp(System.currentTimeMillis()));
             rolePermission.setDelFlag("N");
             rolePermissionMapper.insert(rolePermission);
-            return CommonResult.success("添加角色成功");
+            return CommonResult.success(null, "添加角色成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

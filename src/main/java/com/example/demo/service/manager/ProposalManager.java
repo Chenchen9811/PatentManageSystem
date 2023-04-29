@@ -27,7 +27,7 @@ public class ProposalManager {
         if (ObjectUtils.isNotEmpty(request.getProposalType())) {
             wrapper.eq(Proposal::getProposalType, request.getProposalType());
         }
-        if (ObjectUtils.isNotEmpty(request.getProposalType())) {
+        if (null != (request.getProposalState())) {
             wrapper.eq(Proposal::getProposalState, request.getProposalState());
         }
         if (StringUtils.isNotBlank(request.getProposerCode())) {

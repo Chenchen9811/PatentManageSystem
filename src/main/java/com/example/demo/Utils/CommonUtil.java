@@ -4,9 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class CommonUtil {
     /**
@@ -51,6 +49,21 @@ public class CommonUtil {
         Random random = new Random();
         int randomNum = random.nextInt(900) + 100;
         return "PERMISSION" + nowTime + randomNum;
+    }
+
+
+    //subList手动分页，page为第几页，rows为每页个数
+    public static <T> List<T> subList(List<T> list, int page, int rows) throws Exception {
+        List<T> listSort = new ArrayList<>();
+        int size = list.size();
+        int pageStart = page == 1 ? 0 : (page - 1) * rows;//截取的开始位置
+        int pageEnd = size < page * rows ? size : page * rows;//截取的结束位置
+        if (size > pageStart) {
+            listSort = list.subList(pageStart, pageEnd);
+        }
+        //总页数
+        int totalPage = list.size() / rows;
+        return listSort;
     }
 
     public static String getJSONString(int code, String message) {

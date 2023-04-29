@@ -16,8 +16,8 @@ public class GetProposalRequest1 {
     private String proposerCode;
     private String inventorCode;
     private String inventorName;
-    private int proposalState;
-    private int proposalType;
+    private Integer proposalState;
+    private Integer proposalType;
     private String proposalName;
     private String proposalCode;
 }

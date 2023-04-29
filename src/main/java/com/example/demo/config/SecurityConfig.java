@@ -30,9 +30,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers(
-                        "/manage"
+                        "/manage",
+                        "/user",
+                        "/proposal"
                 )
-                .hasAnyAuthority("提案人")
+                .hasAnyAuthority("管理人员权限")
                 .antMatchers(
                         "/hello"
                 )
