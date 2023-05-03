@@ -17,10 +17,10 @@ public enum ProposalStatus {
         this.code = code;
     }
 
-    private String getName(){
+    public String getName(){
         return name;
     }
-    private Integer getCode() {
+    public Integer getCode() {
         return code;
     }
 }

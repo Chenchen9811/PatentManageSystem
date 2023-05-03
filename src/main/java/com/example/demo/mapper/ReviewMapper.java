@@ -1,12 +1,9 @@
 package com.example.demo.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.demo.entity.Proposal;
 import com.example.demo.entity.Review;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface ProposalMapper extends BaseMapper<Proposal> {
-
-    Review findReviewByProposalCode(String proposalCode);
+public interface ReviewMapper extends BaseMapper<Review> {
 }

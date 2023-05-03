@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.ProposalMapper">
+    <sql id="selectFields">
+        id, proposal_id, reviewer_id, currentreview_state, result, suggestion
+    </sql>
+    <select id="findReviewByProposalCode" resultType="com.example.demo.entity.Review">
+        select r.id, r.proposal_id, r.reviewer_id, r.currentreview_state, r.result, r.suggestion from t_review r
+        left JOIN t_proposal p on p.id = r.proposal_id where p.proposal_code = #{proposalCode}
+    </select>
+</mapper>

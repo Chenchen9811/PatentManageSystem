@@ -6,14 +6,18 @@ import com.example.demo.Utils.CommonUtil;
 import com.example.demo.Utils.HostHolder;
 import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
-import com.example.demo.entity.Inventor;
-import com.example.demo.entity.Proposal;
-import com.example.demo.entity.User;
+import com.example.demo.common.ResultCode;
+import com.example.demo.common.ReviewStatus;
+import com.example.demo.entity.*;
 import com.example.demo.entity.vo.ProposalVo1;
+import com.example.demo.entity.vo.ReviewVo;
 import com.example.demo.mapper.InventorMapper;
 import com.example.demo.mapper.ProposalMapper;
+import com.example.demo.mapper.ReviewMapper;
+import com.example.demo.request.AddReviewRequest;
 import com.example.demo.request.GetProposalRequest1;
 import com.example.demo.request.NewProposalRequest;
+import com.example.demo.service.DepartmentService;
 import com.example.demo.service.ProposalService;
 import com.example.demo.service.UserService;
 import com.example.demo.service.manager.ProposalManager;
@@ -30,6 +34,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -49,6 +54,12 @@ public class ProposalServiceImpl implements ProposalService {
 
     @Resource
     private ProposalManager proposalManager;
+
+    @Resource
+    private DepartmentService departmentService;
+
+    @Resource
+    private ReviewMapper reviewMapper;
 
 
 
@@ -139,9 +150,61 @@ public class ProposalServiceImpl implements ProposalService {
                 vo.setProposerName(proposal.getProposerName());
                 vo.setProposalDate(proposal.getProposalDate().toString());
                 vo.setInventorName(i.getInventorName());
+                vo.setDepartmentName(departmentService.findDepartmentById(proposal.getDepartmentId()).getDepartmentName());
                 vo1List.add(vo);
             }
             return CommonResult.success(PageInfoUtil.getPageInfo(vo1List, request.getPageIndex(), request.getPageSize()), "查找成功!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @Override
+    public CommonResult getAllDepartments() throws Exception {
+        try {
+            List<Department> departmentList = departmentService.getAllDepartments();
+            return CommonResult.success(departmentList.stream()
+                    .map(Department::getDepartmentName)
+                    .collect(Collectors.toList()),"查找成功!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @Transactional
+    @Override
+    public CommonResult review(AddReviewRequest request) throws Exception {
+        try {
+            Review review = new Review();
+            Proposal proposal = proposalMapper.selectOne(new LambdaQueryWrapper<Proposal>().eq(Proposal::getProposalCode, request.getProposalCode()));
+            review.setProposalId(proposal.getId());
+            review.setCurrentReviewState(request.getResult());
+            review.setSuggestion(request.getSuggestion());
+            review.setReviewerId(hostHolder.getUser().getId());
+            review.setResult(request.getResult().equals(ReviewStatus.FAILED.getCode())? ReviewStatus.FAILED.getMessage() : ReviewStatus.PASSED.getMessage());
+            review.setReviewDate(new Timestamp(System.currentTimeMillis()));
+            reviewMapper.insert(review);
+            return CommonResult.success(null, "添加审批结果成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @Override
+    public CommonResult getReview(String proposalCode) throws Exception {
+
+        try {
+            Review review = proposalMapper.findReviewByProposalCode(proposalCode);
+            User reviewer = userService.findUserByUserId(review.getReviewerId());
+            Role reviewerRole = userService.findRoleByUserId(reviewer.getId());
+            return CommonResult.success(new ReviewVo(reviewer.getUserName(), reviewerRole.getRoleName(),
+                    review.getReviewDate().toString(), review.getResult()), "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

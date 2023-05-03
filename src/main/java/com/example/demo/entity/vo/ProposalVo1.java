@@ -11,4 +11,5 @@ public class ProposalVo1 {
     private String proposalDate;
     private String proposalCode;
     private String proposalName;
+    private String departmentName;
 }

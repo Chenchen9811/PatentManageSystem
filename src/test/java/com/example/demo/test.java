@@ -2,6 +2,7 @@ package com.example.demo;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.demo.entity.Proposal;
+import com.example.demo.entity.Review;
 import com.example.demo.entity.User;
 import com.example.demo.mapper.ProposalMapper;
 import com.example.demo.mapper.UserMapper;
@@ -26,16 +27,18 @@ public class test {
 
     @Test
     public void testMapper() {
-        Proposal proposal = new Proposal();
-        proposal.setProposalDate(new Timestamp(System.currentTimeMillis()));
-        proposal.setProposalType(1);
-        proposal.setProposalName("test");
-        proposal.setProposerId(111L);
-        proposal.setProposalCode("test");
-        proposal.setProposerName("test");
-        proposal.setReferenceBook("test");
-        proposalMapper.insert(proposal);
-        System.out.println(proposal.getId());
+//        Proposal proposal = new Proposal();
+//        proposal.setProposalDate(new Timestamp(System.currentTimeMillis()));
+//        proposal.setProposalType(1);
+//        proposal.setProposalName("test");
+//        proposal.setProposerId(111L);
+//        proposal.setProposalCode("test");
+//        proposal.setProposerName("test");
+//        proposal.setReferenceBook("test");
+//        proposalMapper.insert(proposal);
+//        System.out.println(proposal.getId());
+        Review review = proposalMapper.findReviewByProposalCode("1");
+        System.out.println(review);
     }
 
 }

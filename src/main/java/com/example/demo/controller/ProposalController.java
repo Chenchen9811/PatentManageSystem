@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.common.CommonResult;
+import com.example.demo.request.AddReviewRequest;
 import com.example.demo.request.GetProposalRequest1;
 import com.example.demo.request.NewProposalRequest;
 import com.example.demo.service.ProposalService;
@@ -39,6 +40,46 @@ public class ProposalController {
         try {
             result = proposalService.getProposalList1(request);
             return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/getAllDepartments")
+    public CommonResult getAllDepartments() {
+        CommonResult result = null;
+        try {
+            result = proposalService.getAllDepartments();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/review")
+    public CommonResult review(@Valid @RequestBody AddReviewRequest request, BindingResult bindingResult) {
+        CommonResult result = null;
+        try {
+            result = proposalService.review(request);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/getReview/{proposalCode}")
+    public CommonResult getReview(@PathVariable String proposalCode) {
+        try {
+            return proposalService.getReview(proposalCode);
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

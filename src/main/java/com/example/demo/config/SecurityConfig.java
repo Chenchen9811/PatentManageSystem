@@ -39,6 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/hello"
                 )
                 .hasAnyAuthority("主管")
+                .mvcMatchers("/user/login").permitAll()
                 .anyRequest()
                 .permitAll()
                 .and().csrf().disable(); // 不开启csrf

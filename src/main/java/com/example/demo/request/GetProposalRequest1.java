@@ -20,4 +20,5 @@ public class GetProposalRequest1 {
     private Integer proposalType;
     private String proposalName;
     private String proposalCode;
+    private String departmentName;
 }

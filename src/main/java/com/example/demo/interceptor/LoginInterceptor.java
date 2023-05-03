@@ -8,6 +8,7 @@ import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.annotation.Resource;
@@ -24,6 +25,10 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 如果不是映射到方法，直接通过
+        if (!(handler instanceof HandlerMethod)) {
+            return true;
+        }
         String userId = request.getHeader("userId");
         String token = request.getHeader("token");
         // token不为空时验证
