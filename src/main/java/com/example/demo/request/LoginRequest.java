@@ -1,6 +1,6 @@
 package com.example.demo.request;
 
-import com.sun.istack.internal.NotNull;
+
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;

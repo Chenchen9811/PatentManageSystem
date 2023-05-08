@@ -37,8 +37,9 @@ public class test {
 //        proposal.setReferenceBook("test");
 //        proposalMapper.insert(proposal);
 //        System.out.println(proposal.getId());
-        Review review = proposalMapper.findReviewByProposalCode("1");
-        System.out.println(review);
+//        Review review = proposalMapper.findReviewByProposalCode("1");
+//        System.out.println(review);
+        
     }
 
 }
