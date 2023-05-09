@@ -63,7 +63,7 @@ public class ProposalServiceImpl implements ProposalService {
 
 
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult newProposal(NewProposalRequest request) throws Exception{
         try {
@@ -143,13 +143,13 @@ public class ProposalServiceImpl implements ProposalService {
             List<ProposalVo1> vo1List = new ArrayList<>();
             for (Proposal proposal : proposalList) {
                 ProposalVo1 vo = new ProposalVo1();
-                Inventor i = inventorMapper.selectOne(new LambdaQueryWrapper<Inventor>().eq(Inventor::getProposalId, proposal.getId()));
+                List<Inventor> inventorList = inventorMapper.selectList(new LambdaQueryWrapper<Inventor>().eq(Inventor::getProposalId, proposal.getId()));
                 vo.setProposalCode(proposal.getProposalCode());
                 vo.setProposalName(proposal.getProposalName());
                 vo.setProposalType(proposal.getProposalType());
                 vo.setProposerName(proposal.getProposerName());
                 vo.setProposalDate(proposal.getProposalDate().toString());
-                vo.setInventorName(i.getInventorName());
+                vo.setInventorNameList(inventorList.stream().map(Inventor::getInventorName).collect(Collectors.toList()));
                 vo.setDepartmentName(departmentService.findDepartmentById(proposal.getDepartmentId()).getDepartmentName());
                 vo1List.add(vo);
             }
@@ -175,7 +175,7 @@ public class ProposalServiceImpl implements ProposalService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult review(AddReviewRequest request) throws Exception {
         try {

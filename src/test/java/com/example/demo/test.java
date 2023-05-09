@@ -42,4 +42,10 @@ public class test {
         
     }
 
+    @Test
+    public void testDate() {
+        String date = "2023-05-09";
+        System.out.println(Timestamp.valueOf(date).toString());
+    }
+
 }

@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
         return list;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult addUser(AddUserRequest request) throws Exception {
         try {
@@ -146,7 +146,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult updateUser(UpdateUserRequest request) throws Exception {
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
@@ -175,7 +175,7 @@ public class UserServiceImpl implements UserService {
         return CommonResult.success(null, "用户信息修改成功!");
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult deleteUser(String userCode) throws Exception{
         try {
@@ -207,7 +207,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult addRole(AddRoleRequest request) throws Exception {
         try {
@@ -267,7 +267,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult deleteRole(String roleName) throws Exception {
         try {
