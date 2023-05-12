@@ -6,11 +6,10 @@ import com.example.demo.Utils.CommonUtil;
 import com.example.demo.Utils.HostHolder;
 import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
-import com.example.demo.common.ResultCode;
 import com.example.demo.common.ReviewStatus;
 import com.example.demo.entity.*;
-import com.example.demo.entity.vo.ProposalVo1;
-import com.example.demo.entity.vo.ReviewVo;
+import com.example.demo.response.ProposalVo1;
+import com.example.demo.response.ReviewVo;
 import com.example.demo.mapper.InventorMapper;
 import com.example.demo.mapper.ProposalMapper;
 import com.example.demo.mapper.ReviewMapper;
@@ -21,13 +20,10 @@ import com.example.demo.service.DepartmentService;
 import com.example.demo.service.ProposalService;
 import com.example.demo.service.UserService;
 import com.example.demo.service.manager.ProposalManager;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -35,7 +31,6 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -61,7 +56,26 @@ public class ProposalServiceImpl implements ProposalService {
     @Resource
     private ReviewMapper reviewMapper;
 
+    @Override
+    public Proposal findProposalByProposerName(String proposerName) {
+        return proposalMapper.selectOne(new LambdaQueryWrapper<Proposal>().eq(Proposal::getProposerName, proposerName));
+    }
 
+    @Override
+    public Proposal findProposalByProposalId(Long proposalId) {
+        return proposalMapper.selectById(proposalId);
+    }
+
+    @Override
+    public CommonResult getCode(String typeName) {
+        try {
+            return CommonResult.success(CommonUtil.generateCode(typeName), "生成编号成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override

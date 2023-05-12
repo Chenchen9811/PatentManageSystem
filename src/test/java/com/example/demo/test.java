@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.demo.Utils.CommonUtil;
 import com.example.demo.entity.Proposal;
 import com.example.demo.entity.Review;
 import com.example.demo.entity.User;
@@ -44,8 +45,9 @@ public class test {
 
     @Test
     public void testDate() {
-        String date = "2023-05-09";
-        System.out.println(Timestamp.valueOf(date).toString());
+        Timestamp timestamp = CommonUtil.stringDateToTimeStamp(new String("2023-05-10"));
+        System.out.println(timestamp.toString());
+        System.out.println(CommonUtil.generateCode("POfficialFee"));
     }
 
 }

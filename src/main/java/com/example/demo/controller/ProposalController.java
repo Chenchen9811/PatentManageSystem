@@ -86,4 +86,17 @@ public class ProposalController {
             return CommonResult.failed(e.getMessage());
         }
     }
+
+    @ResponseBody
+    @GetMapping("/getCode")
+    public CommonResult getCode(@RequestParam("typeName") String typeName) {
+        CommonResult result = null;
+        try {
+            result = proposalService.getCode(typeName);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 }

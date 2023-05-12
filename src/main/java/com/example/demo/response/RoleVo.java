@@ -1,4 +1,4 @@
-package com.example.demo.entity.vo;
+package com.example.demo.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

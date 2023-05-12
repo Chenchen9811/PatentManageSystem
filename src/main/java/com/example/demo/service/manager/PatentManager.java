@@ -1,13 +1,83 @@
 package com.example.demo.service.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.example.demo.Utils.CommonUtil;
 import com.example.demo.entity.Patent;
+import com.example.demo.entity.PatentAnnualFee;
+import com.example.demo.entity.PatentOfficialFee;
+import com.example.demo.request.GetPatentOfficialFeeRequest;
 import com.example.demo.request.GetPatentRequest;
+import com.example.demo.request.UpdateAnnualFeeRequest;
+import com.example.demo.request.UpdatePatentOfficialFeeRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PatentManager {
+
+
+    public PatentAnnualFee getUpdatedAnnualFee(UpdateAnnualFeeRequest request, PatentAnnualFee annualFee) {
+        if (StringUtils.isNotBlank(request.getActualAmount())) {
+            annualFee.setActualAmount(request.getActualAmount());
+        }
+        if (StringUtils.isNotBlank(request.getDueAmount())) {
+            annualFee.setDueAmount(request.getDueAmount());
+        }
+        if (StringUtils.isNotBlank(request.getDueDate())) {
+            annualFee.setDueDate(CommonUtil.stringDateToTimeStamp(request.getDueDate()));
+        }
+        if (StringUtils.isNotBlank(request.getActualPayDate())) {
+            annualFee.setActualPayDate(CommonUtil.stringDateToTimeStamp(request.getActualPayDate()));
+        }
+        if (StringUtils.isNotBlank(request.getYear())) {
+            annualFee.setYear(request.getYear());
+        }
+        if (StringUtils.isNotBlank(request.getPayStatus())) {
+            annualFee.setPayStatus(request.getPayStatus());
+        }
+        return annualFee;
+    }
+
+
+    public PatentOfficialFee getUpdatedOfficialFee(UpdatePatentOfficialFeeRequest request, PatentOfficialFee officialFee) {
+        if (StringUtils.isNotBlank(request.getOfficialFeeName())) {
+            officialFee.setOfficialFeeName(request.getOfficialFeeName());
+        }
+        if (StringUtils.isNotBlank(request.getOfficialFeeStatus())) {
+            officialFee.setOfficialFeeStatus(request.getOfficialFeeStatus());
+        }
+        if (StringUtils.isNotBlank(request.getPayerName())) {
+            officialFee.setPayerName(request.getPayerName());
+        }
+        if (StringUtils.isNotBlank(request.getDueAmount())) {
+            officialFee.setDueAmount(request.getDueAmount());
+        }
+        if (StringUtils.isNotBlank(request.getActualAmount())) {
+            officialFee.setActualAmount(request.getActualAmount());
+        }
+        if (StringUtils.isNotBlank(request.getDueDate())) {
+            officialFee.setDueDate(CommonUtil.stringDateToTimeStamp(request.getDueDate()));
+        }
+        if (StringUtils.isNotBlank(request.getActualPayDate())) {
+            officialFee.setActualPayDate(CommonUtil.stringDateToTimeStamp(request.getActualPayDate()));
+        }
+        return officialFee;
+    }
+
+    public LambdaQueryWrapper<Patent> getWrapperByOfficialFee(GetPatentOfficialFeeRequest request) {
+        LambdaQueryWrapper<Patent> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.isNotBlank(request.getPatentCode())) {
+            wrapper.eq(Patent::getPatentCode, request.getPatentCode());
+        }
+        if (StringUtils.isNotBlank(request.getPatentName())) {
+            wrapper.eq(Patent::getPatentName, request.getPatentName());
+        }
+        if (StringUtils.isNotBlank(request.getTotalFee())) {
+            wrapper.eq(Patent::getTotalFee, request.getTotalFee());
+        }
+        return wrapper;
+    }
 
     public LambdaQueryWrapper<Patent> getWrapperByGetPatentRequest(GetPatentRequest request) {
         LambdaQueryWrapper<Patent> wrapper = new LambdaQueryWrapper<>();

@@ -26,9 +26,9 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 如果不是映射到方法，直接通过
-        if (!(handler instanceof HandlerMethod)) {
-            return true;
-        }
+//        if (!(handler instanceof HandlerMethod)) {
+//            return true;
+//        }
         String userId = request.getHeader("userId");
         String token = request.getHeader("token");
         // token不为空时验证
@@ -58,8 +58,8 @@ public class LoginInterceptor implements HandlerInterceptor {
                 response.sendRedirect(request.getContextPath() + "/user/login");
             }
         }
-//        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//        CommonResult.unauthorized(ResultCode.UNAUTHORIZED.getMessage());
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        CommonResult.unauthorized(ResultCode.UNAUTHORIZED.getMessage());
 //        response.sendRedirect(request.getContextPath() + "/user/login");
         return false;
     }

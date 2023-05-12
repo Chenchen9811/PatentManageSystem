@@ -1,21 +1,23 @@
 package com.example.demo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.example.demo.Utils.CommonUtil;
 import com.example.demo.Utils.HostHolder;
 import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
-import com.example.demo.entity.Department;
-import com.example.demo.entity.Patent;
-import com.example.demo.entity.PatentInventor;
-import com.example.demo.entity.User;
-import com.example.demo.entity.vo.GetPatentResponse;
+import com.example.demo.entity.*;
+import com.example.demo.mapper.PatentAnnualFeeMapper;
+import com.example.demo.mapper.PatentOfficialFeeMapper;
+import com.example.demo.request.*;
+import com.example.demo.response.GetPatentAnnualFeeResponse;
+import com.example.demo.response.GetPatentOfficialFeeResponse;
+import com.example.demo.response.GetPatentResponse;
 import com.example.demo.mapper.PatentInventorMapper;
 import com.example.demo.mapper.PatentMapper;
-import com.example.demo.request.GetPatentRequest;
-import com.example.demo.request.NewPatentRequest;
-import com.example.demo.request.NewProposalRequest;
 import com.example.demo.service.DepartmentService;
 import com.example.demo.service.PatentService;
+import com.example.demo.service.ProposalService;
 import com.example.demo.service.UserService;
 import com.example.demo.service.manager.PatentManager;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +51,200 @@ public class PatentServiceImpl implements PatentService {
 
     @Resource
     private DepartmentService departmentService;
+
+    @Resource
+    private PatentOfficialFeeMapper patentOfficialFeeMapper;
+
+    @Resource
+    private ProposalService proposalService;
+
+    @Resource
+    private PatentAnnualFeeMapper annualFeeMapper;
+
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult deleteAnnualFee(String annualFeeCode) {
+        try {
+            return annualFeeMapper.delete(new LambdaQueryWrapper<PatentAnnualFee>().eq(PatentAnnualFee::getAnnualFeeCode, annualFeeCode)) == 0?
+                    CommonResult.failed("删除失败") :
+                    CommonResult.success(null, "删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult updateAnnualFee(UpdateAnnualFeeRequest request) {
+        try {
+            PatentAnnualFee annualFee = this.findPatentAnnualFeeByCode(request.getAnnualFeeCode());
+            annualFee = patentManager.getUpdatedAnnualFee(request, annualFee);
+            LambdaUpdateWrapper<PatentAnnualFee> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(PatentAnnualFee::getAnnualFeeCode, request.getAnnualFeeCode());
+
+            return annualFeeMapper.update(annualFee, updateWrapper) == 0?
+                    CommonResult.failed("编辑失败") :
+                    CommonResult.success(null, "编辑成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public CommonResult getAnnualFeeCode(String patentCode, String year) {
+        try {
+            Patent patent = this.findPatentByCode(patentCode);
+            LambdaQueryWrapper<PatentAnnualFee> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(PatentAnnualFee::getPatentId, patent.getId());
+            wrapper.eq(PatentAnnualFee::getYear, year);
+            PatentAnnualFee annualFee = annualFeeMapper.selectOne(wrapper);
+            return CommonResult.success(annualFee.getAnnualFeeCode(), "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public CommonResult getAnnualFee(String patentName, Integer pageIndex, Integer pageSize) {
+        try {
+            Patent patent = this.findPatentByName(patentName);
+            List<PatentAnnualFee> annualFeeList = annualFeeMapper.selectList(new LambdaQueryWrapper<PatentAnnualFee>().eq(PatentAnnualFee::getPatentId, patent.getId()));
+            return CommonResult.success(PageInfoUtil.getPageInfo(
+                    annualFeeList.stream().map(annualFee -> {
+                        GetPatentAnnualFeeResponse response = new GetPatentAnnualFeeResponse();
+                        response.setActualAmount(annualFee.getActualAmount());
+                        response.setDueAmount(annualFee.getDueAmount());
+                        response.setDueDate(CommonUtil.getYmdbyTimeStamp(annualFee.getDueDate()));
+                        response.setYear(annualFee.getYear());
+                        response.setPayStatus(annualFee.getPayStatus());
+                        response.setActualPayDate(CommonUtil.getYmdbyTimeStamp(annualFee.getActualPayDate()));
+                        return response;
+                    }).collect(Collectors.toList()), pageIndex,pageSize), "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public CommonResult newAnnualFee(NewPatenAnnualFeeRequest request) {
+        try {
+            // 验重
+            PatentAnnualFee annualFee = annualFeeMapper.selectOne(new LambdaQueryWrapper<PatentAnnualFee>().eq(PatentAnnualFee::getYear, request.getYear()));
+            if (null != annualFee) {
+                return CommonResult.failed(request.getPatentName() + "专利" + request.getYear() + "年度年费已存在");
+            }
+            annualFee = new PatentAnnualFee();
+            annualFee.setAnnualFeeCode(CommonUtil.generateCode("PatentAnnualFee"));
+            annualFee.setAnnualFeeName(request.getPatentName() + "" + request.getYear() + "年度年费");
+            annualFee.setPayStatus(request.getPayStatus());
+            annualFee.setYear(request.getYear());
+            annualFee.setDueAmount(request.getDueAmount());
+            annualFee.setActualAmount(request.getActualAmount());
+            annualFee.setDueDate(CommonUtil.stringDateToTimeStamp(request.getDueDate()));
+            annualFee.setActualPayDate(CommonUtil.stringDateToTimeStamp(request.getActualPayDate()));
+            annualFee.setRemark(request.getRemark());
+            annualFee.setPatentId(this.findPatentByName(request.getPatentName()).getId());
+            return annualFeeMapper.insert(annualFee) == 0 ?
+                    CommonResult.failed("添加" + request.getYear() + "年度年费失败") :
+                    CommonResult.success(null, "添加" + request.getPatentName() + "专利" + request.getYear() + "年度年费成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult deleteOfficialFee(String officialFeeName) throws Exception {
+        try {
+            return patentOfficialFeeMapper.delete(new LambdaQueryWrapper<PatentOfficialFee>().eq(PatentOfficialFee::getOfficialFeeName, officialFeeName)) == 0 ?
+                    CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult updateOfficialFee(UpdatePatentOfficialFeeRequest request) throws Exception {
+        try {
+            PatentOfficialFee officialFee = patentOfficialFeeMapper.selectOne(new LambdaQueryWrapper<PatentOfficialFee>().eq(PatentOfficialFee::getOfficialFeeCode, request.getOfficialFeeCode()));
+            officialFee = patentManager.getUpdatedOfficialFee(request, officialFee);
+            LambdaUpdateWrapper<PatentOfficialFee> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(PatentOfficialFee::getOfficialFeeCode, request.getOfficialFeeCode());
+            return patentOfficialFeeMapper.update(officialFee, updateWrapper) == 0 ? CommonResult.failed("修改失败") : CommonResult.success(null, "修改成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @Override
+    public CommonResult getOfficialFee(GetPatentOfficialFeeRequest request) throws Exception {
+        try {
+            LambdaQueryWrapper<Patent> wrapper = patentManager.getWrapperByOfficialFee(request);
+            List<Patent> patentList = patentMapper.selectList(wrapper);
+            if (StringUtils.isNotBlank(request.getProposerName())) {
+                Proposal proposal = proposalService.findProposalByProposerName(request.getProposerName());
+                patentList.stream().filter(patent -> patent.getProposalId().equals(proposal.getId())).collect(Collectors.toList());
+            }
+            return CommonResult.success(PageInfoUtil.getPageInfo(
+                    patentList.stream().map(patent -> {
+                        GetPatentOfficialFeeResponse response = new GetPatentOfficialFeeResponse();
+                        response.setPatentCode(patent.getPatentCode());
+                        response.setPatentName(patent.getPatentName());
+                        response.setTotalFee(patent.getTotalFee());
+                        Proposal proposal = proposalService.findProposalByProposalId(patent.getProposalId());
+                        response.setProposerName(proposal == null ? null : proposal.getProposerName());
+                        return response;
+                    }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize()), "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult newOfficialFee(NewPatentOfficialFeeRequest request) throws Exception {
+        try {
+            // 验重
+            PatentOfficialFee officialFee = this.findPatentOfficialFeeByName(request.getOfficialFeeName());
+            if (null != officialFee) {
+                return CommonResult.failed("该官费已存在");
+            }
+            officialFee = new PatentOfficialFee();
+            officialFee.setOfficialFeeName(request.getOfficialFeeName());
+            officialFee.setOfficialFeeCode(CommonUtil.generateCode("POfficialFee"));
+            officialFee.setPatentId(this.findPatentByName(request.getPatentName()).getId());
+            officialFee.setDueAmount(request.getDueAmount());
+            officialFee.setActualAmount(request.getActualAmount());
+            officialFee.setDueDate(CommonUtil.stringDateToTimeStamp(request.getDueDate()));
+            officialFee.setActualPayDate(CommonUtil.stringDateToTimeStamp(request.getActualPayDate()));
+            officialFee.setRemark(request.getRemark());
+            officialFee.setOfficialFeeStatus(request.getOfficialFeeStatus());
+            patentOfficialFeeMapper.insert(officialFee);
+            return CommonResult.success(null, "添加专利官费成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+    }
 
     @Override
     public CommonResult myPatent(Integer pageIndex, Integer pageSize) throws Exception {
@@ -169,11 +365,11 @@ public class PatentServiceImpl implements PatentService {
             patent.setPatentType(request.getPatentType());
             patent.setAgency(request.getAgency());
             patent.setApplicationCode(request.getApplicationCode());
-//            patent.setApplicationDate(Timestamp.valueOf(request.getApplicationDate()));
-            patent.setApplicationDate(new Timestamp(System.currentTimeMillis()));
+            patent.setApplicationDate(CommonUtil.stringDateToTimeStamp(request.getApplicationDate()));
+//            patent.setApplicationDate(new Timestamp(System.currentTimeMillis()));
             patent.setGrantCode(request.getGrantCode());
-//            patent.setGrantDate(Timestamp.valueOf(request.getGrantDate()))
-            patent.setGrantDate(new Timestamp(System.currentTimeMillis()));
+            patent.setGrantDate(CommonUtil.stringDateToTimeStamp(request.getGrantDate()));
+//            patent.setGrantDate(new Timestamp(System.currentTimeMillis()));
             patent.setCurrentProgram(request.getCurrentProgram());
             patent.setDepartmentId(department.getId());
             patentMapper.insert(patent);
@@ -185,14 +381,14 @@ public class PatentServiceImpl implements PatentService {
                 }
             });
             int size = inventorList.size();
-            for (int i = 0; i < size; i ++) {
+            for (int i = 0; i < size; i++) {
                 PatentInventor patentInventor = new PatentInventor();
                 NewPatentRequest.Inventor inventor = inventorList.get(i);
                 User user = userService.findUserByUserName(inventor.getInventorName());
                 patentInventor.setPatentId(patent.getId());
                 patentInventor.setInventorName(inventor.getInventorName());
                 patentInventor.setInventorCode(user.getUserCode());
-                patentInventor.setContribute(inventor.getRate() == 100? new BigDecimal("1.00") : new BigDecimal("0."+ inventor.getRate()));
+                patentInventor.setContribute(inventor.getRate() == 100 ? new BigDecimal("1.00") : new BigDecimal("0." + inventor.getRate()));
                 patentInventor.setRate(i + 1);
                 patentInventor.setCreateTime(new Timestamp(System.currentTimeMillis()));
                 patentInventor.setCreateUser(hostHolder.getUser().getId());
@@ -205,6 +401,26 @@ public class PatentServiceImpl implements PatentService {
             log.error(e.getMessage());
             throw new Exception(e.getMessage());
         }
+    }
+
+    @Override
+    public PatentOfficialFee findPatentOfficialFeeByName(String officialFeeName) {
+        return patentOfficialFeeMapper.selectOne(new LambdaQueryWrapper<PatentOfficialFee>().eq(PatentOfficialFee::getOfficialFeeName, officialFeeName));
+    }
+
+    @Override
+    public Patent findPatentByName(String patentName) {
+        return patentMapper.selectOne(new LambdaQueryWrapper<Patent>().eq(Patent::getPatentName, patentName));
+    }
+
+    @Override
+    public Patent findPatentByCode(String patentCode) {
+        return patentMapper.selectOne(new LambdaQueryWrapper<Patent>().eq(Patent::getPatentCode, patentCode));
+    }
+
+    @Override
+    public PatentAnnualFee findPatentAnnualFeeByCode(String annualFeeCode) {
+        return annualFeeMapper.selectOne(new LambdaQueryWrapper<PatentAnnualFee>().eq(PatentAnnualFee::getAnnualFeeCode, annualFeeCode));
     }
 
 

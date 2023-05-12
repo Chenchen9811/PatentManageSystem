@@ -3,6 +3,8 @@ package com.example.demo.Utils;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -51,6 +53,14 @@ public class CommonUtil {
         return "PERMISSION" + nowTime + randomNum;
     }
 
+    public static String generateCode(String str) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String nowTime = sdf.format(new Date());
+        Random random = new Random();
+        int randomNum = random.nextInt(900) + 100;
+        return str + nowTime + randomNum;
+    }
+
 
     //subList手动分页，page为第几页，rows为每页个数
     public static <T> List<T> subList(List<T> list, int page, int rows) throws Exception {
@@ -64,6 +74,26 @@ public class CommonUtil {
         //总页数
         int totalPage = list.size() / rows;
         return listSort;
+    }
+
+    public static Timestamp stringDateToTimeStamp(String date) {
+        date = date + " 06:00:01";
+        Timestamp ts = null;
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        format.setLenient(false);
+        try {
+            ts = new Timestamp(format.parse(date).getTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+//            log.info("转换有异常>>>>>>>"+e.getMessage());
+            return null;
+        }
+//        log.info("Timestamp>>>>>>>"+ts.toString());
+        return ts;
+    }
+
+    public static String getYmdbyTimeStamp(Timestamp timestamp) {
+        return timestamp.toString().substring(0, 10);
     }
 
     public static String getJSONString(int code, String message) {
