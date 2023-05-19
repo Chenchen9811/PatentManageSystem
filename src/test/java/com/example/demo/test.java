@@ -2,11 +2,8 @@ package com.example.demo;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.demo.Utils.CommonUtil;
-import com.example.demo.entity.Proposal;
-import com.example.demo.entity.Review;
-import com.example.demo.entity.User;
-import com.example.demo.mapper.ProposalMapper;
-import com.example.demo.mapper.UserMapper;
+import com.example.demo.entity.*;
+import com.example.demo.mapper.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +11,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -25,6 +24,15 @@ public class test {
 
     @Resource
     private ProposalMapper proposalMapper;
+
+    @Resource
+    private PatentBonusMapper bonusMapper;
+
+    @Resource
+    private TrademarkBonusMapper trademarkBonusMapper;
+
+    @Resource
+    private TrademarkMapper trademarkMapper;
 
     @Test
     public void testMapper() {
@@ -40,7 +48,7 @@ public class test {
 //        System.out.println(proposal.getId());
 //        Review review = proposalMapper.findReviewByProposalCode("1");
 //        System.out.println(review);
-        
+        System.out.println(trademarkMapper.findTrademarkByInventorName("admin").toString());
     }
 
     @Test

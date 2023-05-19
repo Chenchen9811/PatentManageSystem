@@ -1,13 +1,16 @@
 package com.example.demo.Utils;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Slf4j
 public class CommonUtil {
     /**
      * 获取ip地址
@@ -90,6 +93,18 @@ public class CommonUtil {
         }
 //        log.info("Timestamp>>>>>>>"+ts.toString());
         return ts;
+    }
+
+    public static java.sql.Date stringToDate(String date) {
+        SimpleDateFormat format = null;
+        try {
+            format = new SimpleDateFormat("yyyy-MM-dd");
+            return new java.sql.Date(format.parse(date).getTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("转换有异常>>>>>>>"+e.getMessage());
+            return null;
+        }
     }
 
     public static String getYmdbyTimeStamp(Timestamp timestamp) {

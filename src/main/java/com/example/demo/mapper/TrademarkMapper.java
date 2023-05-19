@@ -6,4 +6,5 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface TrademarkMapper extends BaseMapper<Trademark> {
+    Trademark findTrademarkByInventorName(String inventorName);
 }

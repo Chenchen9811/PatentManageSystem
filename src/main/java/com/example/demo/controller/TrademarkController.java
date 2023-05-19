@@ -1,8 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.common.CommonResult;
-import com.example.demo.request.GetTrademarkRequest;
-import com.example.demo.request.NewTrademarkRequest;
+import com.example.demo.request.*;
 import com.example.demo.service.TrademarkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -58,6 +57,77 @@ public class TrademarkController {
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/newBonus")
+    public CommonResult newBonus(@Valid @RequestBody NewTrademarkBonusRequest request, BindingResult bindingResult) {
+        CommonResult result = null;
+        try {
+            result = trademarkService.newBonus(request);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/getBonus")
+    public CommonResult getBonus(@Valid @RequestBody GetTrademarkBonusRequest request, BindingResult bindingResult) {
+        CommonResult result = null;
+        try {
+            result = trademarkService.getBonus(request);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @DeleteMapping("/deleteBonus")
+    public CommonResult deleteBonus(@RequestParam("trademarkCode") String trademarkCode,
+                                    @RequestParam("inventorName") String inventorName) {
+        try {
+            return trademarkService.deleteBonus(trademarkCode, inventorName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/newOfficialFee")
+    public CommonResult newOfficialFee(@Valid @RequestBody NewTrademarkOfficialFeeRequest request, BindingResult bindingResult) {
+        try {
+            return trademarkService.newOfficialFee(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/getOfficialFee")
+    public CommonResult getOfficialFee(@Valid @RequestBody GetTrademarkOfficialFeeRequest request, BindingResult bindingResult) {
+        try {
+            return trademarkService.getOfficialFee(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @DeleteMapping("/deleteOfficialFee")
+    public CommonResult deleteOfficialFee(@RequestParam("officialFeeId") Long officialFeeId) {
+        try {
+            return trademarkService.deleteOfficialFee(officialFeeId);
+        } catch (Exception e) {
+            e.printStackTrace();
             return CommonResult.failed(e.getMessage());
         }
     }

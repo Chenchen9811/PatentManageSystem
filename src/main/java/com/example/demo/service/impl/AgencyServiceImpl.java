@@ -70,8 +70,9 @@ public class AgencyServiceImpl implements AgencyService {
             agency.setAgencyEmail(request.getAgencyEmail());
             agency.setAgencyAddress(request.getAgencyAddress());
             agency.setAgencyRemark(request.getAgencyRemark());
-            agencyMapper.insert(agency);
-            return CommonResult.success(null, "添加代理机构成功");
+
+            return agencyMapper.insert(agency) != 0 ?
+                    CommonResult.success(null, "添加代理机构成功") : CommonResult.failed("添加失败");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

@@ -181,12 +181,69 @@ public class PatentController {
         }
     }
 
+
     @ResponseBody
     @DeleteMapping("/deleteAnnualFee")
     public CommonResult deleteAnnualFee(@RequestParam("annualFeeCode") String annualFeeCode) {
         CommonResult result = null;
         try {
             result = patentService.deleteAnnualFee(annualFeeCode);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+
+    @ResponseBody
+    @PostMapping("/newBonus")
+    public CommonResult newBonus(@Valid @RequestBody NewPatentBonusRequest request, BindingResult bindingResult) {
+        CommonResult result = null;
+        try {
+            result = patentService.newBonus(request);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/getBonus")
+    public CommonResult getBonus(@RequestParam("patentCode") String patentCode,
+                                 @RequestParam("pageIndex") Integer pageIndex,
+                                 @RequestParam("pageSize") Integer pageSize) {
+        CommonResult result = null;
+        try {
+            result = patentService.getBonus(patentCode, pageIndex, pageSize);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @DeleteMapping("/deleteBonus")
+    public CommonResult deleteBonus(@RequestParam("patentCode") String patentCode,
+                                    @RequestParam("inventorName") String inventorName) {
+        CommonResult result = null;
+        try {
+            result = patentService.deleteBonus(patentCode, inventorName);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/updateBonus")
+    public CommonResult updateBonus(@Valid @RequestBody NewPatentBonusRequest request, BindingResult bindingResult) {
+        CommonResult result = null;
+        try {
+            result = patentService.updateBonus(request);
             return result;
         } catch (Exception e) {
             e.printStackTrace();

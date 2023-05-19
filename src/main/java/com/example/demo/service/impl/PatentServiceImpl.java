@@ -7,14 +7,12 @@ import com.example.demo.Utils.HostHolder;
 import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.*;
-import com.example.demo.mapper.PatentAnnualFeeMapper;
-import com.example.demo.mapper.PatentOfficialFeeMapper;
+import com.example.demo.mapper.*;
 import com.example.demo.request.*;
 import com.example.demo.response.GetPatentAnnualFeeResponse;
+import com.example.demo.response.GetPatentBonusResponse;
 import com.example.demo.response.GetPatentOfficialFeeResponse;
 import com.example.demo.response.GetPatentResponse;
-import com.example.demo.mapper.PatentInventorMapper;
-import com.example.demo.mapper.PatentMapper;
 import com.example.demo.service.DepartmentService;
 import com.example.demo.service.PatentService;
 import com.example.demo.service.ProposalService;
@@ -61,12 +59,122 @@ public class PatentServiceImpl implements PatentService {
     @Resource
     private PatentAnnualFeeMapper annualFeeMapper;
 
+    @Resource
+    private PatentBonusMapper bonusMapper;
+
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult updateBonus(NewPatentBonusRequest request) {
+        try {
+            Patent patent = this.findPatentByCode(request.getPatentCode());
+            List<PatentBonus> bonusList = this.findBonusByPatentId(patent.getId());
+            if (0 != bonusList.size()) {
+                bonusMapper.deleteBatchIds(bonusList.stream().map(PatentBonus::getId).collect(Collectors.toList()));
+            }
+            return this.newBonus(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult deleteBonus(String patentCode, String inventorName) {
+        try {
+            return bonusMapper.delete(new LambdaQueryWrapper<PatentBonus>()
+                    .eq(PatentBonus::getPatentId, this.findPatentByCode(patentCode).getId())
+                    .eq(PatentBonus::getInventorName, inventorName)) == 0? CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public CommonResult getBonus(String patentCode, Integer pageIndex, Integer pageSize) {
+        try {
+            List<PatentBonus> bonusList = null;
+            if (StringUtils.isNotBlank(patentCode)) {
+                Patent patent = this.findPatentByCode(patentCode);
+                bonusList = bonusMapper.selectList(new LambdaQueryWrapper<PatentBonus>()
+                        .eq(PatentBonus::getPatentId, patent.getId())
+                        .orderByAsc(PatentBonus::getRanking));
+            } else {
+                bonusList = bonusMapper.selectList(new LambdaQueryWrapper<PatentBonus>()
+                        .orderByAsc(PatentBonus::getPatentId, PatentBonus::getRanking));
+            }
+            return CommonResult.success(PageInfoUtil.getPageInfo(
+                    bonusList.stream().map(bonus -> {
+                        GetPatentBonusResponse response = new GetPatentBonusResponse();
+                        Patent patent = this.findPatentById(bonus.getPatentId());
+                        response.setPatentBonusId(bonus.getId());
+                        response.setBonusAmount(bonus.getBonusAmount());
+                        response.setRanking(bonus.getRanking());
+                        response.setPatentCode(patent.getPatentCode());
+                        response.setBonusType(bonus.getBonusType());
+                        response.setPatentType(patent.getPatentType());
+                        response.setActualRelease(bonus.getActualRelease());
+                        response.setReleaseStatus(bonus.getReleaseStatus());
+                        return response;
+                    }).collect(Collectors.toList()), pageIndex, pageSize), "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult newBonus(NewPatentBonusRequest request) {
+        try {
+            // 验重
+            Patent patent = this.findPatentByCode(request.getPatentCode());
+            List<PatentBonus> bonusList = this.findBonusByPatentId(patent.getId());
+            if (bonusList.size() != 0) {
+                return CommonResult.failed("该专利已存在奖金");
+            }
+            bonusList = new ArrayList<>();
+            List<NewPatentBonusRequest.inventor> inventorList = request.getInventorList();
+            Collections.sort(inventorList, new Comparator<NewPatentBonusRequest.inventor>() {
+                @Override
+                public int compare(NewPatentBonusRequest.inventor o1, NewPatentBonusRequest.inventor o2) {
+                    return Integer.parseInt(o2.getActualRelease()) - Integer.parseInt(o1.getActualRelease());
+                }
+            });
+            int size = inventorList.size();
+            for (int i = 0; i < size; i++) {
+                NewPatentBonusRequest.inventor inventor = inventorList.get(i);
+                PatentBonus patentBonus = new PatentBonus();
+                patentBonus.setPatentId(patent.getId());
+                patentBonus.setBonusAmount(request.getBonusAmount());
+                patentBonus.setInventorName(inventor.getInventorName());
+                patentBonus.setActualRelease(inventor.getActualRelease());
+                patentBonus.setBonusType(request.getBonusType());
+                patentBonus.setReleaseStatus(request.getReleaseStatus());
+                patentBonus.setRanking(i + 1);
+                bonusList.add(patentBonus);
+            }
+
+            return bonusMapper.insertBatchSomeColumn(bonusList) == 0 ?
+                    CommonResult.failed("新增失败") :
+                    CommonResult.success(null, "新增成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult deleteAnnualFee(String annualFeeCode) {
         try {
-            return annualFeeMapper.delete(new LambdaQueryWrapper<PatentAnnualFee>().eq(PatentAnnualFee::getAnnualFeeCode, annualFeeCode)) == 0?
+            return annualFeeMapper.delete(new LambdaQueryWrapper<PatentAnnualFee>().eq(PatentAnnualFee::getAnnualFeeCode, annualFeeCode)) == 0 ?
                     CommonResult.failed("删除失败") :
                     CommonResult.success(null, "删除成功");
         } catch (Exception e) {
@@ -84,10 +192,8 @@ public class PatentServiceImpl implements PatentService {
             annualFee = patentManager.getUpdatedAnnualFee(request, annualFee);
             LambdaUpdateWrapper<PatentAnnualFee> updateWrapper = new LambdaUpdateWrapper<>();
             updateWrapper.eq(PatentAnnualFee::getAnnualFeeCode, request.getAnnualFeeCode());
-
-            return annualFeeMapper.update(annualFee, updateWrapper) == 0?
-                    CommonResult.failed("编辑失败") :
-                    CommonResult.success(null, "编辑成功");
+            return annualFeeMapper.update(annualFee, updateWrapper) == 0 ?
+                    CommonResult.failed("编辑失败") : CommonResult.success(null, "编辑成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -126,7 +232,7 @@ public class PatentServiceImpl implements PatentService {
                         response.setPayStatus(annualFee.getPayStatus());
                         response.setActualPayDate(CommonUtil.getYmdbyTimeStamp(annualFee.getActualPayDate()));
                         return response;
-                    }).collect(Collectors.toList()), pageIndex,pageSize), "查找成功");
+                    }).collect(Collectors.toList()), pageIndex, pageSize), "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -423,5 +529,13 @@ public class PatentServiceImpl implements PatentService {
         return annualFeeMapper.selectOne(new LambdaQueryWrapper<PatentAnnualFee>().eq(PatentAnnualFee::getAnnualFeeCode, annualFeeCode));
     }
 
+    @Override
+    public List<PatentBonus> findBonusByPatentId(Long patentId) {
+        return bonusMapper.selectList(new LambdaQueryWrapper<PatentBonus>().eq(PatentBonus::getPatentId, patentId));
+    }
 
+    @Override
+    public Patent findPatentById(Long patentId) {
+        return patentMapper.selectById(patentId);
+    }
 }

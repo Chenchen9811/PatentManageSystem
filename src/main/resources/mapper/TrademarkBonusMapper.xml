@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.TrademarkBonusMapper">
+
+<select id="findBonusListByTrademarkCode" resultType="com.example.demo.entity.TrademarkBonus">
+    SELECT
+        t1.id,
+        t1.trademark_id,
+        t1.inventor_name,
+        t1.ranking,
+        t1.actual_release,
+        t1.release_status,
+        t1.bonus_type,
+        t1.bonus_amount
+    FROM
+        t_trademark_bonus t1
+            LEFT JOIN t_trademark t2 ON t1.trademark_id = t2.id
+    WHERE
+        t2.trademark_code = #{trademarkCode}
+    </select>
+</mapper>
