@@ -7,10 +7,15 @@ import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.Department;
 import com.example.demo.entity.Software;
+import com.example.demo.entity.SoftwareOfficialFee;
 import com.example.demo.entity.User;
 import com.example.demo.mapper.SoftwareMapper;
+import com.example.demo.mapper.SoftwareOfficialFeeMapper;
+import com.example.demo.request.GetSoftwareOfficialFeeRequest;
 import com.example.demo.request.GetSoftwareRequest;
+import com.example.demo.request.NewSoftwareOfficialFeeRequest;
 import com.example.demo.request.NewSoftwareRequest;
+import com.example.demo.response.GetSoftwareOfficialFeeResponse;
 import com.example.demo.response.GetSoftwareResponse;
 import com.example.demo.service.DepartmentService;
 import com.example.demo.service.SoftwareService;
@@ -43,11 +48,79 @@ public class SoftwareServiceImpl implements SoftwareService {
     @Resource
     private HostHolder hostHolder;
 
+    @Resource
+    private SoftwareOfficialFeeMapper officialFeeMapper;
+
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public Software findSoftwareByName(String softwareName) {
-        return softwareMapper.selectOne(new LambdaQueryWrapper<Software>().eq(Software::getSoftwareName, softwareName));
+    public CommonResult deleteOfficialFee(String officialFeeCode) {
+        try {
+            // 验证是否存在
+            SoftwareOfficialFee officialFee = this.findOfficialFeeByCode(officialFeeCode);
+            if (null == officialFee) {
+                return CommonResult.failed("要删除的官费不存在");
+            }
+            return officialFeeMapper.deleteById(officialFee.getId()) != 0 ? CommonResult.success(null, "删除成功") : CommonResult.failed("删除失败");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
     }
 
+    @Override
+    public CommonResult getOfficialFee(GetSoftwareOfficialFeeRequest request) {
+        try {
+            LambdaQueryWrapper<SoftwareOfficialFee> wrapper = softwareManager.getWrapper(request);
+            List<SoftwareOfficialFee> officialFeeList = officialFeeMapper.selectList(wrapper);
+            List<GetSoftwareOfficialFeeResponse> list = officialFeeList.stream().map(fee -> {
+                GetSoftwareOfficialFeeResponse response = new GetSoftwareOfficialFeeResponse();
+                response.setOfficialFeeCode(fee.getOfficialFeeCode());
+                response.setOfficialFeeName(fee.getOfficialFeeName());
+                response.setActualAmount(fee.getActualAmount());
+                response.setDueAmount(fee.getDueAmount());
+                response.setDueDate(fee.getDueDate().toString());
+                response.setActualPayDate(fee.getActualPayDate().toString());
+                response.setPayStatus(fee.getPayStatus());
+                response.setRemark(fee.getRemark());
+                return response;
+            }).collect(Collectors.toList());
+            return CommonResult.success(PageInfoUtil.getPageInfo(list, request.getPageIndex(), request.getPageSize()), "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult newOfficialFee(NewSoftwareOfficialFeeRequest request) {
+        try {
+            // 验重
+            SoftwareOfficialFee officialFee = this.findOfficialFeeByName(request.getOfficialFeeName());
+            if (null != officialFee) {
+                return CommonResult.failed("该软著官费已存在");
+            }
+            Software software = this.findSoftwareByCode(request.getSoftwareCode());
+            officialFee = new SoftwareOfficialFee();
+            officialFee.setOfficialFeeName(request.getOfficialFeeName());
+            officialFee.setOfficialFeeCode(CommonUtil.generateCode("SoftwareOFee"));
+            officialFee.setActualAmount(request.getActualAmount());
+            officialFee.setDueAmount(request.getDueAmount());
+            officialFee.setActualPayDate(CommonUtil.stringToDate(request.getActualPayDate()));
+            officialFee.setDueDate(CommonUtil.stringToDate(request.getDueDate()));
+            officialFee.setSoftwareId(software.getId());
+            officialFee.setRemark(request.getRemark());
+            officialFee.setPayStatus(request.getPayStatus());
+            return officialFeeMapper.insert(officialFee) != 0 ?
+                    CommonResult.success(null, "新增软著官费成功") : CommonResult.failed("新增软著官费失败");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
 
     @Override
     public CommonResult software(Integer pageIndex, Integer pageSize, Integer isDepartment) throws Exception {
@@ -136,14 +209,14 @@ public class SoftwareServiceImpl implements SoftwareService {
             software.setRegisterCode(request.getRegisterCode());
             software.setCertificateCode(request.getCertificateCode());
             software.setArchiveCode(request.getArchiveCode());
-            software.setApplicationDate(request.getApplicationDate() == null? null : CommonUtil.stringDateToTimeStamp(request.getApplicationDate()));
-            software.setCertificateDate(request.getCertificateDate() == null? null : CommonUtil.stringDateToTimeStamp(request.getCertificateDate()));
-            software.setArchiveDate(request.getArchiveDate() == null? null : CommonUtil.stringDateToTimeStamp(request.getArchiveDate()));
+            software.setApplicationDate(request.getApplicationDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getApplicationDate()));
+            software.setCertificateDate(request.getCertificateDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getCertificateDate()));
+            software.setArchiveDate(request.getArchiveDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getArchiveDate()));
             software.setRightStatus(request.getRightStatus());
             software.setRightRange(request.getRightRange());
-            software.setProposalDate(request.getProposalDate() == null? null : CommonUtil.stringDateToTimeStamp(request.getProposalDate()));
-            software.setFinishDate(request.getFinishDate() == null? null : CommonUtil.stringDateToTimeStamp(request.getFinishDate()));
-            software.setPublishDate(request.getPublishDate() == null? null : CommonUtil.stringDateToTimeStamp(request.getPublishDate()));
+            software.setProposalDate(request.getProposalDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getProposalDate()));
+            software.setFinishDate(request.getFinishDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getFinishDate()));
+            software.setPublishDate(request.getPublishDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getPublishDate()));
             softwareMapper.insert(software);
             return CommonResult.success(null, "添加软著成功");
         } catch (Exception e) {
@@ -151,5 +224,25 @@ public class SoftwareServiceImpl implements SoftwareService {
             log.error(e.getMessage());
             throw new Exception(e.getMessage());
         }
+    }
+
+    @Override
+    public Software findSoftwareByName(String softwareName) {
+        return softwareMapper.selectOne(new LambdaQueryWrapper<Software>().eq(Software::getSoftwareName, softwareName));
+    }
+
+    @Override
+    public SoftwareOfficialFee findOfficialFeeByName(String officialFeeName) {
+        return officialFeeMapper.selectOne(new LambdaQueryWrapper<SoftwareOfficialFee>().eq(SoftwareOfficialFee::getOfficialFeeName, officialFeeName));
+    }
+
+    @Override
+    public Software findSoftwareByCode(String softwareCode) {
+        return softwareMapper.selectOne(new LambdaQueryWrapper<Software>().eq(Software::getSoftwareCode, softwareCode));
+    }
+
+    @Override
+    public SoftwareOfficialFee findOfficialFeeByCode(String officialFeeCode) {
+        return officialFeeMapper.selectOne(new LambdaQueryWrapper<SoftwareOfficialFee>().eq(SoftwareOfficialFee::getOfficialFeeCode, officialFeeCode));
     }
 }

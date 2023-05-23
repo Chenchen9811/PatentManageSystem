@@ -58,7 +58,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                 response.sendRedirect(request.getContextPath() + "/user/login");
             }
         }
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         CommonResult.unauthorized(ResultCode.UNAUTHORIZED.getMessage());
 //        response.sendRedirect(request.getContextPath() + "/user/login");
         return false;

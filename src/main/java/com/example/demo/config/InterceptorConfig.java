@@ -27,6 +27,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
         excludePath.add("/user/login"); //登录
         excludePath.add("/user/logout"); //登出
         excludePath.add("/assets/**");  //静态资源
+        excludePath.add("/file/**");
 
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")

@@ -3,6 +3,8 @@ package com.example.demo.service.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.demo.entity.Software;
+import com.example.demo.entity.SoftwareOfficialFee;
+import com.example.demo.request.GetSoftwareOfficialFeeRequest;
 import com.example.demo.request.GetSoftwareRequest;
 import com.example.demo.service.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +18,26 @@ public class SoftwareManager {
 
     @Resource
     private UserService userService;
+
+    public LambdaQueryWrapper<SoftwareOfficialFee> getWrapper(GetSoftwareOfficialFeeRequest request) {
+        LambdaQueryWrapper<SoftwareOfficialFee> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.isNotBlank(request.getOfficialFeeName())) {
+            wrapper.eq(SoftwareOfficialFee::getOfficialFeeName, request.getOfficialFeeName());
+        }
+        if (StringUtils.isNotBlank(request.getDueDateBegin()) && StringUtils.isNotBlank(request.getDueDateEnd())) {
+            wrapper.between(SoftwareOfficialFee::getDueDate, request.getDueDateBegin(), request.getDueDateEnd());
+        }
+        if (StringUtils.isNotBlank(request.getActualPayDateBegin()) && StringUtils.isNotBlank(request.getActualPayDateEnd())) {
+            wrapper.between(SoftwareOfficialFee::getActualPayDate, request.getActualPayDateBegin(), request.getActualPayDateEnd());
+        }
+        if (StringUtils.isNotBlank(request.getDueAmount())) {
+            wrapper.eq(SoftwareOfficialFee::getDueAmount, request.getDueAmount());
+        }
+        if (StringUtils.isNotBlank(request.getActualAmount())) {
+            wrapper.eq(SoftwareOfficialFee::getActualAmount, request.getActualAmount());
+        }
+        return wrapper;
+    }
 
     public LambdaQueryWrapper<Software> getWrapperByGetSoftwareRequest(GetSoftwareRequest request) {
         LambdaQueryWrapper<Software> wrapper = new LambdaQueryWrapper<>();

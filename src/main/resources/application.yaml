@@ -22,3 +22,7 @@ logging:
     root: info
 server:
   port: 8080
+
+file:
+  upload:
+    url: D:\file

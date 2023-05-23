@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -105,6 +106,11 @@ public class CommonUtil {
             log.error("转换有异常>>>>>>>"+e.getMessage());
             return null;
         }
+    }
+
+    public static String getFilePath(File file) {
+        String absolutePath = file.getAbsolutePath();
+        return absolutePath.substring(0, absolutePath.lastIndexOf(File.separator));
     }
 
     public static String getYmdbyTimeStamp(Timestamp timestamp) {

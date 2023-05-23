@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
 import com.example.demo.common.CommonResult;
+import com.example.demo.request.GetSoftwareOfficialFeeRequest;
 import com.example.demo.request.GetSoftwareRequest;
+import com.example.demo.request.NewSoftwareOfficialFeeRequest;
 import com.example.demo.request.NewSoftwareRequest;
 import com.example.demo.service.SoftwareService;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +62,39 @@ public class SoftwareController {
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/newOfficialFee")
+    public CommonResult newOfficialFee(@Valid @RequestBody NewSoftwareOfficialFeeRequest request, BindingResult bindingResult) {
+        try {
+            return softwareService.newOfficialFee(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/getOfficialFee")
+    public CommonResult getOfficialFee(@Valid @RequestBody GetSoftwareOfficialFeeRequest request, BindingResult bindingResult) {
+        try {
+            return softwareService.getOfficialFee(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @DeleteMapping("/deleteOfficialFee")
+    public CommonResult deleteOfficialFee(@RequestParam("officialFeeCode") String officialFeeCode) {
+        try {
+            return softwareService.deleteOfficialFee(officialFeeCode);
+        } catch (Exception e) {
+            e.printStackTrace();
             return CommonResult.failed(e.getMessage());
         }
     }
