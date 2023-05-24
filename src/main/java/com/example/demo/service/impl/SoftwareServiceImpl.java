@@ -66,20 +66,20 @@ public class SoftwareServiceImpl implements SoftwareService {
             List<User> uploaderList = null;
             // 查询满足条件是softwareList
             softwareList = softwareMapper.selectList(wrapper);
-            if (softwareList.size() == 0) return CommonResult.failed("softwareList为空," + "暂无结果");
+            if (softwareList.size() == 0) return CommonResult.failed("查找不到相关软著");
             // 查询满足File条件的softwareFileList
             LambdaQueryWrapper<SoftwareFile> fileWrapper = softwareManager.getFileWrapper(request);
             fileList = fileMapper.selectList(fileWrapper);
             if (fileList.size() == 0) return CommonResult.failed("暂无对应文件");
             List<Long> softwareIds = fileList.stream().map(SoftwareFile::getSoftwareId).collect(Collectors.toList());
-//            softwareList = softwareList.stream().filter(software -> softwareIds.contains(software.getId())).collect(Collectors.toList());
-            List<Long> proposalIds = new ArrayList<>();
-            for (Software software : softwareList) {
-                if (softwareIds.contains(software.getId())) proposalIds.add(software.getProposalId());
-            }
-            if (proposalIds.size() == 0) return CommonResult.failed("proposalIds为空," + "暂无结果");
-            proposalList = proposalService.findProposalListByIds(proposalIds);
-            if (proposalList.size() == 0) return CommonResult.failed("proposalList为空," + "暂无结果");
+            softwareList = softwareList.stream().filter(software -> softwareIds.contains(software.getId())).collect(Collectors.toList());
+//            List<Long> proposalIds = new ArrayList<>();
+//            for (Software software : softwareList) {
+//                if (softwareIds.contains(software.getId())) proposalIds.add(software.getProposalId());
+//            }
+            if (softwareList.size() == 0) return CommonResult.failed("没有找到符合条件的软著");
+            proposalList = proposalService.findProposalListByIds(softwareList.stream().map(Software::getProposalId).collect(Collectors.toList()));
+            if (proposalList.size() == 0) return CommonResult.failed("查找的软著没有对应的提案");
             uploaderList = userService.findUserListByIds(fileList.stream().map(SoftwareFile::getUploaderId).collect(Collectors.toList()));
             Map<Long, Software> softwareMap = new HashMap<>();
             Map<Long, Proposal> proposalMap = new HashMap<>();
