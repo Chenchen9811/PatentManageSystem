@@ -1,7 +1,9 @@
 package com.example.demo.Utils;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.common.Constants;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -12,7 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
-public class CommonUtil {
+public class CommonUtil implements Constants {
+
+
     /**
      * 获取ip地址
      *
@@ -106,6 +110,10 @@ public class CommonUtil {
             log.error("转换有异常>>>>>>>"+e.getMessage());
             return null;
         }
+    }
+
+    public static String getFileUrl(String fileName) {
+        return UPLOAD_PATH + File.separator + fileName;
     }
 
     public static String getFilePath(File file) {

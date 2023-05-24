@@ -9,10 +9,7 @@ import com.example.demo.common.CommonResult;
 import com.example.demo.entity.*;
 import com.example.demo.mapper.*;
 import com.example.demo.request.*;
-import com.example.demo.response.GetPatentAnnualFeeResponse;
-import com.example.demo.response.GetPatentBonusResponse;
-import com.example.demo.response.GetPatentOfficialFeeResponse;
-import com.example.demo.response.GetPatentResponse;
+import com.example.demo.response.*;
 import com.example.demo.service.DepartmentService;
 import com.example.demo.service.PatentService;
 import com.example.demo.service.ProposalService;
@@ -25,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,6 +60,85 @@ public class PatentServiceImpl implements PatentService {
     @Resource
     private PatentBonusMapper bonusMapper;
 
+    @Resource
+    private PatentFileMapper fileMapper;
+
+
+    @Override
+    public CommonResult getFileInfo(GetPatentFileInfoRequest request) {
+        try {
+            List<Patent> patentList = null;
+            List<PatentFile> fileList = null;
+            List<User> uploaderList = null;
+            LambdaQueryWrapper<PatentFile> wrapper = patentManager.getWrapper(request);
+            Map<Long, Patent> patentMap = new HashMap<>();
+            Map<Long, User> uploaderMap = new HashMap<>();
+            if (StringUtils.isNotBlank(request.getPatentCode())) {
+                // 如果专利编号不为空，就差某个专利的所有文件信息
+                patentList = new ArrayList<>();
+                Patent patent = this.findPatentByCode(request.getPatentCode());
+                patentList.add(patent);
+                wrapper.eq(PatentFile::getPatentId, patent.getId());
+                fileList = fileMapper.selectList(wrapper);
+            }
+            else {
+                // 专利编号不为空，那么所有专利的文件信息都要查，然后再过滤一部分PatentFile的查询条件
+                patentList = patentMapper.selectList(new LambdaQueryWrapper<Patent>());
+                fileList = fileMapper.selectList(wrapper);
+            }
+            uploaderList = userService.findUserListByIds(fileList.stream().map(PatentFile::getUploaderId).distinct().collect(Collectors.toList()));
+            for (Patent patent : patentList) {
+                patentMap.put(patent.getId(), patent);
+            }
+            for (User user : uploaderList) {
+                uploaderMap.put(user.getId(), user);
+            }
+            List<GetPatentFileInfoResponse> responseList = fileList.stream().map(file -> {
+                GetPatentFileInfoResponse response = new GetPatentFileInfoResponse();
+                User uploader = uploaderMap.get(file.getUploaderId());
+                Patent patent = patentMap.get(file.getPatentId());
+                response.setFileName(file.getFileName());
+                response.setFileStatus(file.getFileStatus());
+                response.setFileType(file.getFileType());
+                response.setPatentCode(patent.getPatentCode());
+                response.setUploaderName(uploader.getUserName());
+                response.setUploadDate(file.getUploadDate().toString());
+                return response;
+            }).collect(Collectors.toList());
+
+            return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult newFileInfo(NewPatentFileInfoRequest request) {
+        try {
+            // 验重
+            PatentFile file = this.findFileByName(request.getFileName());
+            if (null != file) {
+                return CommonResult.failed("该文件已存在");
+            }
+            file = new PatentFile();
+            file.setFileName(request.getFileName());
+            file.setFileStatus(request.getFileStatus());
+            Patent patent = this.findPatentByCode(request.getPatentCode());
+            file.setPatentId(patent.getId());
+            file.setUploaderId(hostHolder.getUser().getId());
+            file.setUploadDate(new Date(System.currentTimeMillis()));
+            file.setFileUrl(CommonUtil.getFileUrl(request.getFileName()));
+            file.setFileType(request.getFileType());
+            return fileMapper.insert(file) != 0 ? CommonResult.success(null, "新增文件成功") : CommonResult.failed("新增文件失败");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -86,7 +163,7 @@ public class PatentServiceImpl implements PatentService {
         try {
             return bonusMapper.delete(new LambdaQueryWrapper<PatentBonus>()
                     .eq(PatentBonus::getPatentId, this.findPatentByCode(patentCode).getId())
-                    .eq(PatentBonus::getInventorName, inventorName)) == 0? CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
+                    .eq(PatentBonus::getInventorName, inventorName)) == 0 ? CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -537,5 +614,15 @@ public class PatentServiceImpl implements PatentService {
     @Override
     public Patent findPatentById(Long patentId) {
         return patentMapper.selectById(patentId);
+    }
+
+    @Override
+    public PatentFile findFileByName(String fileName) {
+        return fileMapper.selectOne(new LambdaQueryWrapper<PatentFile>().eq(PatentFile::getFileName, fileName));
+    }
+
+    @Override
+    public PatentFile findFileByPatentId(Long patentId) {
+        return fileMapper.selectOne(new LambdaQueryWrapper<PatentFile>().eq(PatentFile::getPatentId, patentId));
     }
 }

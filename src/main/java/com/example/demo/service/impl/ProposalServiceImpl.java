@@ -225,4 +225,9 @@ public class ProposalServiceImpl implements ProposalService {
             throw new Exception(e.getMessage());
         }
     }
+
+    @Override
+    public List<Proposal> findProposalListByIds(List<Long> proposalIds) {
+        return proposalMapper.selectBatchIds(proposalIds);
+    }
 }

@@ -5,16 +5,26 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.example.demo.Utils.CommonUtil;
 import com.example.demo.entity.Patent;
 import com.example.demo.entity.PatentAnnualFee;
+import com.example.demo.entity.PatentFile;
 import com.example.demo.entity.PatentOfficialFee;
-import com.example.demo.request.GetPatentOfficialFeeRequest;
-import com.example.demo.request.GetPatentRequest;
-import com.example.demo.request.UpdateAnnualFeeRequest;
-import com.example.demo.request.UpdatePatentOfficialFeeRequest;
+import com.example.demo.request.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PatentManager {
+
+    public LambdaQueryWrapper<PatentFile> getWrapper(GetPatentFileInfoRequest request) {
+        LambdaQueryWrapper<PatentFile> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.isNotBlank(request.getFileName())) {
+            wrapper.eq(PatentFile::getFileName, request.getFileName());
+        }
+        if (StringUtils.isNotBlank(request.getUploadDateBegin()) && StringUtils.isNotBlank(request.getUploadDateEnd())) {
+            wrapper.between(PatentFile::getUploadDate, request.getUploadDateBegin(), request.getUploadDateEnd());
+        }
+        wrapper.eq(PatentFile::getFileType, request.getFileType());
+        return wrapper;
+    }
 
 
     public PatentAnnualFee getUpdatedAnnualFee(UpdateAnnualFeeRequest request, PatentAnnualFee annualFee) {

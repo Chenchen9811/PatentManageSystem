@@ -5,28 +5,30 @@ import com.example.demo.Utils.CommonUtil;
 import com.example.demo.Utils.HostHolder;
 import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
-import com.example.demo.entity.Department;
-import com.example.demo.entity.Software;
-import com.example.demo.entity.SoftwareOfficialFee;
-import com.example.demo.entity.User;
+import com.example.demo.entity.*;
+import com.example.demo.mapper.SoftwareFileMapper;
 import com.example.demo.mapper.SoftwareMapper;
 import com.example.demo.mapper.SoftwareOfficialFeeMapper;
-import com.example.demo.request.GetSoftwareOfficialFeeRequest;
-import com.example.demo.request.GetSoftwareRequest;
-import com.example.demo.request.NewSoftwareOfficialFeeRequest;
-import com.example.demo.request.NewSoftwareRequest;
+import com.example.demo.request.*;
+import com.example.demo.response.GetSoftwareFileInfoResponse;
 import com.example.demo.response.GetSoftwareOfficialFeeResponse;
 import com.example.demo.response.GetSoftwareResponse;
 import com.example.demo.service.DepartmentService;
+import com.example.demo.service.ProposalService;
 import com.example.demo.service.SoftwareService;
 import com.example.demo.service.UserService;
 import com.example.demo.service.manager.SoftwareManager;
+import com.sun.corba.se.spi.copyobject.CopierManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +36,7 @@ import java.util.stream.Collectors;
 public class SoftwareServiceImpl implements SoftwareService {
 
     @Resource
-    private DepartmentService departmentService;
+    private ProposalService proposalService;
 
     @Resource
     private UserService userService;
@@ -50,6 +52,94 @@ public class SoftwareServiceImpl implements SoftwareService {
 
     @Resource
     private SoftwareOfficialFeeMapper officialFeeMapper;
+
+    @Resource
+    private SoftwareFileMapper fileMapper;
+
+    @Override
+    public CommonResult getFileInfo(GetSoftwareFileInfoRequest request) {
+        try {
+            LambdaQueryWrapper<Software> wrapper = softwareManager.getWrapper(request);
+            List<Software> softwareList = null;
+            List<Proposal> proposalList = null;
+            List<SoftwareFile> fileList = null;
+            List<User> uploaderList = null;
+            // 查询满足条件是softwareList
+            softwareList = softwareMapper.selectList(wrapper);
+            if (softwareList.size() == 0) return CommonResult.failed("softwareList为空," + "暂无结果");
+            // 查询满足File条件的softwareFileList
+            LambdaQueryWrapper<SoftwareFile> fileWrapper = softwareManager.getFileWrapper(request);
+            fileList = fileMapper.selectList(fileWrapper);
+            if (fileList.size() == 0) return CommonResult.failed("暂无对应文件");
+            List<Long> softwareIds = fileList.stream().map(SoftwareFile::getSoftwareId).collect(Collectors.toList());
+//            softwareList = softwareList.stream().filter(software -> softwareIds.contains(software.getId())).collect(Collectors.toList());
+            List<Long> proposalIds = new ArrayList<>();
+            for (Software software : softwareList) {
+                if (softwareIds.contains(software.getId())) proposalIds.add(software.getProposalId());
+            }
+            if (proposalIds.size() == 0) return CommonResult.failed("proposalIds为空," + "暂无结果");
+            proposalList = proposalService.findProposalListByIds(proposalIds);
+            if (proposalList.size() == 0) return CommonResult.failed("proposalList为空," + "暂无结果");
+            uploaderList = userService.findUserListByIds(fileList.stream().map(SoftwareFile::getUploaderId).collect(Collectors.toList()));
+            Map<Long, Software> softwareMap = new HashMap<>();
+            Map<Long, Proposal> proposalMap = new HashMap<>();
+            Map<Long, User> uploaderMap = new HashMap<>();
+            for (Software software : softwareList) {
+                softwareMap.put(software.getId(), software);
+            }
+            for (Proposal proposal : proposalList) {
+                proposalMap.put(proposal.getId(), proposal);
+            }
+            for (User uploader : uploaderList) {
+                uploaderMap.put(uploader.getId(), uploader);
+            }
+            List<GetSoftwareFileInfoResponse> responseList = fileList.stream().map(file -> {
+                GetSoftwareFileInfoResponse response = new GetSoftwareFileInfoResponse();
+                Software software = softwareMap.get(file.getSoftwareId());
+                Proposal proposal = proposalMap.get(software.getProposalId());
+                User uploader = uploaderMap.get(file.getUploaderId());
+                response.setFileName(file.getFileName());
+                response.setProposalDate(CommonUtil.getYmdbyTimeStamp(proposal.getProposalDate()));
+                response.setDevelopWay(software.getDevelopWay());
+                response.setVersion(software.getVersion());
+                response.setRightRange(software.getRightRange());
+                response.setUploaderName(uploader.getUserName());
+                response.setProposerName(proposal.getProposerName());
+                return response;
+            }).collect(Collectors.toList());
+            return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult newFileInfo(NewSoftwareFileInfoRequest request) {
+        try {
+            // 验重
+            SoftwareFile file = this.findFileByName(request.getFileName());
+            if (null != file) {
+                return CommonResult.failed("该文件已存在");
+            }
+            Software software = this.findSoftwareByCode(request.getSoftwareCode());
+            file = new SoftwareFile();
+            file.setFileName(request.getFileName());
+            file.setFileType(request.getFileType());
+            file.setUploadDate(new Date(System.currentTimeMillis()));
+            file.setSoftwareId(software.getId());
+            file.setFileUrl(CommonUtil.getFileUrl(request.getFileName()));
+            file.setUploaderId(hostHolder.getUser().getId());
+            file.setFileStatus(request.getFileStatus() == null ? null : request.getFileStatus());
+            return fileMapper.insert(file) != 0 ? CommonResult.success(null, "添加文件成功") : CommonResult.failed("添加文件失败");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -244,5 +334,10 @@ public class SoftwareServiceImpl implements SoftwareService {
     @Override
     public SoftwareOfficialFee findOfficialFeeByCode(String officialFeeCode) {
         return officialFeeMapper.selectOne(new LambdaQueryWrapper<SoftwareOfficialFee>().eq(SoftwareOfficialFee::getOfficialFeeCode, officialFeeCode));
+    }
+
+    @Override
+    public SoftwareFile findFileByName(String fileName) {
+        return fileMapper.selectOne(new LambdaQueryWrapper<SoftwareFile>().eq(SoftwareFile::getFileName, fileName));
     }
 }

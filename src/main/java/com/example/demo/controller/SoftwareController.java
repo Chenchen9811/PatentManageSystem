@@ -1,10 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.common.CommonResult;
-import com.example.demo.request.GetSoftwareOfficialFeeRequest;
-import com.example.demo.request.GetSoftwareRequest;
-import com.example.demo.request.NewSoftwareOfficialFeeRequest;
-import com.example.demo.request.NewSoftwareRequest;
+import com.example.demo.request.*;
 import com.example.demo.service.SoftwareService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -93,6 +90,28 @@ public class SoftwareController {
     public CommonResult deleteOfficialFee(@RequestParam("officialFeeCode") String officialFeeCode) {
         try {
             return softwareService.deleteOfficialFee(officialFeeCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/newFileInfo")
+    public CommonResult newFileInfo(@Valid @RequestBody NewSoftwareFileInfoRequest request, BindingResult bindingResult) {
+        try {
+            return softwareService.newFileInfo(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/getFileInfo")
+    public CommonResult getFileInfo(@Valid @RequestBody GetSoftwareFileInfoRequest request, BindingResult bindingResult) {
+        try {
+            return softwareService.getFileInfo(request);
         } catch (Exception e) {
             e.printStackTrace();
             return CommonResult.failed(e.getMessage());

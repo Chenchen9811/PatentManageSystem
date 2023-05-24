@@ -2,11 +2,9 @@ package com.example.demo.service;
 
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.Software;
+import com.example.demo.entity.SoftwareFile;
 import com.example.demo.entity.SoftwareOfficialFee;
-import com.example.demo.request.GetSoftwareOfficialFeeRequest;
-import com.example.demo.request.GetSoftwareRequest;
-import com.example.demo.request.NewSoftwareOfficialFeeRequest;
-import com.example.demo.request.NewSoftwareRequest;
+import com.example.demo.request.*;
 
 public interface SoftwareService {
     CommonResult newSoftware(NewSoftwareRequest request) throws Exception;
@@ -19,6 +17,8 @@ public interface SoftwareService {
 
     SoftwareOfficialFee findOfficialFeeByCode(String officialFeeCode);
 
+    SoftwareFile findFileByName(String fileName);
+
     CommonResult getSoftware(GetSoftwareRequest request) throws Exception;
 
     CommonResult software(Integer pageIndex, Integer pageSize, Integer isDepartment) throws Exception;
@@ -28,4 +28,8 @@ public interface SoftwareService {
     CommonResult getOfficialFee(GetSoftwareOfficialFeeRequest request);
 
     CommonResult deleteOfficialFee(String officialFeeCode) throws Exception;
+
+    CommonResult newFileInfo(NewSoftwareFileInfoRequest request);
+
+    CommonResult getFileInfo(GetSoftwareFileInfoRequest request);
 }

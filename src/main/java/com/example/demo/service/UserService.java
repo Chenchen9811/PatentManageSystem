@@ -33,6 +33,8 @@ public interface UserService {
 
     List<Permission> findPermissionByRoleId(Long roleId);
 
+    List<User> findUserListByIds(List<Long> userIds);
+
     CommonResult addUser(AddUserRequest request) throws Exception;
 
     CommonResult updateUser(UpdateUserRequest result) throws Exception;

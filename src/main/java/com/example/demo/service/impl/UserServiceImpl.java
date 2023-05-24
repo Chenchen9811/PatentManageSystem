@@ -281,4 +281,9 @@ public class UserServiceImpl implements UserService {
         }
         return CommonResult.success(null, "删除成功!");
     }
+
+    @Override
+    public List<User> findUserListByIds(List<Long> userIds) {
+        return userMapper.selectBatchIds(userIds);
+    }
 }

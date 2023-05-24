@@ -1,10 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.common.CommonResult;
-import com.example.demo.entity.Patent;
-import com.example.demo.entity.PatentAnnualFee;
-import com.example.demo.entity.PatentBonus;
-import com.example.demo.entity.PatentOfficialFee;
+import com.example.demo.entity.*;
 import com.example.demo.request.*;
 
 import java.util.List;
@@ -32,6 +29,10 @@ public interface PatentService {
 
     List<PatentBonus> findBonusByPatentId(Long patentId);
 
+    PatentFile findFileByName(String fileName);
+
+    PatentFile findFileByPatentId(Long patentId);
+
     CommonResult getOfficialFee(GetPatentOfficialFeeRequest request) throws Exception;
 
     CommonResult updateOfficialFee(UpdatePatentOfficialFeeRequest request) throws Exception;
@@ -55,4 +56,8 @@ public interface PatentService {
     CommonResult deleteBonus(String patentCode, String inventorName);
 
     CommonResult updateBonus(NewPatentBonusRequest request);
+
+    CommonResult newFileInfo(NewPatentFileInfoRequest request);
+
+    CommonResult getFileInfo(GetPatentFileInfoRequest request);
 }

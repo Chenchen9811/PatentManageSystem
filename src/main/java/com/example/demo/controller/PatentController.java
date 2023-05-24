@@ -250,4 +250,26 @@ public class PatentController {
             return CommonResult.failed(e.getMessage());
         }
     }
+
+    @ResponseBody
+    @PostMapping("/newFileInfo")
+    public CommonResult newFileInfo(@Valid @RequestBody NewPatentFileInfoRequest request, BindingResult bindingResult) {
+        try {
+            return patentService.newFileInfo(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/getFileInfo")
+    public CommonResult getFileInfo(@Valid @RequestBody GetPatentFileInfoRequest request, BindingResult bindingResult) {
+        try {
+            return patentService.getFileInfo(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 }

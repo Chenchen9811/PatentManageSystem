@@ -3,7 +3,9 @@ package com.example.demo.service.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.demo.entity.Software;
+import com.example.demo.entity.SoftwareFile;
 import com.example.demo.entity.SoftwareOfficialFee;
+import com.example.demo.request.GetSoftwareFileInfoRequest;
 import com.example.demo.request.GetSoftwareOfficialFeeRequest;
 import com.example.demo.request.GetSoftwareRequest;
 import com.example.demo.service.UserService;
@@ -18,6 +20,26 @@ public class SoftwareManager {
 
     @Resource
     private UserService userService;
+
+    public LambdaQueryWrapper<Software> getWrapper(GetSoftwareFileInfoRequest request) {
+        LambdaQueryWrapper<Software> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.isNotBlank(request.getSoftwareCode())) {
+            wrapper.eq(Software::getSoftwareCode, request.getSoftwareCode());
+        }
+        return wrapper;
+    }
+
+    public LambdaQueryWrapper<SoftwareFile> getFileWrapper(GetSoftwareFileInfoRequest request) {
+        LambdaQueryWrapper<SoftwareFile> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SoftwareFile::getFileType, request.getFileType());
+        if (StringUtils.isNotBlank(request.getFileName())) {
+            wrapper.eq(SoftwareFile::getFileName, request.getFileName());
+        }
+        if (StringUtils.isNotBlank(request.getUploadDateBegin()) && StringUtils.isNotBlank(request.getUploadDateEnd())) {
+            wrapper.between(SoftwareFile::getUploadDate, request.getUploadDateBegin(), request.getUploadDateEnd());
+        }
+        return wrapper;
+    }
 
     public LambdaQueryWrapper<SoftwareOfficialFee> getWrapper(GetSoftwareOfficialFeeRequest request) {
         LambdaQueryWrapper<SoftwareOfficialFee> wrapper = new LambdaQueryWrapper<>();

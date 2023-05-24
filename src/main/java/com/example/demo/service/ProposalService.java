@@ -6,6 +6,8 @@ import com.example.demo.request.AddReviewRequest;
 import com.example.demo.request.GetProposalRequest1;
 import com.example.demo.request.NewProposalRequest;
 
+import java.util.List;
+
 public interface ProposalService {
     CommonResult newProposal(NewProposalRequest request) throws Exception;
 
@@ -22,4 +24,6 @@ public interface ProposalService {
     Proposal findProposalByProposalId(Long proposalId);
 
     CommonResult getCode(String typeName);
+
+    List<Proposal> findProposalListByIds(List<Long> proposalIds);
 }
