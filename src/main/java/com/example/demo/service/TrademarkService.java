@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.Trademark;
 import com.example.demo.entity.TrademarkBonus;
+import com.example.demo.entity.TrademarkFile;
 import com.example.demo.request.*;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public interface TrademarkService {
 
     List<TrademarkBonus> findBonusListByTrademarkId(Long trademarkId);
 
+    TrademarkFile findFileByName(String fileName);
+
     CommonResult getTrademark(GetTrademarkRequest request) throws Exception;
 
     CommonResult getDepartmentTrademark(Integer pageIndex, Integer pageSize, Integer isDepartment) throws Exception;
@@ -37,4 +40,8 @@ public interface TrademarkService {
     CommonResult getOfficialFee(GetTrademarkOfficialFeeRequest request);
 
     CommonResult deleteOfficialFee(Long officialFeeId);
+
+    CommonResult newFileInfo(NewTrademarkFileInfoRequest request);
+
+    CommonResult getFileInfo(GetTrademarkFileInfoRequest request);
 }

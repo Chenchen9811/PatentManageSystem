@@ -64,7 +64,7 @@ public class SoftwareServiceImpl implements SoftwareService {
             List<Proposal> proposalList = null;
             List<SoftwareFile> fileList = null;
             List<User> uploaderList = null;
-            // 查询满足条件是softwareList
+            // 查询满足条件的softwareList
             softwareList = softwareMapper.selectList(wrapper);
             if (softwareList.size() == 0) return CommonResult.failed("查找不到相关软著");
             // 查询满足File条件的softwareFileList
@@ -80,7 +80,7 @@ public class SoftwareServiceImpl implements SoftwareService {
             if (softwareList.size() == 0) return CommonResult.failed("没有找到符合条件的软著");
             proposalList = proposalService.findProposalListByIds(softwareList.stream().map(Software::getProposalId).collect(Collectors.toList()));
             if (proposalList.size() == 0) return CommonResult.failed("查找的软著没有对应的提案");
-            uploaderList = userService.findUserListByIds(fileList.stream().map(SoftwareFile::getUploaderId).collect(Collectors.toList()));
+            uploaderList = userService.findUserListByIds(fileList.stream().map(SoftwareFile::getUploaderId).distinct().collect(Collectors.toList()));
             Map<Long, Software> softwareMap = new HashMap<>();
             Map<Long, Proposal> proposalMap = new HashMap<>();
             Map<Long, User> uploaderMap = new HashMap<>();

@@ -7,6 +7,7 @@ import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.*;
 import com.example.demo.mapper.TrademarkBonusMapper;
+import com.example.demo.mapper.TrademarkFileMapper;
 import com.example.demo.mapper.TrademarkMapper;
 import com.example.demo.mapper.TrademarkOfficialFeeMapper;
 import com.example.demo.request.*;
@@ -15,6 +16,7 @@ import com.example.demo.response.GetTrademarkBonusResponse;
 import com.example.demo.response.GetTrademarkOfficialFeeResponse;
 import com.example.demo.response.GetTrademarkResponse;
 import com.example.demo.service.DepartmentService;
+import com.example.demo.service.ProposalService;
 import com.example.demo.service.TrademarkService;
 import com.example.demo.service.UserService;
 import com.example.demo.service.manager.TrademarkManager;
@@ -52,6 +54,107 @@ public class TrademarkServiceImpl implements TrademarkService {
 
     @Resource
     private TrademarkOfficialFeeMapper officialFeeMapper;
+
+    @Resource
+    private TrademarkFileMapper fileMapper;
+
+    @Resource
+    private ProposalService proposalService;
+
+
+    @Override
+    public CommonResult getFileInfo(GetTrademarkFileInfoRequest request) {
+        try {
+            List<Trademark> trademarkList = null;
+            List<TrademarkFile> fileList = null;
+            List<Proposal> proposalList = null;
+            List<User> uploaderList = null;
+            // 查询符合条件的商标
+            LambdaQueryWrapper<Trademark> trademarkWrapper = trademarkManager.getWrapper(request);
+            trademarkList = trademarkMapper.selectList(trademarkWrapper);
+            if (trademarkList.size() == 0) {
+                return CommonResult.failed("没有找到符合条件的商标，查找失败");
+            }
+            // 查找符合条件的商标文件
+            LambdaQueryWrapper<TrademarkFile> fileWrapper = trademarkManager.getFileWrapper(request);
+            fileList = fileMapper.selectList(fileWrapper);
+            if (fileList.size() == 0) {
+                return CommonResult.failed("没有找到符合条件的商标文件，查找失败");
+            }
+            // 获取查找条件相交的商标和商标文件
+            List<Long> fileTrademarkIds = fileList.stream().map(TrademarkFile::getTrademarkId).collect(Collectors.toList());
+            trademarkList = trademarkList.stream().filter(trademark -> fileTrademarkIds.contains(trademark.getId())).collect(Collectors.toList());
+            if (trademarkList.size() == 0) {
+                return CommonResult.failed("查找的商标没有对应的商标文件，查找失败");
+            }
+            // 获取符合条件商标的提案
+            proposalList = proposalService.findProposalListByIds(trademarkList.stream().map(Trademark::getProposalId).collect(Collectors.toList()));
+            if (proposalList.size() == 0) {
+                return CommonResult.failed("查找的商标没有对应的提案，查找失败");
+            }
+            uploaderList = userService.findUserListByIds(fileList.stream().map(TrademarkFile::getUploaderId).distinct().collect(Collectors.toList()));
+            Map<Long, Proposal> proposalMap = new HashMap<>();
+            Map<Long, Trademark> trademarkMap = new HashMap<>();
+            Map<Long, User> uploaderMap = new HashMap<>();
+            for (Proposal proposal : proposalList) {
+                proposalMap.put(proposal.getId(), proposal);
+            }
+            for (Trademark trademark : trademarkList) {
+                trademarkMap.put(trademark.getId(), trademark);
+            }
+            for (User uploader : uploaderList) {
+                uploaderMap.put(uploader.getId(), uploader);
+            }
+            List<GetTrademarkFileInfoResponse> responseList = fileList.stream().map(file -> {
+                GetTrademarkFileInfoResponse response = new GetTrademarkFileInfoResponse();
+                Trademark trademark = trademarkMap.get(file.getTrademarkId());
+                Proposal proposal = proposalMap.get(trademark.getProposalId());
+                User uploader = uploaderMap.get(file.getUploaderId());
+                response.setFileName(file.getFileName());
+                response.setTrademarkCode(trademark.getTrademarkCode());
+                response.setTrademarkOwnerName(trademark.getTrademarkOwner());
+                response.setTrademarkType(trademark.getTrademarkType());
+                response.setUploadDate(file.getUploadDate().toString());
+                response.setCopyRightCode(trademark.getCopyRightCode());
+                response.setProposalDate(CommonUtil.getYmdbyTimeStamp(proposal.getProposalDate()));
+                response.setProposerName(proposal.getProposerName());
+                response.setUploadDate(file.getUploadDate().toString());
+                response.setUploaderName(uploader.getUserName());
+                return response;
+            }).collect(Collectors.toList());
+            return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult newFileInfo(NewTrademarkFileInfoRequest request) {
+        try {
+            // 验重
+            TrademarkFile file = this.findFileByName(request.getFileName());
+            if (null != file) {
+                return CommonResult.failed("该文件已存在");
+            }
+            Trademark trademark = this.findTrademarkByCode(request.getTrademarkCode());
+            file = new TrademarkFile();
+            file.setFileName(request.getFileName());
+            file.setTrademarkId(trademark.getId());
+            file.setFileUrl(CommonUtil.getFileUrl(request.getFileName()));
+            file.setFileType(request.getFileType());
+            file.setFileStatus(request.getFileStatus() == null ? null : request.getFileStatus());
+            file.setUploaderId(hostHolder.getUser().getId());
+            file.setUploadDate(new Date(System.currentTimeMillis()));
+            return fileMapper.insert(file) != 0 ? CommonResult.success(null, "添加商标文件成功") : CommonResult.failed("添加商标文件失败");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -330,5 +433,10 @@ public class TrademarkServiceImpl implements TrademarkService {
     @Override
     public Trademark findTrademarkByInventorName(String inventorName) {
         return trademarkMapper.findTrademarkByInventorName(inventorName);
+    }
+
+    @Override
+    public TrademarkFile findFileByName(String fileName) {
+        return fileMapper.selectOne(new LambdaQueryWrapper<TrademarkFile>().eq(TrademarkFile::getFileName, fileName));
     }
 }

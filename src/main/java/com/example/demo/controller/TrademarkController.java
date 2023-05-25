@@ -131,4 +131,26 @@ public class TrademarkController {
             return CommonResult.failed(e.getMessage());
         }
     }
+
+    @ResponseBody
+    @PostMapping("/newFileInfo")
+    public CommonResult newFileInfo(@Valid @RequestBody NewTrademarkFileInfoRequest request, BindingResult bindingResult) {
+        try {
+            return trademarkService.newFileInfo(request);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/getFileInfo")
+    public CommonResult getFileInfo(@Valid @RequestBody GetTrademarkFileInfoRequest request, BindingResult bindingResult) {
+        try {
+            return trademarkService.getFileInfo(request);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 }

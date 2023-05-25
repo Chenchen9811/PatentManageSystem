@@ -2,8 +2,10 @@ package com.example.demo.service.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.demo.entity.Trademark;
+import com.example.demo.entity.TrademarkFile;
 import com.example.demo.entity.TrademarkOfficialFee;
 import com.example.demo.entity.User;
+import com.example.demo.request.GetTrademarkFileInfoRequest;
 import com.example.demo.request.GetTrademarkOfficialFeeRequest;
 import com.example.demo.request.GetTrademarkRequest;
 import com.example.demo.service.TrademarkService;
@@ -23,6 +25,25 @@ public class TrademarkManager {
 
     @Resource
     private TrademarkService trademarkService;
+
+    public LambdaQueryWrapper<TrademarkFile> getFileWrapper(GetTrademarkFileInfoRequest request) {
+        LambdaQueryWrapper<TrademarkFile> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.isNotBlank(request.getFileName())) {
+            wrapper.eq(TrademarkFile::getFileName, request.getFileName());
+        }
+        if (StringUtils.isNotBlank(request.getUploadDateBegin()) && StringUtils.isNotBlank(request.getUploadDateEnd())) {
+            wrapper.between(TrademarkFile::getUploadDate, request.getUploadDateBegin(), request.getUploadDateEnd());
+        }
+        wrapper.eq(TrademarkFile::getFileType, request.getFileType());
+        return wrapper;
+    }
+
+    public LambdaQueryWrapper<Trademark> getWrapper(GetTrademarkFileInfoRequest request) {
+        LambdaQueryWrapper<Trademark> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.isNotBlank(request.getTrademarkCode()))
+            wrapper.eq(Trademark::getTrademarkCode, request.getTrademarkCode());
+        return wrapper;
+    }
 
     public LambdaQueryWrapper<TrademarkOfficialFee> getWrapper(GetTrademarkOfficialFeeRequest request) {
         LambdaQueryWrapper<TrademarkOfficialFee> wrapper = new LambdaQueryWrapper<>();
