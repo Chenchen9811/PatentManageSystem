@@ -139,11 +139,11 @@ public class ProposalServiceImpl implements ProposalService {
                 proposalIds.add(proposal.getId());
             }
             LambdaQueryWrapper<Inventor> inventorWrapper = new LambdaQueryWrapper<>();
-            if (StringUtils.isNotBlank(request.getInventorCode())) {
-                inventorWrapper.eq(Inventor::getInventorCode, request.getInventorCode());
+            if (StringUtils.isNotBlank(request.getCriteria().getItems().getInventorCode())) {
+                inventorWrapper.eq(Inventor::getInventorCode, request.getCriteria().getItems().getInventorCode());
             }
-            if (StringUtils.isNotBlank(request.getInventorName())) {
-                inventorWrapper.eq(Inventor::getInventorName, request.getInventorName());
+            if (StringUtils.isNotBlank(request.getCriteria().getItems().getInventorName())) {
+                inventorWrapper.eq(Inventor::getInventorName, request.getCriteria().getItems().getInventorName());
             }
             List<Inventor> inventors = inventorMapper.selectList(inventorWrapper);
             for (Inventor inventor : inventors) {
@@ -152,7 +152,7 @@ public class ProposalServiceImpl implements ProposalService {
                 }
             }
 //            PageInfo<Proposal> pageInfo = PageInfoUtil.getPageInfo(proposalList, request.getPageIndex(), request.getPageSize());
-            log.info("pageIndex:{}, pageSize:{}", request.getPageIndex(), request.getPageSize());
+            log.info("pageIndex:{}, pageSize:{}", request.getPageNum(), request.getPageSize());
             // Proposal和Inventor转ProposalVo
             List<ProposalVo1> vo1List = new ArrayList<>();
             for (Proposal proposal : proposalList) {
@@ -167,7 +167,7 @@ public class ProposalServiceImpl implements ProposalService {
                 vo.setDepartmentName(departmentService.findDepartmentById(proposal.getDepartmentId()).getDepartmentName());
                 vo1List.add(vo);
             }
-            return CommonResult.success(PageInfoUtil.getPageInfo(vo1List, request.getPageIndex(), request.getPageSize()), "查找成功!");
+            return CommonResult.success(PageInfoUtil.getPageInfo(vo1List, request.getPageNum(), request.getPageSize()), "查找成功!");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

@@ -20,30 +20,30 @@ public class ProposalManager {
 
     public LambdaQueryWrapper<Proposal> buildWrapperByRequest1(GetProposalRequest1 request) {
         LambdaQueryWrapper<Proposal> wrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(request.getProposalCode())) {
-            wrapper.eq(Proposal::getProposalCode, request.getProposalCode());
+        if (StringUtils.isNotBlank(request.getCriteria().getItems().getProposalCode())) {
+            wrapper.eq(Proposal::getProposalCode, request.getCriteria().getItems().getProposalCode());
         }
-        if (StringUtils.isNotBlank(request.getProposalName())) {
-            wrapper.eq(Proposal::getProposalName, request.getProposerName());
+        if (StringUtils.isNotBlank(request.getCriteria().getItems().getProposalName())) {
+            wrapper.eq(Proposal::getProposalName, request.getCriteria().getItems().getProposerName());
         }
-        if (ObjectUtils.isNotEmpty(request.getProposalType())) {
-            wrapper.eq(Proposal::getProposalType, request.getProposalType());
+        if (ObjectUtils.isNotEmpty(request.getCriteria().getItems().getProposalType())) {
+            wrapper.eq(Proposal::getProposalType, request.getCriteria().getItems().getProposalType());
         }
-        if (null != (request.getProposalState())) {
-            wrapper.eq(Proposal::getProposalState, request.getProposalState());
+        if (null != (request.getCriteria().getItems().getProposalState())) {
+            wrapper.eq(Proposal::getProposalState, request.getCriteria().getItems().getProposalState());
         }
-        if (StringUtils.isNotBlank(request.getProposerCode())) {
-            wrapper.eq(Proposal::getProposerCode, request.getProposerCode());
+        if (StringUtils.isNotBlank(request.getCriteria().getItems().getProposerCode())) {
+            wrapper.eq(Proposal::getProposerCode, request.getCriteria().getItems().getProposerCode());
         }
-        if (StringUtils.isNotBlank(request.getProposerName())) {
-            wrapper.eq(Proposal::getProposerName, request.getProposerName());
+        if (StringUtils.isNotBlank(request.getCriteria().getItems().getProposerName())) {
+            wrapper.eq(Proposal::getProposerName, request.getCriteria().getItems().getProposerName());
         }
-        if (StringUtils.isNotBlank(request.getDepartmentName())) {
-            Department department = departmentService.findDepartmentByDepartmentName(request.getDepartmentName());
+        if (StringUtils.isNotBlank(request.getCriteria().getItems().getDepartmentName())) {
+            Department department = departmentService.findDepartmentByDepartmentName(request.getCriteria().getItems().getDepartmentName());
             wrapper.eq(Proposal::getDepartmentId, department.getId());
         }
-        if (StringUtils.isNotBlank(request.getStartDate()) && StringUtils.isNotBlank(request.getEndDate())) {
-            wrapper.between(Proposal::getProposalDate, request.getStartDate(), request.getEndDate());
+        if (StringUtils.isNotBlank(request.getCriteria().getItems().getStartDate()) && StringUtils.isNotBlank(request.getCriteria().getItems().getEndDate())) {
+            wrapper.between(Proposal::getProposalDate, request.getCriteria().getItems().getStartDate(), request.getCriteria().getItems().getEndDate());
         }
         return wrapper;
     }
