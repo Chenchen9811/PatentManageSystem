@@ -32,7 +32,7 @@ public class PatentController {
     }
 
     @ResponseBody
-    @GetMapping("/getPatent")
+    @PostMapping("/getPatent")
     public CommonResult getPatent(@RequestBody GetPatentRequest request) {
         CommonResult result = null;
         try {
@@ -46,7 +46,7 @@ public class PatentController {
     }
 
     @ResponseBody
-    @GetMapping("/departmentPatent")
+    @PostMapping("/departmentPatent")
     public CommonResult departmentPatent(@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
         CommonResult result = null;
         try {

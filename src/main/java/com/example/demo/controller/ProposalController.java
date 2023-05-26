@@ -34,7 +34,7 @@ public class ProposalController {
     }
 
     @ResponseBody
-    @GetMapping("/getProposalList1")
+    @PostMapping("/getProposalList1")
     public CommonResult getProposalList1(@Valid @RequestBody GetProposalRequest1 request, BindingResult bindingResult) {
         CommonResult result = null;
         try {

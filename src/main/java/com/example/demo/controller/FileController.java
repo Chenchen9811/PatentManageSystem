@@ -60,6 +60,7 @@ public class FileController {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            log.error(e.getMessage());
         }
 
     }
