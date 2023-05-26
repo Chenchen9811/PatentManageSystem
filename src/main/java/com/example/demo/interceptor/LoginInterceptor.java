@@ -29,8 +29,10 @@ public class LoginInterceptor implements HandlerInterceptor {
 //        if (!(handler instanceof HandlerMethod)) {
 //            return true;
 //        }
-        String userId = request.getHeader("userId");
-        String token = request.getHeader("token");
+        String userId = request.getHeader("Userid");
+        String token = request.getHeader("Token");
+        String authorization = request.getHeader("Authorization");
+
         // token不为空时验证
         if (!StringUtils.isBlank(token)) {
             boolean isValidToken = false;
