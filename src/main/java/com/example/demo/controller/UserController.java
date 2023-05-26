@@ -102,8 +102,8 @@ public class UserController implements Constants, Message {
     }
 
     @ResponseBody
-    @GetMapping(path = "/getUser/{userName}")
-    public CommonResult getUser(@PathVariable String userName) {
+    @GetMapping(path = "/getUser")
+    public CommonResult getUser(@RequestParam("userName") String userName) {
         CommonResult result = null;
         try {
             result = userService.getUser(userName);
@@ -130,8 +130,8 @@ public class UserController implements Constants, Message {
     }
 
     @ResponseBody
-    @GetMapping(path = "/getRole/{roleName}")
-    public CommonResult getRole(@PathVariable String roleName) {
+    @GetMapping(path = "/getRole")
+    public CommonResult getRole(@RequestParam("roleName") String roleName) {
         CommonResult result = null;
         try {
             result = userService.getRole(roleName);
