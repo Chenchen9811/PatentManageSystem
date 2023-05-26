@@ -263,7 +263,7 @@ public class PatentController {
     }
 
     @ResponseBody
-    @GetMapping("/getFileInfo")
+    @PostMapping("/getFileInfo")
     public CommonResult getFileInfo(@Valid @RequestBody GetPatentFileInfoRequest request, BindingResult bindingResult) {
         try {
             return patentService.getFileInfo(request);

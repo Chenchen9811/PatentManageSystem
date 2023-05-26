@@ -75,7 +75,7 @@ public class SoftwareController {
     }
 
     @ResponseBody
-    @GetMapping("/getOfficialFee")
+    @PostMapping ("/getOfficialFee")
     public CommonResult getOfficialFee(@Valid @RequestBody GetSoftwareOfficialFeeRequest request, BindingResult bindingResult) {
         try {
             return softwareService.getOfficialFee(request);
@@ -108,7 +108,7 @@ public class SoftwareController {
     }
 
     @ResponseBody
-    @GetMapping("/getFileInfo")
+    @PostMapping("/getFileInfo")
     public CommonResult getFileInfo(@Valid @RequestBody GetSoftwareFileInfoRequest request, BindingResult bindingResult) {
         try {
             return softwareService.getFileInfo(request);

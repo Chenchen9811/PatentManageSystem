@@ -75,7 +75,7 @@ public class TrademarkController {
     }
 
     @ResponseBody
-    @GetMapping("/getBonus")
+    @PostMapping("/getBonus")
     public CommonResult getBonus(@Valid @RequestBody GetTrademarkBonusRequest request, BindingResult bindingResult) {
         CommonResult result = null;
         try {
@@ -111,7 +111,7 @@ public class TrademarkController {
     }
 
     @ResponseBody
-    @GetMapping("/getOfficialFee")
+    @PostMapping("/getOfficialFee")
     public CommonResult getOfficialFee(@Valid @RequestBody GetTrademarkOfficialFeeRequest request, BindingResult bindingResult) {
         try {
             return trademarkService.getOfficialFee(request);
@@ -144,7 +144,7 @@ public class TrademarkController {
     }
 
     @ResponseBody
-    @GetMapping("/getFileInfo")
+    @PostMapping("/getFileInfo")
     public CommonResult getFileInfo(@Valid @RequestBody GetTrademarkFileInfoRequest request, BindingResult bindingResult) {
         try {
             return trademarkService.getFileInfo(request);
