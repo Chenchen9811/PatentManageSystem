@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class GetSoftwareBonusResponse {
-    private Long bonusId;
+    private String bonusId;
     private String softwareCode;
     private String softwareName;
 
