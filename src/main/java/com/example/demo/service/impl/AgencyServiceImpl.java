@@ -7,6 +7,7 @@ import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.Agency;
 import com.example.demo.mapper.AgencyMapper;
+import com.example.demo.request.GetAgencyRequest;
 import com.example.demo.request.NewAgencyRequest;
 import com.example.demo.response.GetAgencyResponse;
 import com.example.demo.service.AgencyService;
@@ -30,10 +31,14 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
-    public CommonResult getAgency(Integer pageIndex, Integer pageSize) throws Exception {
+    public CommonResult getAgency(GetAgencyRequest request) throws Exception {
         try {
+            LambdaQueryWrapper<Agency> wrapper = new LambdaQueryWrapper<>();
+            if (request.getCriteria().getItems().size() != 0) {
+                wrapper.eq(Agency::getAgencyName, request.getCriteria().getItems().get(0));
+            }
             return CommonResult.success(PageInfoUtil.getPageInfo(
-                    agencyMapper.selectList(new QueryWrapper<Agency>()).stream().map(agency -> {
+                    agencyMapper.selectList(wrapper).stream().map(agency -> {
                         GetAgencyResponse response = new GetAgencyResponse();
                         response.setAgencyName(agency.getAgencyName());
                         response.setAgencyCode(agency.getAgencyCode());
@@ -44,7 +49,7 @@ public class AgencyServiceImpl implements AgencyService {
                         response.setAgencyAddress(agency.getAgencyAddress());
                         response.setAgencyRemark(agency.getAgencyRemark());
                         return response;
-                    }).collect(Collectors.toList()), pageIndex, pageSize), "查找成功");
+                    }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize()), "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

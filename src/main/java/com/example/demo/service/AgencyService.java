@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.Agency;
+import com.example.demo.request.GetAgencyRequest;
 import com.example.demo.request.NewAgencyRequest;
 
 public interface AgencyService {
@@ -9,5 +10,5 @@ public interface AgencyService {
 
     Agency findAgencyByName(String agencyName);
 
-    CommonResult getAgency(Integer pageIndex, Integer pageSize) throws Exception;
+    CommonResult getAgency(GetAgencyRequest request) throws Exception;
 }

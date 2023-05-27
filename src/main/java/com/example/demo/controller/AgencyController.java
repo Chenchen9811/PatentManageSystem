@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.common.CommonResult;
+import com.example.demo.request.GetAgencyRequest;
 import com.example.demo.request.NewAgencyRequest;
 import com.example.demo.service.AgencyService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/agency")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class AgencyController {
     @Resource
     private AgencyService agencyService;
@@ -33,10 +35,10 @@ public class AgencyController {
 
     @ResponseBody
     @GetMapping("/getList")
-    public CommonResult getAgency(@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
+    public CommonResult getAgency(@RequestBody GetAgencyRequest request) {
         CommonResult result = null;
         try {
-            result = agencyService.getAgency(pageIndex, pageSize);
+            result = agencyService.getAgency(request);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
