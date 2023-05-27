@@ -102,6 +102,7 @@ public class SoftwareServiceImpl implements SoftwareService {
                 response.setVersion(software.getVersion());
                 response.setInventorName(inventor.getUserName());
                 response.setReleaseStatus(bonus.getReleaseStatus());
+                response.setBonusId(bonus.getId());
                 return response;
             }).collect(Collectors.toList());
             return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
