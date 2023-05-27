@@ -120,7 +120,7 @@ public class SoftwareController {
     }
 
     @ResponseBody
-    @PostMapping("/getList")
+    @PostMapping("/getSoftwareBonusList")
     public CommonResult getList(@Valid @RequestBody GetSoftwareBonusRequest request, BindingResult bindingResult) {
         try {
             return softwareService.getList(request);
