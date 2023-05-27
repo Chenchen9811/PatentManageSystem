@@ -5,5 +5,5 @@ import com.example.demo.entity.Software;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface SoftwareMapper extends BaseMapper<Software> {
+public interface SoftwareMapper extends ExpandBaseMapper<Software> {
 }

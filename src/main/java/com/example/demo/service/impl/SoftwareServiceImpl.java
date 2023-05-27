@@ -61,6 +61,34 @@ public class SoftwareServiceImpl implements SoftwareService {
     @Resource
     private SoftwareBonusMapper bonusMapper;
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult newBonus(NewSoftwareBonusRequest request) {
+        try {
+            Software software = this.findSoftwareByCode(request.getSoftwareCode());
+            List<SoftwareBonus> bonusList = new ArrayList<>();
+            List<NewSoftwareBonusRequest.inventor> inventorList = request.getListOfInventor();
+            int size = inventorList.size();
+            for (int i = 0; i < size; i++) {
+                NewSoftwareBonusRequest.inventor inventor = inventorList.get(i);
+                SoftwareBonus bonus = new SoftwareBonus();
+                bonus.setRanking(i + 1);
+                bonus.setBonusAmount(request.getBonusAmount());
+                bonus.setSoftwareId(software.getId());
+                bonus.setActualRelease(inventor.getActualRelease());
+                bonus.setReleaseStatus(request.getReleaseStatus());
+                bonus.setInventorName(inventor.getInventorName());
+                bonus.setBonusType(request.getBonusType());
+                bonusList.add(bonus);
+            }
+            return bonusMapper.insertBatchSomeColumn(bonusList) == 0 ? CommonResult.failed("添加失败") : CommonResult.success(null, "添加成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
     @Override
     public CommonResult getList(GetSoftwareBonusRequest request) {
         try {

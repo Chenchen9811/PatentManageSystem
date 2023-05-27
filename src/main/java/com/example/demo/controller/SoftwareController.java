@@ -129,4 +129,15 @@ public class SoftwareController {
             return CommonResult.failed(e.getMessage());
         }
     }
+
+    @ResponseBody
+    @PostMapping("/newBonus")
+    public CommonResult newBonus(@RequestBody NewSoftwareBonusRequest request, BindingResult bindingResult) {
+        try {
+            return softwareService.newBonus(request);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 }

@@ -34,4 +34,6 @@ public interface SoftwareService {
     CommonResult getFileInfo(GetSoftwareFileInfoRequest request);
 
     CommonResult getList(GetSoftwareBonusRequest request);
+
+    CommonResult newBonus(NewSoftwareBonusRequest request);
 }
