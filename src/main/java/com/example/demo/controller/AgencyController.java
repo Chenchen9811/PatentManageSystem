@@ -34,7 +34,7 @@ public class AgencyController {
     }
 
     @ResponseBody
-    @GetMapping("/getList")
+    @PostMapping("/getList")
     public CommonResult getAgency(@RequestBody GetAgencyRequest request) {
         CommonResult result = null;
         try {
