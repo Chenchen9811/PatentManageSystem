@@ -33,7 +33,7 @@ public class TrademarkController {
     }
 
     @ResponseBody
-    @PostMapping("/getTrademark")
+    @PostMapping("/getList")
     public CommonResult getTrademark(@RequestBody GetTrademarkRequest request) {
         CommonResult result = null;
         try {

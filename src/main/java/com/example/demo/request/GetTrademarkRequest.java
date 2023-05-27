@@ -20,4 +20,5 @@ public class GetTrademarkRequest {
     private Integer pageIndex;
     @NotNull(message = "每页显示条数不能为空")
     private Integer pageSize;
+    private Criteria criteria;
 }

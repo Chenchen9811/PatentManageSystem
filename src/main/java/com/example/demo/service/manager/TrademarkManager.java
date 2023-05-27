@@ -5,6 +5,7 @@ import com.example.demo.entity.Trademark;
 import com.example.demo.entity.TrademarkFile;
 import com.example.demo.entity.TrademarkOfficialFee;
 import com.example.demo.entity.User;
+import com.example.demo.request.Criteria;
 import com.example.demo.request.GetTrademarkFileInfoRequest;
 import com.example.demo.request.GetTrademarkOfficialFeeRequest;
 import com.example.demo.request.GetTrademarkRequest;
@@ -70,6 +71,49 @@ public class TrademarkManager {
         }
         if (StringUtils.isNotBlank(request.getDueAmount())) {
             wrapper.eq(TrademarkOfficialFee::getDueAmount, request.getDueAmount());
+        }
+        return wrapper;
+    }
+
+    public LambdaQueryWrapper<Trademark> getWrapper(GetTrademarkRequest request) {
+        LambdaQueryWrapper<Trademark> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "trademarkCode" : {
+                    wrapper.eq(Trademark::getTrademarkCode, kv.getValue());
+                    break;
+                }
+                case "trademarkName" : {
+                    wrapper.eq(Trademark::getTrademarkName, kv.getValue());
+                    break;
+                }
+                case "inventorName" : {
+                    User user = userService.findUserByUserName(kv.getValue());
+                    wrapper.eq(Trademark::getInventorId, user.getId());
+                    break;
+                }
+                case "trademarkOwner" : {
+                    wrapper.eq(Trademark::getTrademarkOwner, kv.getValue());
+                    break;
+                }
+                case "copyRightCode" : {
+                    wrapper.eq(Trademark::getCopyRightCode, kv.getValue());
+                    break;
+                }
+                case "currentStatus" : {
+                    wrapper.eq(Trademark::getCurrentStatus, kv.getValue());
+                    break;
+                }
+                case "rightStatus" : {
+                    wrapper.eq(Trademark::getRightStatus, kv.getValue());
+                    break;
+                }
+                case "agency" : {
+                    wrapper.eq(Trademark::getAgency, kv.getValue());
+                    break;
+                }
+            }
         }
         return wrapper;
     }

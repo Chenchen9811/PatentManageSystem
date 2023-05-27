@@ -347,7 +347,7 @@ public class TrademarkServiceImpl implements TrademarkService {
     @Override
     public CommonResult getTrademark(GetTrademarkRequest request) throws Exception {
         try {
-            LambdaQueryWrapper<Trademark> wrapper = trademarkManager.getWrapperByGetTrademarkRequest(request);
+            LambdaQueryWrapper<Trademark> wrapper = trademarkManager.getWrapper(request);
             List<Trademark> trademarkList = trademarkMapper.selectList(wrapper);
             return CommonResult.success(PageInfoUtil.getPageInfo(trademarkList.stream().map(trademark -> {
                 GetTrademarkResponse response = new GetTrademarkResponse();
