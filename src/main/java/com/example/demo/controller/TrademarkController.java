@@ -76,7 +76,7 @@ public class TrademarkController {
     }
 
     @ResponseBody
-    @PostMapping("/getBonus")
+    @PostMapping("/getBonusList")
     public CommonResult getBonus(@Valid @RequestBody GetTrademarkBonusRequest request, BindingResult bindingResult) {
         CommonResult result = null;
         try {
@@ -112,7 +112,7 @@ public class TrademarkController {
     }
 
     @ResponseBody
-    @PostMapping("/getOfficialFee")
+    @PostMapping("/getOfficialFeeList")
     public CommonResult getOfficialFee(@Valid @RequestBody GetTrademarkOfficialFeeRequest request, BindingResult bindingResult) {
         try {
             return trademarkService.getOfficialFee(request);

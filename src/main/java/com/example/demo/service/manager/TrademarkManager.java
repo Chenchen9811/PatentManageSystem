@@ -46,9 +46,58 @@ public class TrademarkManager {
         return wrapper;
     }
 
+    public LambdaQueryWrapper<TrademarkOfficialFee> getCriteriaWrapper(GetTrademarkOfficialFeeRequest request) {
+        LambdaQueryWrapper<TrademarkOfficialFee> wrapper = new LambdaQueryWrapper<>();
+        boolean trademarkCode = false, trademarkName = false, inventorName = false;
+        Trademark trademark = null;
+        List<Long> trademarkIds = new ArrayList<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "trademarkCode" : {
+                    trademark = trademarkService.findTrademarkByCode(request.getTrademarkCode());
+                    trademarkIds.add(trademark.getId());
+                    trademarkCode = true;
+                    break;
+                }
+                case "trademarkName" : {
+                    trademark = trademarkService.findTrademarkByName(request.getTrademarkName());
+                    trademarkIds.add(trademark.getId());
+                    trademarkName = true;
+                    break;
+                }
+                case "inventorName" : {
+                    trademark = trademarkService.findTrademarkByInventorName(request.getInventorName());
+                    trademarkIds.add(trademark.getId());
+                    inventorName = true;
+                    break;
+                }
+                case "actualPayBeginDate" : {
+                    String endDate = null;
+                    for (Criteria.KV kV : items) {
+                        if (kV.getKey().equals("actualPayEndDate")) {
+                            endDate = kV.getValue();
+                        }
+                        break;
+                    }
+                    wrapper.between(TrademarkOfficialFee::getActualPayDate, kv.getValue(), endDate);
+                    break;
+                }
+                case "dueAmount" : {
+                    wrapper.eq(TrademarkOfficialFee::getDueAmount, kv.getValue());
+                    break;
+                }
+            }
+        }
+        if (trademarkCode || trademarkName || inventorName) {
+            wrapper.in(TrademarkOfficialFee::getTrademarkId, trademarkIds);
+        }
+        return wrapper;
+    }
+
     public LambdaQueryWrapper<TrademarkOfficialFee> getWrapper(GetTrademarkOfficialFeeRequest request) {
         LambdaQueryWrapper<TrademarkOfficialFee> wrapper = new LambdaQueryWrapper<>();
-        boolean trademarkCode, trademarkName, inventorName = false;
+        boolean trademarkCode = false, trademarkName = false, inventorName = false;
         Trademark trademark = null;
         List<Long> trademarkIds = new ArrayList<>();
         if (trademarkCode = StringUtils.isNotBlank(request.getTrademarkCode())) {

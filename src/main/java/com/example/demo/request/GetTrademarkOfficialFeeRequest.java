@@ -12,4 +12,5 @@ public class GetTrademarkOfficialFeeRequest {
     private String dueAmount;
     private Integer pageIndex;
     private Integer pageSize;
+    private Criteria criteria;
 }

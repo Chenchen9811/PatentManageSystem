@@ -172,7 +172,7 @@ public class TrademarkServiceImpl implements TrademarkService {
     @Override
     public CommonResult getOfficialFee(GetTrademarkOfficialFeeRequest request) {
         try {
-            LambdaQueryWrapper<TrademarkOfficialFee> wrapper = trademarkManager.getWrapper(request);
+            LambdaQueryWrapper<TrademarkOfficialFee> wrapper = trademarkManager.getCriteriaWrapper(request);
             List<TrademarkOfficialFee> officialFeeList = officialFeeMapper.selectList(wrapper);
             List<Trademark> trademarkList = trademarkMapper.selectBatchIds(officialFeeList.stream().map(TrademarkOfficialFee::getTrademarkId).distinct().collect(Collectors.toList()));
             Map<Long, Trademark> map = new HashMap<>();
@@ -246,13 +246,27 @@ public class TrademarkServiceImpl implements TrademarkService {
     public CommonResult getBonus(GetTrademarkBonusRequest request) {
         try {
             LambdaQueryWrapper<TrademarkBonus> wrapper = new LambdaQueryWrapper<>();
-            if (StringUtils.isNotBlank(request.getTrademarkCode())) {
-                Trademark trademark = this.findTrademarkByCode(request.getTrademarkCode());
-                wrapper.eq(TrademarkBonus::getTrademarkId, trademark.getId());
+            List<Criteria.KV> items = request.getCriteria().getItems();
+            for (Criteria.KV kv : items) {
+                switch (kv.getKey()) {
+                    case "trademarkCode" : {
+                        Trademark trademark = this.findTrademarkByCode(request.getTrademarkCode());
+                        wrapper.eq(TrademarkBonus::getTrademarkId, trademark.getId());
+                        break;
+                    }
+                    case "inventorName" : {
+                        wrapper.eq(TrademarkBonus::getInventorName, kv.getValue());
+                        break;
+                    }
+                }
             }
-            if (StringUtils.isNotBlank(request.getInventorName())) {
-                wrapper.eq(TrademarkBonus::getInventorName, request.getInventorName());
-            }
+//            if (StringUtils.isNotBlank(request.getTrademarkCode())) {
+//                Trademark trademark = this.findTrademarkByCode(request.getTrademarkCode());
+//                wrapper.eq(TrademarkBonus::getTrademarkId, trademark.getId());
+//            }
+//            if (StringUtils.isNotBlank(request.getInventorName())) {
+//                wrapper.eq(TrademarkBonus::getInventorName, request.getInventorName());
+//            }
             List<TrademarkBonus> bonusList = bonusMapper.selectList(wrapper);
             Map<Long, Trademark> map = new HashMap<>();
             List<Trademark> trademarks = trademarkMapper.selectBatchIds(bonusList.stream().map(TrademarkBonus::getTrademarkId).distinct().collect(Collectors.toList()));
