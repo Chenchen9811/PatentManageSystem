@@ -32,7 +32,7 @@ public class AgencyController {
     }
 
     @ResponseBody
-    @GetMapping("/getAgency")
+    @GetMapping("/getList")
     public CommonResult getAgency(@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
         CommonResult result = null;
         try {
