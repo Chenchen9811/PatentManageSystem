@@ -46,7 +46,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .allowedOrigins("*")
                 .allowedHeaders("*")
                 .allowCredentials(true)
-                .allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS", "HEAD")
+                .allowedMethods("*")
                 .maxAge(3600 * 24);
     }
 

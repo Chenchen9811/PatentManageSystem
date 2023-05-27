@@ -139,12 +139,12 @@ public class ProposalServiceImpl implements ProposalService {
                 proposalIds.add(proposal.getId());
             }
             LambdaQueryWrapper<Inventor> inventorWrapper = new LambdaQueryWrapper<>();
-            if (StringUtils.isNotBlank(request.getCriteria().getItems().getInventorCode())) {
-                inventorWrapper.eq(Inventor::getInventorCode, request.getCriteria().getItems().getInventorCode());
-            }
-            if (StringUtils.isNotBlank(request.getCriteria().getItems().getInventorName())) {
-                inventorWrapper.eq(Inventor::getInventorName, request.getCriteria().getItems().getInventorName());
-            }
+//            if (StringUtils.isNotBlank(request.getCriteria().getItems().getInventorCode())) {
+//                inventorWrapper.eq(Inventor::getInventorCode, request.getCriteria().getItems().getInventorCode());
+//            }
+//            if (StringUtils.isNotBlank(request.getCriteria().getItems().getInventorName())) {
+//                inventorWrapper.eq(Inventor::getInventorName, request.getCriteria().getItems().getInventorName());
+//            }
             List<Inventor> inventors = inventorMapper.selectList(inventorWrapper);
             for (Inventor inventor : inventors) {
                 if (!proposalIds.contains(inventor.getProposalId())) {

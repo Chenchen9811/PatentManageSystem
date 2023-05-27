@@ -3,6 +3,7 @@ package com.example.demo.request;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 public class GetProposalRequest1 {
@@ -14,21 +15,12 @@ public class GetProposalRequest1 {
     private Criteria criteria;
     @Data
     public static class Criteria {
-        Item items;
+        List<KV> items;
+
         @Data
-        public static class Item {
-            private String startDate;
-            private String endDate;
-            private String proposerName;
-            private String proposerCode;
-            private String inventorCode;
-            private String inventorName;
-            private Integer proposalState;
-            private Integer proposalType;
-            private String proposalName;
-            private String proposalCode;
-            private String departmentName;
-            private Criteria criteria;
+        public static class KV {
+            private String key;
+            private String value;
         }
     }
 }

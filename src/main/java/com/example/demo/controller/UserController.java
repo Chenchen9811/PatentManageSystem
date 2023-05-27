@@ -28,6 +28,7 @@ import java.util.HashMap;
 @RestController
 @Slf4j
 @RequestMapping("/user")
+@CrossOrigin(origins = "*")
 public class UserController implements Constants, Message {
 
     @Resource
