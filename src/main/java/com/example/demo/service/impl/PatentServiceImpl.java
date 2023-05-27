@@ -493,15 +493,14 @@ public class PatentServiceImpl implements PatentService {
     @Override
     public CommonResult getPatent(GetPatentRequest request) throws Exception {
         try {
-            LambdaQueryWrapper<Patent> wrapper = patentManager.getWrapperByGetPatentRequest(request);
+//            LambdaQueryWrapper<Patent> wrapper = patentManager.getWrapperByGetPatentRequest(request);
+            Map<String, Object> map = patentManager.getWrapper(request);
+            LambdaQueryWrapper<Patent> wrapper = (LambdaQueryWrapper<Patent>)map.get("patentWrapper");
+            LambdaQueryWrapper<PatentInventor> patentInventorWrapper = (LambdaQueryWrapper<PatentInventor>)map.get("patentInventorWrapper");
             List<Patent> patentList = patentMapper.selectList(wrapper);
             Set<Long> patentIds = new HashSet<>();
             for (Patent patent : patentList) {
                 patentIds.add(patent.getId());
-            }
-            LambdaQueryWrapper<PatentInventor> patentInventorWrapper = new LambdaQueryWrapper<>();
-            if (StringUtils.isNotBlank(request.getInventorName())) {
-                patentInventorWrapper.eq(PatentInventor::getInventorName, request.getInventorName());
             }
             List<PatentInventor> patentInventors = patentInventorMapper.selectList(patentInventorWrapper);
             for (PatentInventor patentInventor : patentInventors) {

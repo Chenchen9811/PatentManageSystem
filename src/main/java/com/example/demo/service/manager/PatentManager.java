@@ -3,13 +3,14 @@ package com.example.demo.service.manager;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.example.demo.Utils.CommonUtil;
-import com.example.demo.entity.Patent;
-import com.example.demo.entity.PatentAnnualFee;
-import com.example.demo.entity.PatentFile;
-import com.example.demo.entity.PatentOfficialFee;
+import com.example.demo.entity.*;
 import com.example.demo.request.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class PatentManager {
@@ -89,8 +90,78 @@ public class PatentManager {
         return wrapper;
     }
 
+
+    public Map<String, Object> getWrapper(GetPatentRequest request) {
+        LambdaQueryWrapper<Patent> patentWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<PatentInventor> patentInventorWrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "patentName" : {
+                    patentWrapper.eq(Patent::getPatentName, kv.getValue());
+                    break;
+                }
+                case "patentType" : {
+                    patentWrapper.eq(Patent::getPatentType, kv.getValue());
+                    break;
+                }
+                case "patentCode" : {
+                    patentWrapper.eq(Patent::getPatentCode, kv.getValue());
+                    break;
+                }
+                case "applicationCode" : {
+                    patentWrapper.eq(Patent::getApplicationCode, kv.getValue());
+                    break;
+                }
+                case "applicationBeginDate" : {
+                    String endDate = null;
+                    for (Criteria.KV kV : items) {
+                        if (kV.getKey().equals("applicationEndDate")) {
+                            endDate = kV.getValue();
+                        }
+                        break;
+                    }
+                    patentWrapper.between(Patent::getApplicationDate, kv.getValue(), endDate);
+                    break;
+                }
+                case "grantCode" : {
+                    patentWrapper.eq(Patent::getGrantCode, kv.getValue());
+                    break;
+                }
+                case "grantBeginDate" : {
+                    String endDate = null;
+                    for (Criteria.KV kV : items) {
+                        if (kV.getKey().equals("grantEndDate")) {
+                            endDate = kV.getValue();
+                        }
+                        break;
+                    }
+                    patentWrapper.between(Patent::getGrantDate, kv.getValue(), endDate);
+                    break;
+                }
+                case "currentProgram" : {
+                    patentWrapper.eq(Patent::getCurrentProgram, kv.getValue());
+                    break;
+                }
+                case "rightStatus" : {
+                    patentWrapper.eq(Patent::getRightStatus, kv.getValue());
+                    break;
+                }
+                case "inventorName" : {
+                    patentInventorWrapper.eq(PatentInventor::getInventorName, request.getInventorName());
+                    break;
+                }
+            }
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("patentWrapper", patentWrapper);
+        map.put("patentInventorWrapper", patentInventorWrapper);
+        return map;
+    }
+
     public LambdaQueryWrapper<Patent> getWrapperByGetPatentRequest(GetPatentRequest request) {
         LambdaQueryWrapper<Patent> wrapper = new LambdaQueryWrapper<>();
+
         if (StringUtils.isNotBlank(request.getPatentName())) {
             wrapper.eq(Patent::getPatentName, request.getPatentName());
         }

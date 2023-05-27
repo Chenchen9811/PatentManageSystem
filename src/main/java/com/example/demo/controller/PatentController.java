@@ -32,7 +32,7 @@ public class PatentController {
     }
 
     @ResponseBody
-    @PostMapping("/getPatent")
+    @PostMapping("/getList")
     public CommonResult getPatent(@RequestBody GetPatentRequest request) {
         CommonResult result = null;
         try {

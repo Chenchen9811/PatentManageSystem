@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 public class GetPatentRequest {
@@ -25,4 +26,7 @@ public class GetPatentRequest {
     private Integer pageIndex;
     @NotNull(message = "每页显示条数不能为空")
     private Integer pageSize;
+
+    private Criteria criteria;
+
 }
