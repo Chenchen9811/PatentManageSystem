@@ -28,10 +28,12 @@ public class SoftwareManager {
                     break;
                 }
                 case "bonusType" : {
+                    if (kv.getKey().equals("0")) break;
                     wrapper.eq(SoftwareBonus::getBonusType, kv.getValue());
                     break;
                 }
                 case "releaseStatus" : {
+                    if (kv.getKey().equals("0")) break;
                     wrapper.eq(SoftwareBonus::getReleaseStatus, kv.getValue());
                     break;
                 }

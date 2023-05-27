@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.demo.Utils.CommonUtil;
 import com.example.demo.entity.*;
@@ -34,6 +35,9 @@ public class test {
     @Resource
     private TrademarkMapper trademarkMapper;
 
+    @Resource
+    private SoftwareBonusMapper softwareBonusMapper;
+
     @Test
     public void testMapper() {
 //        Proposal proposal = new Proposal();
@@ -48,8 +52,10 @@ public class test {
 //        System.out.println(proposal.getId());
 //        Review review = proposalMapper.findReviewByProposalCode("1");
 //        System.out.println(review);
-        System.out.println(trademarkMapper.findTrademarkByInventorName("admin").toString());
+//        System.out.println(trademarkMapper.findTrademarkByInventorName("admin").toString());
+        System.out.println(softwareBonusMapper.selectList(new LambdaQueryWrapper<SoftwareBonus>()));
     }
+
 
     @Test
     public void testDate() {
