@@ -6,10 +6,12 @@ import com.example.demo.Utils.HostHolder;
 import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.*;
+import com.example.demo.mapper.SoftwareBonusMapper;
 import com.example.demo.mapper.SoftwareFileMapper;
 import com.example.demo.mapper.SoftwareMapper;
 import com.example.demo.mapper.SoftwareOfficialFeeMapper;
 import com.example.demo.request.*;
+import com.example.demo.response.GetSoftwareBonusResponse;
 import com.example.demo.response.GetSoftwareFileInfoResponse;
 import com.example.demo.response.GetSoftwareOfficialFeeResponse;
 import com.example.demo.response.GetSoftwareResponse;
@@ -55,6 +57,60 @@ public class SoftwareServiceImpl implements SoftwareService {
 
     @Resource
     private SoftwareFileMapper fileMapper;
+
+    @Resource
+    private SoftwareBonusMapper bonusMapper;
+
+    @Override
+    public CommonResult getList(GetSoftwareBonusRequest request) {
+        try {
+            List<Software> softwareList = null;
+            List<SoftwareBonus> bonusList = null;
+            List<User> inventorList = null;
+            softwareList = softwareMapper.selectList(softwareManager.getSoftwareWrapper(request));
+            if (softwareList.size() == 0) {
+                return CommonResult.failed("没有找到相关软著信息或没有符合查询条件的软著奖金");
+            }
+            bonusList = bonusMapper.selectList(softwareManager.getBonusWrapper(request));
+            List<Long> softwareIds = bonusList.stream().map(SoftwareBonus::getSoftwareId).distinct().collect(Collectors.toList());
+            if (bonusList.size() == 0) {
+                return CommonResult.failed("没有找到相关软著奖金的信息");
+            }
+            softwareList = softwareList.stream().filter(software -> softwareIds.contains(software.getId())).collect(Collectors.toList());
+            inventorList = userService.findUserListByIds(softwareList.stream().map(Software::getInventorId).collect(Collectors.toList()));
+            if (inventorList.size() == 0) {
+                return CommonResult.failed("相关发明人信息缺失");
+            }
+            Map<Long, Software> softwareMap = new HashMap<>();
+            Map<String, User> inventorMap = new HashMap<>();
+            for (Software software : softwareList) {
+                softwareMap.put(software.getId(), software);
+            }
+            for (User inventor : inventorList) {
+                inventorMap.put(inventor.getUserName(), inventor);
+            }
+            List<GetSoftwareBonusResponse> responseList = bonusList.stream().map(bonus -> {
+                GetSoftwareBonusResponse response = new GetSoftwareBonusResponse();
+                Software software = softwareMap.get(bonus.getSoftwareId());
+                User inventor = inventorMap.get(bonus.getInventorName());
+                response.setSoftwareName(software.getSoftwareName());
+                response.setSoftwareCode(software.getSoftwareCode());
+                response.setBonusAmount(bonus.getBonusAmount());
+                response.setBonusType(bonus.getBonusType());
+                response.setActualRelease(bonus.getActualRelease());
+                response.setRanking(bonus.getRanking());
+                response.setVersion(software.getVersion());
+                response.setInventorName(inventor.getUserName());
+                response.setReleaseStatus(bonus.getReleaseStatus());
+                return response;
+            }).collect(Collectors.toList());
+            return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
 
     @Override
     public CommonResult getFileInfo(GetSoftwareFileInfoRequest request) {

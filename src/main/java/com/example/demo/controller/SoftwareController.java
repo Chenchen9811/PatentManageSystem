@@ -118,4 +118,15 @@ public class SoftwareController {
             return CommonResult.failed(e.getMessage());
         }
     }
+
+    @ResponseBody
+    @PostMapping("/getList")
+    public CommonResult getList(@Valid @RequestBody GetSoftwareBonusRequest request, BindingResult bindingResult) {
+        try {
+            return softwareService.getList(request);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 }

@@ -2,14 +2,8 @@ package com.example.demo.service.manager;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.demo.entity.Software;
-import com.example.demo.entity.SoftwareFile;
-import com.example.demo.entity.SoftwareOfficialFee;
-import com.example.demo.entity.User;
-import com.example.demo.request.Criteria;
-import com.example.demo.request.GetSoftwareFileInfoRequest;
-import com.example.demo.request.GetSoftwareOfficialFeeRequest;
-import com.example.demo.request.GetSoftwareRequest;
+import com.example.demo.entity.*;
+import com.example.demo.request.*;
 import com.example.demo.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -23,6 +17,54 @@ public class SoftwareManager {
 
     @Resource
     private UserService userService;
+
+    public LambdaQueryWrapper<SoftwareBonus> getBonusWrapper(GetSoftwareBonusRequest request) {
+        LambdaQueryWrapper<SoftwareBonus> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "bonusAmount" : {
+                    wrapper.eq(SoftwareBonus::getBonusAmount, kv.getValue());
+                    break;
+                }
+                case "bonusType" : {
+                    wrapper.eq(SoftwareBonus::getBonusType, kv.getValue());
+                    break;
+                }
+                case "releaseStatus" : {
+                    wrapper.eq(SoftwareBonus::getReleaseStatus, kv.getValue());
+                    break;
+                }
+                case "inventorName" : {
+                    wrapper.eq(SoftwareBonus::getInventorName, kv.getValue());
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
+
+    public LambdaQueryWrapper<Software> getSoftwareWrapper(GetSoftwareBonusRequest request) {
+        LambdaQueryWrapper<Software> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "softwareName" : {
+                    wrapper.eq(Software::getSoftwareName, kv.getValue());
+                    break;
+                }
+                case "softwareCode" : {
+                    wrapper.eq(Software::getSoftwareCode, kv.getValue());
+                    break;
+                }
+                case "version" : {
+                    wrapper.eq(Software::getVersion, kv.getValue());
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
 
     public LambdaQueryWrapper<Software> getWrapper(GetSoftwareFileInfoRequest request) {
         LambdaQueryWrapper<Software> wrapper = new LambdaQueryWrapper<>();
