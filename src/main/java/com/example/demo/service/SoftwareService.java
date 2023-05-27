@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.Software;
+import com.example.demo.entity.SoftwareBonus;
 import com.example.demo.entity.SoftwareFile;
 import com.example.demo.entity.SoftwareOfficialFee;
 import com.example.demo.request.*;
@@ -18,6 +19,8 @@ public interface SoftwareService {
     SoftwareOfficialFee findOfficialFeeByCode(String officialFeeCode);
 
     SoftwareFile findFileByName(String fileName);
+
+    SoftwareBonus findBonusById(Long id);
 
     CommonResult getSoftware(GetSoftwareRequest request) throws Exception;
 
@@ -36,4 +39,8 @@ public interface SoftwareService {
     CommonResult getList(GetSoftwareBonusRequest request);
 
     CommonResult newBonus(NewSoftwareBonusRequest request);
+
+    CommonResult deleteBonus(String id);
+
+    CommonResult updateBonus(UpdateSoftwareBonusRequest request);
 }

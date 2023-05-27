@@ -140,4 +140,26 @@ public class SoftwareController {
             return CommonResult.failed(e.getMessage());
         }
     }
+
+    @ResponseBody
+    @DeleteMapping("/deleteBonus/{id}")
+    public CommonResult deleteBonus(@PathVariable("id") String id) {
+        try {
+            return softwareService.deleteBonus(id);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/updateBonus")
+    public CommonResult updateBonus(@RequestBody UpdateSoftwareBonusRequest request) {
+        try {
+            return softwareService.updateBonus(request);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 }

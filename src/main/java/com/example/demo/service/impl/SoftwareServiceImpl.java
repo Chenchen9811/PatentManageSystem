@@ -61,6 +61,39 @@ public class SoftwareServiceImpl implements SoftwareService {
     @Resource
     private SoftwareBonusMapper bonusMapper;
 
+
+    @Override
+    public CommonResult updateBonus(UpdateSoftwareBonusRequest request) {
+        try {
+            SoftwareBonus bonus = this.findBonusById(request.getBonusId());
+            bonus.setSoftwareId(this.findSoftwareByCode(request.getSoftwareCode()).getId());
+            bonus.setBonusAmount(request.getBonusAmount());
+            bonus.setBonusType(request.getBonusType());
+            bonus.setReleaseStatus(request.getReleaseStatus());
+            bonus.setActualRelease(request.getActualRelease());
+            bonus.setInventorName(request.getInventorName());
+            return bonusMapper.updateById(bonus) == 0 ?
+                    CommonResult.failed("编辑失败") : CommonResult.success(null, "编辑成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult deleteBonus(String id) {
+        try {
+            return bonusMapper.deleteById(Long.parseLong(id)) == 0 ?
+                    CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult newBonus(NewSoftwareBonusRequest request) {
@@ -424,5 +457,10 @@ public class SoftwareServiceImpl implements SoftwareService {
     @Override
     public SoftwareFile findFileByName(String fileName) {
         return fileMapper.selectOne(new LambdaQueryWrapper<SoftwareFile>().eq(SoftwareFile::getFileName, fileName));
+    }
+
+    @Override
+    public SoftwareBonus findBonusById(Long id) {
+        return bonusMapper.selectById(id);
     }
 }
