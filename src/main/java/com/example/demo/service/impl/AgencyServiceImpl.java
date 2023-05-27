@@ -35,7 +35,7 @@ public class AgencyServiceImpl implements AgencyService {
         try {
             LambdaQueryWrapper<Agency> wrapper = new LambdaQueryWrapper<>();
             if (request.getCriteria().getItems().size() != 0) {
-                wrapper.eq(Agency::getAgencyName, request.getCriteria().getItems().get(0));
+                wrapper.eq(Agency::getAgencyName, request.getCriteria().getItems().get(0).getValue());
             }
             return CommonResult.success(PageInfoUtil.getPageInfo(
                     agencyMapper.selectList(wrapper).stream().map(agency -> {
