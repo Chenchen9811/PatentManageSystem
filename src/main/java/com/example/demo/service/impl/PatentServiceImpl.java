@@ -196,6 +196,7 @@ public class PatentServiceImpl implements PatentService {
                         response.setPatentType(patent.getPatentType());
                         response.setActualRelease(bonus.getActualRelease());
                         response.setReleaseStatus(bonus.getReleaseStatus());
+                        response.setInventorName(bonus.getInventorName());
                         return response;
                     }).collect(Collectors.toList()), pageIndex, pageSize), "查找成功");
         } catch (Exception e) {

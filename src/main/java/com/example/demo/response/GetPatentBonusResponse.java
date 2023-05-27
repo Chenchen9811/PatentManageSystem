@@ -12,4 +12,5 @@ public class GetPatentBonusResponse {
     private String releaseStatus;
     private String actualRelease;
     private Integer ranking;
+    private String inventorName;
 }
