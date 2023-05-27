@@ -13,6 +13,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/software")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class SoftwareController {
     @Resource
     private SoftwareService softwareService;

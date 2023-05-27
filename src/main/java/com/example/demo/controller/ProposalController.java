@@ -15,6 +15,7 @@ import javax.validation.Valid;
 @Slf4j
 @RestController
 @RequestMapping("/proposal")
+@CrossOrigin(origins = "*")
 public class ProposalController {
 
     @Resource

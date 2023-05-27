@@ -14,6 +14,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/file")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class FileController {
     @Value("${file.upload.url}")
     private String uploadFilePath;

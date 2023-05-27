@@ -13,6 +13,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/trademark")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class TrademarkController {
     @Resource
     private TrademarkService trademarkService;

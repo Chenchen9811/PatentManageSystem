@@ -14,6 +14,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/bill")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class BillController {
     @Resource
     private BillService billService;

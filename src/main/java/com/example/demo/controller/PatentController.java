@@ -13,6 +13,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/patent")
 @Slf4j
+@CrossOrigin(origins = "*")
 public class PatentController {
     @Resource
     private PatentService patentService;
