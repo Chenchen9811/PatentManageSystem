@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.demo.entity.Software;
 import com.example.demo.entity.SoftwareFile;
 import com.example.demo.entity.SoftwareOfficialFee;
+import com.example.demo.entity.User;
+import com.example.demo.request.Criteria;
 import com.example.demo.request.GetSoftwareFileInfoRequest;
 import com.example.demo.request.GetSoftwareOfficialFeeRequest;
 import com.example.demo.request.GetSoftwareRequest;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 public class SoftwareManager {
@@ -110,6 +113,63 @@ public class SoftwareManager {
         }
         if (StringUtils.isNotBlank(request.getFinishBeginDate()) && StringUtils.isNotBlank(request.getFinishEndDate())) {
             wrapper.between(Software::getFinishDate, request.getFinishBeginDate(), request.getFinishEndDate());
+        }
+        return wrapper;
+    }
+
+    public LambdaQueryWrapper<Software> getWrapper(GetSoftwareRequest request) {
+        LambdaQueryWrapper<Software> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "softwareName" : {
+                    wrapper.eq(Software::getSoftwareName, kv.getValue());
+                    break;
+                }
+                case "softwareCode" : {
+                    wrapper.eq(Software::getSoftwareCode, kv.getValue());
+                    break;
+                }
+                case "inventorName" : {
+                    User user = userService.findUserByUserName(kv.getValue());
+                    wrapper.eq(Software::getInventorId, user.getId());
+                    break;
+                }
+                case "agencyName" : {
+                    wrapper.eq(Software::getAgency, kv.getValue());
+                    break;
+                }
+                case "developWay" : {
+                    wrapper.eq(Software::getDevelopWay, kv.getValue());
+                    break;
+                }
+                case "rightStatus" : {
+                    wrapper.eq(Software::getRightStatus, kv.getValue());
+                    break;
+                }
+                case "proposalBeginDate" : {
+                    String endDate = null;
+                    for (Criteria.KV kV : items) {
+                        if (kV.getKey().equals("proposalEndDate")) {
+                            endDate = kV.getValue();
+                            break;
+                        }
+                    }
+                    wrapper.between(Software::getProposalDate, kv.getValue(), endDate);
+                    break;
+                }
+                case "applicationBeginDate" : {
+                    String endDate = null;
+                    for (Criteria.KV kV : items) {
+                        if (kV.getKey().equals("applicationEndDate")) {
+                            endDate = kV.getValue();
+                            break;
+                        }
+                    }
+                    wrapper.between(Software::getApplicationDate, kv.getValue(), endDate);
+                    break;
+                }
+            }
         }
         return wrapper;
     }

@@ -252,7 +252,7 @@ public class SoftwareServiceImpl implements SoftwareService {
     @Override
     public CommonResult getSoftware(GetSoftwareRequest request) throws Exception {
         try {
-            LambdaQueryWrapper<Software> wrapper = softwareManager.getWrapperByGetSoftwareRequest(request);
+            LambdaQueryWrapper<Software> wrapper = softwareManager.getWrapper(request);
             List<Software> softwareList = softwareMapper.selectList(wrapper);
             return CommonResult.success(PageInfoUtil.getPageInfo(softwareList.stream().map(software -> {
                         GetSoftwareResponse response = new GetSoftwareResponse();

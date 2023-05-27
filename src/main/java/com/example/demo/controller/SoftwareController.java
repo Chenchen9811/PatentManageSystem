@@ -35,7 +35,7 @@ public class SoftwareController {
 
 
     @ResponseBody
-    @PostMapping("/getSoftware")
+    @PostMapping("/getList")
     public CommonResult getSoftware(@Valid @RequestBody GetSoftwareRequest request, BindingResult bindingResult) {
         CommonResult result = null;
         try {
