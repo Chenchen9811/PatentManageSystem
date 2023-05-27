@@ -24,10 +24,50 @@ public class ProposalManager {
     public LambdaQueryWrapper<Proposal> buildWrapperByRequest1(GetProposalRequest1 request) {
         LambdaQueryWrapper<Proposal> wrapper = new LambdaQueryWrapper<>();
         List<GetProposalRequest1.Criteria.KV> items = request.getCriteria().getItems();
-        int size = items.size();
-        Map<String, String> map = new HashMap<>();
         for (GetProposalRequest1.Criteria.KV kv : items) {
-            map.put(kv.getKey(), kv.getValue());
+            String key = kv.getKey();
+            switch (key) {
+                case "proposalCode" : {
+                    wrapper.eq(Proposal::getProposalCode, kv.getValue());
+                    break;
+                }
+                case "proposalName" : {
+                    wrapper.eq(Proposal::getProposalName, kv.getValue());
+                    break;
+                }
+                case "proposalType": {
+                    wrapper.eq(Proposal::getProposalType, kv.getValue());
+                    break;
+                }
+                case "proposalState": {
+                    wrapper.eq(Proposal::getProposalState, kv.getValue());
+                    break;
+                }
+                case "proposerCode": {
+                    wrapper.eq(Proposal::getProposerCode, kv.getValue());
+                    break;
+                }
+                case "proposerName": {
+                    wrapper.eq(Proposal::getProposerName, kv.getValue());
+                    break;
+                }
+                case "departmentName": {
+                    Department department = departmentService.findDepartmentByDepartmentName(kv.getValue());
+                    wrapper.eq(Proposal::getDepartmentId, department.getId());
+                    break;
+                }
+                case "startDate": {
+                    String endDate = null;
+                    for (GetProposalRequest1.Criteria.KV kV : items) {
+                        if (kv.getKey().equals("endDate")) {
+                            endDate = kv.getValue();
+                            break;
+                        }
+                    }
+                    wrapper.between(Proposal::getProposalDate, kv.getValue(), endDate);
+                    break;
+                }
+            }
         }
         
 //        if (StringUtils.isNotBlank(request.getCriteria().getItems().getProposalCode()) {
