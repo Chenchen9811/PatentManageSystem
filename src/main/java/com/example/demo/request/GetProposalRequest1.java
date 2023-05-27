@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class GetProposalRequest1 {
     @NotNull(message = "当前页码不能为空")
-    private Integer pageNum;
+    private Integer pageIndex;
     @NotNull(message = "每页显示条数不能为空")
     private Integer pageSize;
     private Boolean pageable;

@@ -166,7 +166,7 @@ public class ProposalServiceImpl implements ProposalService {
                 }
             }
 //            PageInfo<Proposal> pageInfo = PageInfoUtil.getPageInfo(proposalList, request.getPageIndex(), request.getPageSize());
-            log.info("pageIndex:{}, pageSize:{}", request.getPageNum(), request.getPageSize());
+            log.info("pageIndex:{}, pageSize:{}", request.getPageIndex(), request.getPageSize());
             // Proposal和Inventor转ProposalVo
             List<ProposalVo1> vo1List = new ArrayList<>();
             for (Proposal proposal : proposalList) {
@@ -181,7 +181,7 @@ public class ProposalServiceImpl implements ProposalService {
                 vo.setDepartmentName(departmentService.findDepartmentById(proposal.getDepartmentId()).getDepartmentName());
                 vo1List.add(vo);
             }
-            return CommonResult.success(PageInfoUtil.getPageInfo(vo1List, request.getPageNum(), request.getPageSize()), "查找成功!");
+            return CommonResult.success(PageInfoUtil.getPageInfo(vo1List, request.getPageIndex(), request.getPageSize()), "查找成功!");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
