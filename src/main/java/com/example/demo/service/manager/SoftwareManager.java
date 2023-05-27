@@ -43,6 +43,50 @@ public class SoftwareManager {
         }
         return wrapper;
     }
+    public LambdaQueryWrapper<SoftwareOfficialFee> getCriteriaWrapper(GetSoftwareOfficialFeeRequest request) {
+        LambdaQueryWrapper<SoftwareOfficialFee> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "officialFeeName" : {
+                    wrapper.eq(SoftwareOfficialFee::getOfficialFeeName, kv.getValue());
+                    break;
+                }
+                case "dueDateBegin" : {
+                    String endDate = null;
+                    for (Criteria.KV kV : items) {
+                        if (kV.getKey().equals("dueDateEnd")) {
+                            endDate = kV.getValue();
+                        }
+                        break;
+                    }
+                    wrapper.between(SoftwareOfficialFee::getDueDate, kv.getValue(), endDate);
+                    break;
+                }
+                case "actualPayDateBegin" : {
+                    String endDate = null;
+                    for (Criteria.KV kV : items) {
+                        if (kV.getKey().equals("actualPayDateEnd")) {
+                            endDate = kV.getValue();
+                        }
+                        break;
+                    }
+                    wrapper.between(SoftwareOfficialFee::getActualPayDate, kv.getValue(), endDate);
+                    break;
+                }
+                case "dueAmount" : {
+                    wrapper.eq(SoftwareOfficialFee::getDueAmount, kv.getValue());
+                    break;
+                }
+                case "actualAmount" : {
+                    wrapper.eq(SoftwareOfficialFee::getActualAmount, kv.getValue());
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
+
 
     public LambdaQueryWrapper<SoftwareOfficialFee> getWrapper(GetSoftwareOfficialFeeRequest request) {
         LambdaQueryWrapper<SoftwareOfficialFee> wrapper = new LambdaQueryWrapper<>();

@@ -9,6 +9,7 @@ import com.example.demo.entity.Agency;
 import com.example.demo.mapper.AgencyMapper;
 import com.example.demo.request.GetAgencyRequest;
 import com.example.demo.request.NewAgencyRequest;
+import com.example.demo.request.UpdateAgencyRequest;
 import com.example.demo.response.GetAgencyResponse;
 import com.example.demo.service.AgencyService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,49 @@ public class AgencyServiceImpl implements AgencyService {
     @Override
     public Agency findAgencyByName(String agencyName) {
         return agencyMapper.selectOne(new LambdaQueryWrapper<Agency>().eq(Agency::getAgencyName, agencyName));
+    }
+
+    @Override
+    public Agency findAgencyByCode(String agencyCode) {
+        return agencyMapper.selectOne(new LambdaQueryWrapper<Agency>().eq(Agency::getAgencyCode, agencyCode));
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult deleteAgency(String agencyCode) {
+        try {
+            Agency agency = this.findAgencyByCode(agencyCode);
+            return agencyMapper.deleteById(agency.getId()) == 0 ? CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult updateAgency(UpdateAgencyRequest request) {
+        try {
+            Agency agency = this.findAgencyByCode(request.getAgencyCode());
+            agency.setAgencyRemark(request.getAgencyRemark());
+            agency.setAgencyAddress(request.getAgencyAddress());
+            agency.setAgencyPhone(request.getAgencyPhone());
+            agency.setAgencyEmail(request.getAgencyEmail());
+            agency.setAgencyHolder(request.getAgencyHolder());
+            agency.setAgentName(request.getAgentName());
+            agency.setAgencyName(request.getAgencyName());
+            return agencyMapper.updateById(agency) == 0 ? CommonResult.failed("编辑失败") : CommonResult.success(null, "编辑成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public CommonResult getSingleAgency(String agencyCode) {
+        return null;
     }
 
     @Override

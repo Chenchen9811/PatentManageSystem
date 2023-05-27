@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.common.CommonResult;
 import com.example.demo.request.GetAgencyRequest;
 import com.example.demo.request.NewAgencyRequest;
+import com.example.demo.request.UpdateAgencyRequest;
 import com.example.demo.service.AgencyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -42,6 +43,39 @@ public class AgencyController {
             return result;
         } catch (Exception e) {
             e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/getAgency")
+    public CommonResult getSingleAgency(@RequestParam("agencyCode") String agencyCode) {
+        try {
+            return agencyService.getSingleAgency(agencyCode);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/updateAgency")
+    public CommonResult updateAgency(@Valid @RequestBody UpdateAgencyRequest request) {
+        try {
+            return agencyService.updateAgency(request);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @DeleteMapping("/deleteAgency/{agencyCode}")
+    public CommonResult deleteAgency(@PathVariable("agencyCode") String agencyCode) {
+        try {
+            return agencyService.deleteAgency(agencyCode);
+        } catch (Exception e) {
+//            e.printStackTrace();
             return CommonResult.failed(e.getMessage());
         }
     }

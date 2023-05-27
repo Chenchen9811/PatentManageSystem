@@ -17,4 +17,5 @@ public class GetSoftwareOfficialFeeRequest {
     private String actualPayDateEnd;
     private String dueAmount;
     private String actualAmount;
+    private Criteria criteria;
 }
