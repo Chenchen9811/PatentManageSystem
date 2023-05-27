@@ -90,6 +90,28 @@ public class PatentManager {
         return wrapper;
     }
 
+    public LambdaQueryWrapper<Patent> getWrapper(GetPatentOfficialFeeRequest request) {
+        LambdaQueryWrapper<Patent> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "patentCode" : {
+                    wrapper.eq(Patent::getPatentCode, kv.getValue());
+                    break;
+                }
+                case "patentName" : {
+                    wrapper.eq(Patent::getPatentName, kv.getValue());
+                    break;
+                }
+                case "totalFee" : {
+                    wrapper.eq(Patent::getTotalFee, kv.getValue());
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
+
 
     public Map<String, Object> getWrapper(GetPatentRequest request) {
         LambdaQueryWrapper<Patent> patentWrapper = new LambdaQueryWrapper<>();

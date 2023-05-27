@@ -378,12 +378,20 @@ public class PatentServiceImpl implements PatentService {
     @Override
     public CommonResult getOfficialFee(GetPatentOfficialFeeRequest request) throws Exception {
         try {
-            LambdaQueryWrapper<Patent> wrapper = patentManager.getWrapperByOfficialFee(request);
+            LambdaQueryWrapper<Patent> wrapper = patentManager.getWrapper(request);
             List<Patent> patentList = patentMapper.selectList(wrapper);
-            if (StringUtils.isNotBlank(request.getProposerName())) {
-                Proposal proposal = proposalService.findProposalByProposerName(request.getProposerName());
-                patentList.stream().filter(patent -> patent.getProposalId().equals(proposal.getId())).collect(Collectors.toList());
+            List<Criteria.KV> items = request.getCriteria().getItems();
+            for (Criteria.KV kv : items) {
+                if (kv.getKey().equals("proposerName")) {
+                    Proposal proposal = proposalService.findProposalByProposerName(request.getProposerName());
+                    patentList.stream().filter(patent -> patent.getProposalId().equals(proposal.getId())).collect(Collectors.toList());
+                    break;
+                }
             }
+//            if (StringUtils.isNotBlank(request.getProposerName())) {
+//                Proposal proposal = proposalService.findProposalByProposerName(request.getProposerName());
+//                patentList.stream().filter(patent -> patent.getProposalId().equals(proposal.getId())).collect(Collectors.toList());
+//            }
             return CommonResult.success(PageInfoUtil.getPageInfo(
                     patentList.stream().map(patent -> {
                         GetPatentOfficialFeeResponse response = new GetPatentOfficialFeeResponse();

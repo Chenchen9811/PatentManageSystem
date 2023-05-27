@@ -87,7 +87,7 @@ public class PatentController {
     }
 
     @ResponseBody
-    @PostMapping("/getOfficialFee")
+    @PostMapping("/getOfficialFeeList")
     public CommonResult getOfficialFee(@RequestBody GetPatentOfficialFeeRequest request) {
         CommonResult result = null;
         try {
