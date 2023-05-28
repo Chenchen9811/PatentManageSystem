@@ -327,12 +327,16 @@ public class UserServiceImpl implements UserService {
             }
             List<Role> roleList = roleMapper.selectList(wrapper);
             // 查询角色对应的权限
-            Map<String, List<String>> rolePermissionMap = new HashMap<>();
+            Map<String, List<RoleVo>> rolePermissionMap = new HashMap<>();
+            List<RoleVo> roleVoList = new ArrayList<>();
             for (Role role : roleList) {
-                rolePermissionMap.put(role.getRoleName(), this.findPermissionByRoleId(role.getId()).stream().map(Permission::getPermissionName)
+                RoleVo roleVo = new RoleVo();
+                roleVo.setRoleName(role.getRoleName());
+                roleVo.setPermission(this.findPermissionByRoleId(role.getId()).stream().map(Permission::getPermissionName)
                         .collect(Collectors.toList()));
+                roleVoList.add(roleVo);
             }
-            return CommonResult.success(rolePermissionMap, "查找成功");
+            return CommonResult.success(rolePermissionMap.put("roleList", roleVoList), "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
