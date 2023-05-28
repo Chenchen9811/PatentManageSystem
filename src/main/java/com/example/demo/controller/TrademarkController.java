@@ -145,7 +145,7 @@ public class TrademarkController {
     }
 
     @ResponseBody
-    @PostMapping("/getFileInfo")
+    @PostMapping("/getFileList")
     public CommonResult getFileInfo(@Valid @RequestBody GetTrademarkFileInfoRequest request, BindingResult bindingResult) {
         try {
             return trademarkService.getFileInfo(request);

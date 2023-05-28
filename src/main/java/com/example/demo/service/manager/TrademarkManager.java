@@ -1,10 +1,7 @@
 package com.example.demo.service.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.demo.entity.Trademark;
-import com.example.demo.entity.TrademarkFile;
-import com.example.demo.entity.TrademarkOfficialFee;
-import com.example.demo.entity.User;
+import com.example.demo.entity.*;
 import com.example.demo.request.Criteria;
 import com.example.demo.request.GetTrademarkFileInfoRequest;
 import com.example.demo.request.GetTrademarkOfficialFeeRequest;
@@ -16,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TrademarkManager {
@@ -30,6 +29,7 @@ public class TrademarkManager {
     public LambdaQueryWrapper<TrademarkFile> getFileWrapper(GetTrademarkFileInfoRequest request) {
         LambdaQueryWrapper<TrademarkFile> wrapper = new LambdaQueryWrapper<>();
         List<Criteria.KV> items = request.getCriteria().getItems();
+        Set<Long> trademarkIds = new HashSet<>();
         for (Criteria.KV kv : items) {
             switch (kv.getKey()) {
                 case "fileType": {
@@ -43,7 +43,13 @@ public class TrademarkManager {
                 }
                 case "trademarkCode": {
                     Trademark trademark = trademarkService.findTrademarkByCode(kv.getValue());
-                    wrapper.eq(TrademarkFile::getTrademarkId, trademark.getId());
+                    trademarkIds.add(trademark.getId());
+//                    wrapper.eq(TrademarkFile::getTrademarkId, trademark.getId());
+                    break;
+                }
+                case "trademarkName" : {
+                    Trademark trademark = trademarkService.findTrademarkByName(kv.getValue());
+                    trademarkIds.add(trademark.getId());
                     break;
                 }
                 case "uploadDateBegin": {
@@ -57,7 +63,15 @@ public class TrademarkManager {
                     wrapper.between(TrademarkFile::getUploadDate, kv.getValue(), endDate);
                     break;
                 }
+                case "uploaderName" : {
+                    User user = userService.findUserByUserName(kv.getValue());
+                    wrapper.eq(TrademarkFile::getUploaderId, user.getId());
+                    break;
+                }
             }
+        }
+        if (!trademarkIds.isEmpty()) {
+            wrapper.in(TrademarkFile::getTrademarkId, trademarkIds);
         }
 //        if (StringUtils.isNotBlank(request.getFileName())) {
 //            wrapper.eq(TrademarkFile::getFileName, request.getFileName());

@@ -109,7 +109,7 @@ public class SoftwareController {
     }
 
     @ResponseBody
-    @PostMapping("/getFileInfo")
+    @PostMapping("/getFileList")
     public CommonResult getFileInfo(@Valid @RequestBody GetSoftwareFileInfoRequest request, BindingResult bindingResult) {
         try {
             return softwareService.getFileInfo(request);
