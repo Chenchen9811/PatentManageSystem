@@ -100,7 +100,7 @@ public class UserController implements Constants, Message {
     }
 
     @ResponseBody
-    @GetMapping(path = "/getUser")
+    @PostMapping(path = "/getUser")
     public CommonResult getUser(@Valid @RequestBody GetUserRequest request, BindingResult bindingResult) {
         CommonResult result = null;
         try {
