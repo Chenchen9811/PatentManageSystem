@@ -100,7 +100,7 @@ public class ProposalServiceImpl implements ProposalService {
             proposal.setProposerId(proposer.getId());
             proposal.setDepartmentId(proposer.getDepartmentId());
             proposal.setProposerCode(proposer.getUserCode());
-            proposal.setProposalType(CommonUtil.getProposalStatusCode("在审"));
+            proposal.setProposalState(CommonUtil.getProposalStatusCode("在审"));
             proposalMapper.insert(proposal);
             List<NewProposalRequest.InventorVo> inventorList = request.getListOfInventor();
             Collections.sort(inventorList, new Comparator<NewProposalRequest.InventorVo>() {
