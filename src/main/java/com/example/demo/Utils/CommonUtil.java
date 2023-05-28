@@ -129,6 +129,23 @@ public class CommonUtil implements Constants {
         }
     }
 
+    public static String getProposalTypeString(Integer code) {
+        switch (code) {
+            case 0 :
+                return "发明专利";
+            case 1:
+                return "实用新型专利";
+            case 2:
+                return "外观设计专利";
+            case 3:
+                return "软著";
+            case 4:
+                return "商标";
+            default:
+                return "未知类型";
+        }
+    }
+
     public static Integer getProposalStatusCode(String proposalStatus) {
         switch (proposalStatus) {
             case "全部":
@@ -145,6 +162,25 @@ public class CommonUtil implements Constants {
                 return 5;
         }
     }
+
+    public static String getProposalStatusString(Integer code) {
+        switch (code) {
+            case 0:
+                return "全部";
+            case 1:
+                return "在审";
+            case 2:
+                return "通过";
+            case 3:
+                return "不通过";
+            case 4:
+                return "补充文件";
+            default:
+                return "未知状态";
+        }
+    }
+
+
 
 
     public static String getFileUrl(String fileName) {

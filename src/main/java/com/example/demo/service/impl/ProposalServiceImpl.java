@@ -177,8 +177,9 @@ public class ProposalServiceImpl implements ProposalService {
                 List<Inventor> inventorList = inventorMapper.selectList(new LambdaQueryWrapper<Inventor>().eq(Inventor::getProposalId, proposal.getId()));
                 vo.setProposalCode(proposal.getProposalCode());
                 vo.setProposalName(proposal.getProposalName());
-                vo.setProposalType(proposal.getProposalType());
+                vo.setProposalType(CommonUtil.getProposalTypeString(proposal.getProposalType()));
                 vo.setProposerName(proposal.getProposerName());
+                vo.setProposalState(CommonUtil.getProposalStatusString(proposal.getProposalState()));
                 vo.setProposalDate(proposal.getProposalDate().toString());
                 vo.setInventorNameList(inventorList.stream().map(Inventor::getInventorName).collect(Collectors.toList()));
                 vo.setDepartmentName(departmentService.findDepartmentById(proposal.getDepartmentId()).getDepartmentName());

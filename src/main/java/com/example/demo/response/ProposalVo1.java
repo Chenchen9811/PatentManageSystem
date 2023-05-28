@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class ProposalVo1 {
-    private Integer proposalType;
+    private String proposalState;
     private Integer reviewState;
     private List<String> inventorNameList;
     private String proposerName;
@@ -14,4 +14,5 @@ public class ProposalVo1 {
     private String proposalCode;
     private String proposalName;
     private String departmentName;
+    private String proposalType;
 }
