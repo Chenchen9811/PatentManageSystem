@@ -143,14 +143,18 @@ public class UserServiceImpl implements UserService {
             user.setDepartmentId(department.getId());
             user.setPassword(request.getPassword());
             user.setPhone(request.getPhone());
-            userMapper.insert(user);
+//            userMapper.insert(user);
+
             UserRole userRole = new UserRole();
             // 获取角色id
             String roleName = request.getRoleName();
             Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("role_name", roleName));
+            user.setRoleId(role.getId());
+            user.setDelFlag("N");
             userRole.setRoleId(role.getId());
             userRole.setUserId(userRole.getUserId());
             userRole.setCreateUser(hostHolder.getUser().getId());
+
             userRoleMapper.insert(userRole);
             return CommonResult.success(null, "新增用户成功");
         } catch (Exception e) {
