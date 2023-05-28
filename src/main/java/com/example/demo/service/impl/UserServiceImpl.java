@@ -158,6 +158,7 @@ public class UserServiceImpl implements UserService {
             userRole.setRoleId(role.getId());
             userRole.setUserId(user.getId());
             userRole.setCreateUser(hostHolder.getUser().getId());
+            userRole.setCreateTime(new Timestamp(System.currentTimeMillis()));
             return  userRoleMapper.insert(userRole) == 1 ?
                     CommonResult.success(null, "新增用户成功") : CommonResult.failed("新增用户失败");
         } catch (Exception e) {
