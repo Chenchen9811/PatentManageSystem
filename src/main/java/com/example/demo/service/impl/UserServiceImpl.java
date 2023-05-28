@@ -256,7 +256,7 @@ public class UserServiceImpl implements UserService {
                 return response;
             }).collect(Collectors.toList());
             Map<String, List<GetUserResponse>> map = new HashMap<>();
-            map.put("userList", responseList);
+            map.put("list", responseList);
             return CommonResult.success(map, "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
