@@ -216,7 +216,7 @@ public class UserServiceImpl implements UserService {
 //            }
             LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
             List<Criteria.KV> items = request.getCriteria().getItems();
-            for (Criteria.KV kv : items ) {
+            for (Criteria.KV kv : items) {
                 if (kv.getKey().equals("userName")) {
                     wrapper.eq(User::getUserName, kv.getValue());
                     break;
