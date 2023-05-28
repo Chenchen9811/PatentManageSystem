@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
     public CommonResult addUser(AddUserRequest request) throws Exception {
         try {
             User user = null;
-            user = userMapper.selectOne(new QueryWrapper<User>().eq("user_code", request.getUserCode()));
+            user = userMapper.selectOne(new QueryWrapper<User>().eq("usercode", request.getUserCode()));
             if (null != user) {
                 return CommonResult.failed("用户已存在!");
             }
