@@ -67,10 +67,11 @@ public class UserController implements Constants, Message {
         CommonResult result = null;
         try {
             result = userService.deleteUser(userCode);
+            return result;
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
         }
-        return null;
     }
 
     @ResponseBody
@@ -129,10 +130,10 @@ public class UserController implements Constants, Message {
 
     @ResponseBody
     @GetMapping(path = "/getRole")
-    public CommonResult getRole(@RequestParam("roleName") String roleName) {
+    public CommonResult getRole(@Valid @RequestBody GetRoleRequest request, BindingResult bindingResult) {
         CommonResult result = null;
         try {
-            result = userService.getRole(roleName);
+            result = userService.getRole(request);
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

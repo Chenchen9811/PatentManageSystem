@@ -6,6 +6,8 @@ import com.example.demo.Utils.CommonUtil;
 import com.example.demo.Utils.HostHolder;
 import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
+import com.example.demo.common.ProposalStatus;
+import com.example.demo.common.ProposalType;
 import com.example.demo.common.ReviewStatus;
 import com.example.demo.entity.*;
 import com.example.demo.response.ProposalVo1;
@@ -89,7 +91,7 @@ public class ProposalServiceImpl implements ProposalService {
             proposal = new Proposal();
             proposal.setProposalCode(request.getProposalCode());
             proposal.setProposalName(request.getProposalName());
-            proposal.setProposalType(request.getPatentType());
+            proposal.setProposalType(CommonUtil.judgeProposalType(request.getPatentType()));
             proposal.setProposerName(request.getProposerName());
             proposal.setProposalDate(new Timestamp(System.currentTimeMillis()));
             proposal.setSubstance(request.getDetailText());
@@ -244,4 +246,6 @@ public class ProposalServiceImpl implements ProposalService {
     public List<Proposal> findProposalListByIds(List<Long> proposalIds) {
         return proposalMapper.selectBatchIds(proposalIds);
     }
+
+
 }

@@ -222,6 +222,7 @@ public class UserServiceImpl implements UserService {
 //                return CommonResult.failed("用户不存在");
 //            }
             LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(User::getDelFlag, "N");
             List<Criteria.KV> items = request.getCriteria().getItems();
             for (Criteria.KV kv : items) {
                 if (kv.getKey().equals("userName")) {
@@ -313,18 +314,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public CommonResult getRole(String roleName) throws Exception {
+    public CommonResult getRole(GetRoleRequest request) throws Exception {
         try {
-            Role role = this.findRoleByRoleName(roleName);
-            if (null == role) {
-                return CommonResult.failed("该角色不存在");
+//            Role role = this.findRoleByRoleName(roleName);
+//            if (null == role) {
+//                return CommonResult.failed("该角色不存在");
+//            }
+            List<Criteria.KV> items = request.getCriteria().getItems();
+            LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
+            if (items.size() != 0) {
+                wrapper.eq(Role::getRoleName, items.get(0).getValue());
             }
+            List<Role> roleList = roleMapper.selectList(wrapper);
             // 查询角色对应的权限
-            List<Permission> permissionList = this.findPermissionByRoleId(role.getId());
-            return CommonResult.success(new RoleVo(role.getRoleName(),
-                    permissionList.stream()
-                            .map(Permission::getPermissionName)
-                            .collect(Collectors.toList())), "查找成功");
+            Map<String, List<String>> rolePermissionMap = new HashMap<>();
+            for (Role role : roleList) {
+                rolePermissionMap.put(role.getRoleName(), this.findPermissionByRoleId(role.getId()).stream().map(Permission::getPermissionName)
+                        .collect(Collectors.toList()));
+            }
+            return CommonResult.success(rolePermissionMap, "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

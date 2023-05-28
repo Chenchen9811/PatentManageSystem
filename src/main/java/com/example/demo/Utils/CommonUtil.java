@@ -112,6 +112,17 @@ public class CommonUtil implements Constants {
         }
     }
 
+    public static Integer judgeProposalType(String type) {
+        switch (type) {
+            case "发明专利" : return 0;
+            case "实用新型专利" : return 1;
+            case "外观设计专利" : return 2;
+            case "软著" : return 3;
+            case "商标" : return 4;
+            default: return  5;
+        }
+    }
+
     public static String getFileUrl(String fileName) {
         return UPLOAD_PATH + File.separator + fileName;
     }

@@ -17,7 +17,7 @@ public class NewProposalRequest {
     private String proposerName;
     private String datePicker;
     @NotNull(message = "知识产权类型不能为空")
-    private Integer patentType;
+    private String patentType;
     private List<InventorVo> listOfInventor;
     private String detailText;
 

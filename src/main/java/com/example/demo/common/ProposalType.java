@@ -19,7 +19,7 @@ public enum ProposalType {
         return name;
     }
 
-    public Integer getCode() {
+    public Integer getCode(String name) {
         return code;
     }
 }
