@@ -70,22 +70,14 @@ public class PatentServiceImpl implements PatentService {
             List<Patent> patentList = null;
             List<PatentFile> fileList = null;
             List<User> uploaderList = null;
-            LambdaQueryWrapper<PatentFile> wrapper = patentManager.getWrapper(request);
+            LambdaQueryWrapper<PatentFile> wrapper = patentManager.getFileWrapper(request);
             Map<Long, Patent> patentMap = new HashMap<>();
             Map<Long, User> uploaderMap = new HashMap<>();
-            if (StringUtils.isNotBlank(request.getPatentCode())) {
-                // 如果专利编号不为空，就差某个专利的所有文件信息
-                patentList = new ArrayList<>();
-                Patent patent = this.findPatentByCode(request.getPatentCode());
-                patentList.add(patent);
-                wrapper.eq(PatentFile::getPatentId, patent.getId());
-                fileList = fileMapper.selectList(wrapper);
+            fileList = fileMapper.selectList(wrapper);
+            if (fileList.size() == 0) {
+                return CommonResult.failed("没有符合条件的文件");
             }
-            else {
-                // 专利编号不为空，那么所有专利的文件信息都要查，然后再过滤一部分PatentFile的查询条件
-                patentList = patentMapper.selectList(new LambdaQueryWrapper<Patent>());
-                fileList = fileMapper.selectList(wrapper);
-            }
+            patentList = this.findPatentListByIds(fileList.stream().map(PatentFile::getPatentId).distinct().collect(Collectors.toList()));
             uploaderList = userService.findUserListByIds(fileList.stream().map(PatentFile::getUploaderId).distinct().collect(Collectors.toList()));
             for (Patent patent : patentList) {
                 patentMap.put(patent.getId(), patent);
@@ -632,5 +624,10 @@ public class PatentServiceImpl implements PatentService {
     @Override
     public PatentFile findFileByPatentId(Long patentId) {
         return fileMapper.selectOne(new LambdaQueryWrapper<PatentFile>().eq(PatentFile::getPatentId, patentId));
+    }
+
+    @Override
+    public List<Patent> findPatentListByIds(List<Long> ids) {
+        return patentMapper.selectBatchIds(ids);
     }
 }

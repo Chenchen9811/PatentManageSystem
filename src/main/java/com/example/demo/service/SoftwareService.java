@@ -7,12 +7,16 @@ import com.example.demo.entity.SoftwareFile;
 import com.example.demo.entity.SoftwareOfficialFee;
 import com.example.demo.request.*;
 
+import java.util.List;
+
 public interface SoftwareService {
     CommonResult newSoftware(NewSoftwareRequest request) throws Exception;
 
     Software findSoftwareByName(String softwareName);
 
     Software findSoftwareByCode(String softwareCode);
+
+    List<Software> findSoftwareListByIds(List<Long> ids);
 
     SoftwareOfficialFee findOfficialFeeByName(String officialFeeName);
 

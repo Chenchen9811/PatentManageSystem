@@ -17,4 +17,5 @@ public class GetTrademarkFileInfoRequest {
     private String uploadDateEnd;
     @NotBlank(message = "文件类型不能为空")
     private String fileType;
+    private Criteria criteria;
 }

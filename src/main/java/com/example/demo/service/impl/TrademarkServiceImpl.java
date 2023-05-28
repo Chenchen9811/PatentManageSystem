@@ -69,21 +69,15 @@ public class TrademarkServiceImpl implements TrademarkService {
             List<TrademarkFile> fileList = null;
             List<Proposal> proposalList = null;
             List<User> uploaderList = null;
-            // 查询符合条件的商标
-            LambdaQueryWrapper<Trademark> trademarkWrapper = trademarkManager.getWrapper(request);
-            trademarkList = trademarkMapper.selectList(trademarkWrapper);
-            if (trademarkList.size() == 0) {
-                return CommonResult.failed("没有找到符合条件的商标，查找失败");
-            }
             // 查找符合条件的商标文件
             LambdaQueryWrapper<TrademarkFile> fileWrapper = trademarkManager.getFileWrapper(request);
             fileList = fileMapper.selectList(fileWrapper);
             if (fileList.size() == 0) {
                 return CommonResult.failed("没有找到符合条件的商标文件，查找失败");
             }
-            // 获取查找条件相交的商标和商标文件
-            List<Long> fileTrademarkIds = fileList.stream().map(TrademarkFile::getTrademarkId).collect(Collectors.toList());
-            trademarkList = trademarkList.stream().filter(trademark -> fileTrademarkIds.contains(trademark.getId())).collect(Collectors.toList());
+            // 获取商标文件对应的商标信息，用于构造返回值
+            List<Long> fileTrademarkIds = fileList.stream().map(TrademarkFile::getTrademarkId).distinct().collect(Collectors.toList());
+            trademarkList = this.findTrademarkListByIds(fileTrademarkIds);
             if (trademarkList.size() == 0) {
                 return CommonResult.failed("查找的商标没有对应的商标文件，查找失败");
             }
@@ -452,5 +446,10 @@ public class TrademarkServiceImpl implements TrademarkService {
     @Override
     public TrademarkFile findFileByName(String fileName) {
         return fileMapper.selectOne(new LambdaQueryWrapper<TrademarkFile>().eq(TrademarkFile::getFileName, fileName));
+    }
+
+    @Override
+    public List<Trademark> findTrademarkListByIds(List<Long> ids) {
+        return trademarkMapper.selectBatchIds(ids);
     }
 }

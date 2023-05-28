@@ -1,16 +1,17 @@
 package com.example.demo.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.example.demo.Utils.CommonUtil;
 import com.example.demo.Utils.HostHolder;
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.*;
+import com.example.demo.request.*;
+import com.example.demo.response.GetUserResponse;
 import com.example.demo.response.RoleVo;
 import com.example.demo.mapper.*;
-import com.example.demo.request.AddRoleRequest;
-import com.example.demo.request.AddUserRequest;
-import com.example.demo.request.UpdateUserRequest;
+import com.example.demo.service.DepartmentService;
 import com.example.demo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -21,14 +22,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
+
+    @Resource
+    private DepartmentService departmentService;
 
     @Resource
     private UserMapper userMapper;
@@ -50,6 +52,21 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private UserRoleMapper userRoleMapper;
+
+
+    @Override
+    public CommonResult getRoleList() {
+        try {
+            List<Role> roleList = roleMapper.selectList(new LambdaQueryWrapper<>());
+            Map<String, List<String>> map = new HashMap<>();
+            map.put("roleNameList", roleList.stream().map(Role::getRoleName).collect(Collectors.toList()));
+            return CommonResult.success(map, "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities(Long userId) {
@@ -76,7 +93,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserByUserId(Long userId) {
         return userMapper.selectOne(new QueryWrapper<User>().eq("id", userId).eq("del_flag", "N"));
-}
+    }
 
     @Override
     public User findUserByUserName(String userName) {
@@ -175,7 +192,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CommonResult deleteUser(String userCode) throws Exception{
+    public CommonResult deleteUser(String userCode) throws Exception {
         try {
             UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
             User user = this.findUserByUserCode(userCode);
@@ -191,13 +208,56 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public CommonResult getUser(String userName) throws Exception {
+    public CommonResult getUser(GetUserRequest request) throws Exception {
         try {
-            User user = this.findUserByUserName(userName);
-            if (null == user) {
+//            User user = this.findUserByUserName(userName);
+//            if (null == user) {
+//                return CommonResult.failed("用户不存在");
+//            }
+            LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+            List<Criteria.KV> items = request.getCriteria().getItems();
+            for (Criteria.KV kv : items ) {
+                if (kv.getKey().equals("userName")) {
+                    wrapper.eq(User::getUserName, kv.getValue());
+                    break;
+                }
+            }
+            List<User> userList = userMapper.selectList(wrapper);
+            if (userList.size() == 0) {
                 return CommonResult.failed("用户不存在");
             }
-            return CommonResult.success(user, "查找成功");
+            List<Long> roleIds = userList.stream().map(User::getRoleId).distinct().collect(Collectors.toList());
+            List<Long> departmentIds = userList.stream().map(User::getDepartmentId).distinct().collect(Collectors.toList());
+            List<Department> departmentList = departmentService.getDepartmentListByIds(departmentIds);
+            if (departmentList.size() == 0) {
+                return CommonResult.failed("没有找到相关用户所对应的部门");
+            }
+            List<Role> roleList = roleMapper.selectBatchIds(roleIds);
+            if (roleList.size() == 0) {
+                return CommonResult.failed("没有找到相关用户所对应的角色");
+            }
+            Map<Long, Department> departmentMap = new HashMap<>();
+            Map<Long, Role> roleMap = new HashMap<>();
+            for (Department department : departmentList) {
+                departmentMap.put(department.getId(), department);
+            }
+            for (Role role : roleList) {
+                roleMap.put(role.getId(), role);
+            }
+            List<GetUserResponse> responseList = userList.stream().map(user -> {
+                GetUserResponse response = new GetUserResponse();
+                Department department = departmentMap.get(user.getDepartmentId());
+                Role role = roleMap.get(user.getRoleId());
+                response.setUserName(user.getUserName());
+                response.setRoleName(role.getRoleName());
+                response.setDepartmentName(department.getDepartmentName());
+                response.setPhone(user.getPhone());
+                response.setUserCode(user.getUserCode());
+                return response;
+            }).collect(Collectors.toList());
+            Map<String, List<GetUserResponse>> map = new HashMap<>();
+            map.put("userList", responseList);
+            return CommonResult.success(map, "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

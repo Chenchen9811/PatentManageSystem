@@ -33,4 +33,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     public Department findDepartmentByDepartmentName(String departmentName) {
         return departmentMapper.selectOne(new LambdaQueryWrapper<Department>().eq(Department::getDepartmentName, departmentName));
     }
+
+    @Override
+    public List<Department> getDepartmentListByIds(List<Long> ids) {
+        return departmentMapper.selectBatchIds(ids);
+    }
 }

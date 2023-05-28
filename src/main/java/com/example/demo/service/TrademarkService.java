@@ -17,6 +17,8 @@ public interface TrademarkService {
 
     Trademark findTrademarkByInventorName(String inventorName);
 
+    List<Trademark> findTrademarkListByIds(List<Long> ids);
+
     Trademark findTrademarkById(Long trademarkId);
 
     List<TrademarkBonus> findBonusListByTrademarkCode(String trademarkCode);

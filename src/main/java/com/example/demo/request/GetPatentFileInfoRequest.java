@@ -17,4 +17,5 @@ public class GetPatentFileInfoRequest {
     private String fileName;
     private String uploadDateBegin;
     private String uploadDateEnd;
+    private Criteria criteria;
 }

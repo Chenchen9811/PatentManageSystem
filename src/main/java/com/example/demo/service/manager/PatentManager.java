@@ -4,10 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.example.demo.Utils.CommonUtil;
 import com.example.demo.entity.*;
+import com.example.demo.mapper.PatentMapper;
 import com.example.demo.request.*;
+import com.example.demo.service.PatentService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,15 +18,48 @@ import java.util.Map;
 @Service
 public class PatentManager {
 
-    public LambdaQueryWrapper<PatentFile> getWrapper(GetPatentFileInfoRequest request) {
+
+    @Resource
+    private PatentMapper patentMapper;
+
+
+
+
+    public LambdaQueryWrapper<PatentFile> getFileWrapper(GetPatentFileInfoRequest request) {
         LambdaQueryWrapper<PatentFile> wrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(request.getFileName())) {
-            wrapper.eq(PatentFile::getFileName, request.getFileName());
+//        if (StringUtils.isNotBlank(request.getFileName())) {
+//            wrapper.eq(PatentFile::getFileName, request.getFileName());
+//        }
+//        if (StringUtils.isNotBlank(request.getUploadDateBegin()) && StringUtils.isNotBlank(request.getUploadDateEnd())) {
+//            wrapper.between(PatentFile::getUploadDate, request.getUploadDateBegin(), request.getUploadDateEnd());
+//        }
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "fileType": {
+                    if (Integer.parseInt(kv.getValue()) == 0) break;
+                    wrapper.eq(PatentFile::getFileType, kv.getValue());
+                    break;
+                }
+                case "patentCode": {
+                    Patent patent = patentMapper.selectOne(new LambdaQueryWrapper<Patent>().eq(Patent::getPatentCode, kv.getValue()));
+                    wrapper.eq(PatentFile::getPatentId, patent.getId());
+                    break;
+                }
+                case "uploadDateBegin": {
+                    String endDate = null;
+                    for (Criteria.KV kV : items) {
+                        if (kV.getKey().equals("uploadDateEnd")) {
+                            endDate = kV.getValue();
+                            break;
+                        }
+                    }
+                    wrapper.between(PatentFile::getUploadDate, kv.getValue(), endDate);
+                    break;
+                }
+            }
         }
-        if (StringUtils.isNotBlank(request.getUploadDateBegin()) && StringUtils.isNotBlank(request.getUploadDateEnd())) {
-            wrapper.between(PatentFile::getUploadDate, request.getUploadDateBegin(), request.getUploadDateEnd());
-        }
-        wrapper.eq(PatentFile::getFileType, request.getFileType());
+         wrapper.eq(PatentFile::getFileType, request.getFileType());
         return wrapper;
     }
 

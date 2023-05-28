@@ -6,6 +6,7 @@ import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.request.AddRoleRequest;
 import com.example.demo.request.AddUserRequest;
+import com.example.demo.request.GetUserRequest;
 import com.example.demo.request.UpdateUserRequest;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -43,9 +44,12 @@ public interface UserService {
 
     CommonResult addRole(AddRoleRequest request) throws Exception;
 
-    CommonResult getUser(String userName) throws Exception;
+    CommonResult getUser(GetUserRequest request) throws Exception;
 
     CommonResult getRole(String roleName) throws Exception;
 
     CommonResult deleteRole(String roleName) throws Exception;
+
+    CommonResult getRoleList();
+
 }

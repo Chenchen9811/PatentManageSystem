@@ -27,6 +27,8 @@ public interface PatentService {
 
     Patent findPatentById(Long patentId);
 
+    List<Patent> findPatentListByIds(List<Long> ids);
+
     List<PatentBonus> findBonusByPatentId(Long patentId);
 
     PatentFile findFileByName(String fileName);

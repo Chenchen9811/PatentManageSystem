@@ -128,16 +128,15 @@ public class SoftwareServiceImpl implements SoftwareService {
             List<Software> softwareList = null;
             List<SoftwareBonus> bonusList = null;
             List<User> inventorList = null;
-            softwareList = softwareMapper.selectList(softwareManager.getSoftwareWrapper(request));
-            if (softwareList.size() == 0) {
-                return CommonResult.failed("没有找到相关软著信息或没有符合查询条件的软著奖金");
-            }
             bonusList = bonusMapper.selectList(softwareManager.getBonusWrapper(request));
             List<Long> softwareIds = bonusList.stream().map(SoftwareBonus::getSoftwareId).distinct().collect(Collectors.toList());
             if (bonusList.size() == 0) {
                 return CommonResult.failed("没有找到相关软著奖金的信息");
             }
-            softwareList = softwareList.stream().filter(software -> softwareIds.contains(software.getId())).collect(Collectors.toList());
+            softwareList = this.findSoftwareListByIds(softwareIds);
+            if (softwareList.size() == 0) {
+                return CommonResult.failed("没有找到相关软著信息或没有符合查询条件的软著奖金");
+            }
             inventorList = userService.findUserListByIds(softwareList.stream().map(Software::getInventorId).collect(Collectors.toList()));
             if (inventorList.size() == 0) {
                 return CommonResult.failed("相关发明人信息缺失");
@@ -183,18 +182,14 @@ public class SoftwareServiceImpl implements SoftwareService {
             List<SoftwareFile> fileList = null;
             List<User> uploaderList = null;
             // 查询满足条件的softwareList
-            softwareList = softwareMapper.selectList(wrapper);
+//            softwareList = softwareMapper.selectList(wrapper);
             if (softwareList.size() == 0) return CommonResult.failed("查找不到相关软著");
             // 查询满足File条件的softwareFileList
             LambdaQueryWrapper<SoftwareFile> fileWrapper = softwareManager.getFileWrapper(request);
             fileList = fileMapper.selectList(fileWrapper);
             if (fileList.size() == 0) return CommonResult.failed("暂无对应文件");
-            List<Long> softwareIds = fileList.stream().map(SoftwareFile::getSoftwareId).collect(Collectors.toList());
+            List<Long> softwareIds = fileList.stream().map(SoftwareFile::getSoftwareId).distinct().collect(Collectors.toList());
             softwareList = softwareList.stream().filter(software -> softwareIds.contains(software.getId())).collect(Collectors.toList());
-//            List<Long> proposalIds = new ArrayList<>();
-//            for (Software software : softwareList) {
-//                if (softwareIds.contains(software.getId())) proposalIds.add(software.getProposalId());
-//            }
             if (softwareList.size() == 0) return CommonResult.failed("没有找到符合条件的软著");
             proposalList = proposalService.findProposalListByIds(softwareList.stream().map(Software::getProposalId).collect(Collectors.toList()));
             if (proposalList.size() == 0) return CommonResult.failed("查找的软著没有对应的提案");
@@ -462,5 +457,10 @@ public class SoftwareServiceImpl implements SoftwareService {
     @Override
     public SoftwareBonus findBonusById(Long id) {
         return bonusMapper.selectById(id);
+    }
+
+    @Override
+    public List<Software> findSoftwareListByIds(List<Long> ids) {
+        return softwareMapper.selectBatchIds(ids);
     }
 }

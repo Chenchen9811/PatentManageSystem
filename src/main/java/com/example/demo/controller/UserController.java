@@ -6,10 +6,7 @@ import com.example.demo.common.CommonResult;
 import com.example.demo.common.Constants;
 import com.example.demo.common.Message;
 import com.example.demo.entity.User;
-import com.example.demo.request.AddRoleRequest;
-import com.example.demo.request.AddUserRequest;
-import com.example.demo.request.LoginRequest;
-import com.example.demo.request.UpdateUserRequest;
+import com.example.demo.request.*;
 import com.example.demo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -104,10 +101,10 @@ public class UserController implements Constants, Message {
 
     @ResponseBody
     @GetMapping(path = "/getUser")
-    public CommonResult getUser(@RequestParam("userName") String userName) {
+    public CommonResult getUser(@Valid @RequestBody GetUserRequest request, BindingResult bindingResult) {
         CommonResult result = null;
         try {
-            result = userService.getUser(userName);
+            result = userService.getUser(request);
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -156,6 +153,17 @@ public class UserController implements Constants, Message {
             return CommonResult.failed(e.getMessage());
         }
         return result;
+    }
+
+    @ResponseBody
+    @GetMapping("/getRoleList")
+    public CommonResult getRoleList() {
+        try {
+            return userService.getRoleList();
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
     }
 
 

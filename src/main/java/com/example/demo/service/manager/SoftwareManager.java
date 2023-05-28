@@ -3,6 +3,7 @@ package com.example.demo.service.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.demo.entity.*;
+import com.example.demo.mapper.SoftwareMapper;
 import com.example.demo.request.*;
 import com.example.demo.service.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,9 @@ public class SoftwareManager {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private SoftwareMapper softwareMapper;
 
     public LambdaQueryWrapper<SoftwareBonus> getBonusWrapper(GetSoftwareBonusRequest request) {
         LambdaQueryWrapper<SoftwareBonus> wrapper = new LambdaQueryWrapper<>();
@@ -78,13 +82,43 @@ public class SoftwareManager {
 
     public LambdaQueryWrapper<SoftwareFile> getFileWrapper(GetSoftwareFileInfoRequest request) {
         LambdaQueryWrapper<SoftwareFile> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(SoftwareFile::getFileType, request.getFileType());
-        if (StringUtils.isNotBlank(request.getFileName())) {
-            wrapper.eq(SoftwareFile::getFileName, request.getFileName());
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "softwareCode" : {
+                    Software software = softwareMapper.selectOne(new LambdaQueryWrapper<Software>().eq(Software::getSoftwareCode, kv.getValue()));
+                    wrapper.eq(SoftwareFile::getSoftwareId, software.getId());
+                    break;
+                }
+                case "fileName" : {
+                    wrapper.eq(SoftwareFile::getFileName, kv.getValue());
+                    break;
+                }
+                case "fileType" : {
+                    if (Integer.parseInt(kv.getValue()) == 0) break;
+                    wrapper.eq(SoftwareFile::getFileType, kv.getValue());
+                    break;
+                }
+                case "uploadDateBegin" : {
+                    String endDate = null;
+                    for (Criteria.KV kV : items) {
+                        if (kV.getKey().equals("uploadDateEnd")) {
+                            endDate = kV.getValue();
+                            break;
+                        }
+                    }
+                    wrapper.between(SoftwareFile::getUploadDate, kv.getValue(), endDate);
+                    break;
+                }
+            }
         }
-        if (StringUtils.isNotBlank(request.getUploadDateBegin()) && StringUtils.isNotBlank(request.getUploadDateEnd())) {
-            wrapper.between(SoftwareFile::getUploadDate, request.getUploadDateBegin(), request.getUploadDateEnd());
-        }
+//        wrapper.eq(SoftwareFile::getFileType, request.getFileType());
+//        if (StringUtils.isNotBlank(request.getFileName())) {
+//            wrapper.eq(SoftwareFile::getFileName, request.getFileName());
+//        }
+//        if (StringUtils.isNotBlank(request.getUploadDateBegin()) && StringUtils.isNotBlank(request.getUploadDateEnd())) {
+//            wrapper.between(SoftwareFile::getUploadDate, request.getUploadDateBegin(), request.getUploadDateEnd());
+//        }
         return wrapper;
     }
     public LambdaQueryWrapper<SoftwareOfficialFee> getCriteriaWrapper(GetSoftwareOfficialFeeRequest request) {

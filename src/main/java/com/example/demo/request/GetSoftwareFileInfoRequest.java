@@ -17,4 +17,5 @@ public class GetSoftwareFileInfoRequest {
     private String uploadDateBegin;
     private String uploadDateEnd;
     private String softwareCode;
+    private Criteria criteria;
 }

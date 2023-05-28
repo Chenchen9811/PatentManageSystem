@@ -29,13 +29,43 @@ public class TrademarkManager {
 
     public LambdaQueryWrapper<TrademarkFile> getFileWrapper(GetTrademarkFileInfoRequest request) {
         LambdaQueryWrapper<TrademarkFile> wrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(request.getFileName())) {
-            wrapper.eq(TrademarkFile::getFileName, request.getFileName());
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "fileType": {
+                    if (Integer.parseInt(kv.getValue()) == 0) break;
+                    wrapper.eq(TrademarkFile::getFileType, kv.getValue());
+                    break;
+                }
+                case "fileName": {
+                    wrapper.eq(TrademarkFile::getFileName, kv.getValue());
+                    break;
+                }
+                case "trademarkCode": {
+                    Trademark trademark = trademarkService.findTrademarkByCode(kv.getValue());
+                    wrapper.eq(TrademarkFile::getTrademarkId, trademark.getId());
+                    break;
+                }
+                case "uploadDateBegin": {
+                    String endDate = null;
+                    for (Criteria.KV kV : items) {
+                        if (kV.getKey().equals("uploadDateEnd")) {
+                            endDate = kV.getValue();
+                            break;
+                        }
+                    }
+                    wrapper.between(TrademarkFile::getUploadDate, kv.getValue(), endDate);
+                    break;
+                }
+            }
         }
-        if (StringUtils.isNotBlank(request.getUploadDateBegin()) && StringUtils.isNotBlank(request.getUploadDateEnd())) {
-            wrapper.between(TrademarkFile::getUploadDate, request.getUploadDateBegin(), request.getUploadDateEnd());
-        }
-        wrapper.eq(TrademarkFile::getFileType, request.getFileType());
+//        if (StringUtils.isNotBlank(request.getFileName())) {
+//            wrapper.eq(TrademarkFile::getFileName, request.getFileName());
+//        }
+//        if (StringUtils.isNotBlank(request.getUploadDateBegin()) && StringUtils.isNotBlank(request.getUploadDateEnd())) {
+//            wrapper.between(TrademarkFile::getUploadDate, request.getUploadDateBegin(), request.getUploadDateEnd());
+//        }
+//        wrapper.eq(TrademarkFile::getFileType, request.getFileType());
         return wrapper;
     }
 
@@ -54,25 +84,25 @@ public class TrademarkManager {
         List<Criteria.KV> items = request.getCriteria().getItems();
         for (Criteria.KV kv : items) {
             switch (kv.getKey()) {
-                case "trademarkCode" : {
+                case "trademarkCode": {
                     trademark = trademarkService.findTrademarkByCode(request.getTrademarkCode());
                     trademarkIds.add(trademark.getId());
                     trademarkCode = true;
                     break;
                 }
-                case "trademarkName" : {
+                case "trademarkName": {
                     trademark = trademarkService.findTrademarkByName(request.getTrademarkName());
                     trademarkIds.add(trademark.getId());
                     trademarkName = true;
                     break;
                 }
-                case "inventorName" : {
+                case "inventorName": {
                     trademark = trademarkService.findTrademarkByInventorName(request.getInventorName());
                     trademarkIds.add(trademark.getId());
                     inventorName = true;
                     break;
                 }
-                case "actualPayBeginDate" : {
+                case "actualPayBeginDate": {
                     String endDate = null;
                     for (Criteria.KV kV : items) {
                         if (kV.getKey().equals("actualPayEndDate")) {
@@ -83,7 +113,7 @@ public class TrademarkManager {
                     wrapper.between(TrademarkOfficialFee::getActualPayDate, kv.getValue(), endDate);
                     break;
                 }
-                case "dueAmount" : {
+                case "dueAmount": {
                     wrapper.eq(TrademarkOfficialFee::getDueAmount, kv.getValue());
                     break;
                 }
@@ -129,36 +159,36 @@ public class TrademarkManager {
         List<Criteria.KV> items = request.getCriteria().getItems();
         for (Criteria.KV kv : items) {
             switch (kv.getKey()) {
-                case "trademarkCode" : {
+                case "trademarkCode": {
                     wrapper.eq(Trademark::getTrademarkCode, kv.getValue());
                     break;
                 }
-                case "trademarkName" : {
+                case "trademarkName": {
                     wrapper.eq(Trademark::getTrademarkName, kv.getValue());
                     break;
                 }
-                case "inventorName" : {
+                case "inventorName": {
                     User user = userService.findUserByUserName(kv.getValue());
                     wrapper.eq(Trademark::getInventorId, user.getId());
                     break;
                 }
-                case "trademarkOwner" : {
+                case "trademarkOwner": {
                     wrapper.eq(Trademark::getTrademarkOwner, kv.getValue());
                     break;
                 }
-                case "copyRightCode" : {
+                case "copyRightCode": {
                     wrapper.eq(Trademark::getCopyRightCode, kv.getValue());
                     break;
                 }
-                case "currentStatus" : {
+                case "currentStatus": {
                     wrapper.eq(Trademark::getCurrentStatus, kv.getValue());
                     break;
                 }
-                case "rightStatus" : {
+                case "rightStatus": {
                     wrapper.eq(Trademark::getRightStatus, kv.getValue());
                     break;
                 }
-                case "agency" : {
+                case "agency": {
                     wrapper.eq(Trademark::getAgency, kv.getValue());
                     break;
                 }
