@@ -78,7 +78,7 @@ public class ProposalController {
 
     @ResponseBody
     @GetMapping("/getReview/{proposalCode}")
-    public CommonResult getReview(@PathVariable String proposalCode) {
+    public CommonResult getReview(@PathVariable("proposalCode") String proposalCode) {
         try {
             return proposalService.getReview(proposalCode);
         } catch (Exception e) {

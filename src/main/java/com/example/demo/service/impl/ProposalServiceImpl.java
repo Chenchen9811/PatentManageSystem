@@ -233,6 +233,9 @@ public class ProposalServiceImpl implements ProposalService {
 
         try {
             Review review = proposalMapper.findReviewByProposalCode(proposalCode);
+            if (null == review) {
+                return CommonResult.failed("没有相关审批结果");
+            }
             User reviewer = userService.findUserByUserId(review.getReviewerId());
             Role reviewerRole = userService.findRoleByUserId(reviewer.getId());
             return CommonResult.success(new ReviewVo(reviewer.getUserName(), reviewerRole.getRoleName(),
