@@ -151,12 +151,15 @@ public class UserServiceImpl implements UserService {
             Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("role_name", roleName));
             user.setRoleId(role.getId());
             user.setDelFlag("N");
+            int insert = userMapper.insert(user);
+            if (insert == 0) {
+                CommonResult.failed("新增用户失败");
+            }
             userRole.setRoleId(role.getId());
-            userRole.setUserId(userRole.getUserId());
+            userRole.setUserId(user.getId());
             userRole.setCreateUser(hostHolder.getUser().getId());
-
-            userRoleMapper.insert(userRole);
-            return CommonResult.success(null, "新增用户成功");
+            return  userRoleMapper.insert(userRole) == 1 ?
+                    CommonResult.success(null, "新增用户成功") : CommonResult.failed("新增用户失败");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
