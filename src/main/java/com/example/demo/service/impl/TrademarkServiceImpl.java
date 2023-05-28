@@ -173,6 +173,10 @@ public class TrademarkServiceImpl implements TrademarkService {
             for (Trademark trademark : trademarkList) {
                 map.put(trademark.getId(), trademark);
             }
+            Map<Long, Long> totalFeeMap = new HashMap<>();
+            for (TrademarkOfficialFee fee : officialFeeList) {
+                totalFeeMap.merge(fee.getTrademarkId(), Long.parseLong(fee.getDueAmount()), Long::sum);
+            }
             PageInfo<GetTrademarkOfficialFeeResponse> pageInfo = PageInfoUtil.getPageInfo(officialFeeList.stream().map(fee -> {
                 GetTrademarkOfficialFeeResponse response = new GetTrademarkOfficialFeeResponse();
                 Trademark trademark = map.get(fee.getTrademarkId());
@@ -184,6 +188,7 @@ public class TrademarkServiceImpl implements TrademarkService {
                 response.setTrademarkName(trademark.getTrademarkName());
                 response.setActualPay(fee.getActualPay());
                 response.setId(fee.getId());
+                response.setTotalAmount(String.valueOf(totalFeeMap.get(fee.getTrademarkId())));
                 return response;
             }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize());
             return CommonResult.success(pageInfo, "查找成功");

@@ -12,4 +12,5 @@ public class GetTrademarkOfficialFeeResponse {
     private String dueAmount;
     private String actualPay;
     private Long id;
+    private String totalAmount;
 }
