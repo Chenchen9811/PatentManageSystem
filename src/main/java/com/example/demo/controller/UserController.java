@@ -129,7 +129,7 @@ public class UserController implements Constants, Message {
     }
 
     @ResponseBody
-    @GetMapping(path = "/getRole")
+    @PostMapping(path = "/getRole")
     public CommonResult getRole(@Valid @RequestBody GetRoleRequest request, BindingResult bindingResult) {
         CommonResult result = null;
         try {
