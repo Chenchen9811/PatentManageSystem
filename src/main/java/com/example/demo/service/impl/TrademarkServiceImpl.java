@@ -190,6 +190,7 @@ public class TrademarkServiceImpl implements TrademarkService {
                 response.setActualPay(fee.getActualPay());
                 response.setId(fee.getId());
                 response.setTotalAmount(String.valueOf(totalFeeMap.get(fee.getTrademarkId())));
+                response.setFeeName(fee.getOfficialFeeName());
                 return response;
             }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize());
             return CommonResult.success(pageInfo, "查找成功");
@@ -214,6 +215,7 @@ public class TrademarkServiceImpl implements TrademarkService {
             officialFee.setActualPay(request.getActualPay());
             officialFee.setActualPayDate(CommonUtil.stringToDate(request.getActualPayDate()));
             officialFee.setOfficialFeeStatus(request.getOfficialFeeStatus());
+            officialFee.setOfficialFeeName(request.getOfficialFeeName());
             if (StringUtils.isNotBlank(request.getRemark())) {
                 officialFee.setRemark(request.getRemark());
             }

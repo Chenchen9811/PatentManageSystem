@@ -12,4 +12,5 @@ public class NewTrademarkOfficialFeeRequest {
     private String actualPayDate;
     private String officialFeeStatus;
     private String remark;
+    private String officialFeeName;
 }

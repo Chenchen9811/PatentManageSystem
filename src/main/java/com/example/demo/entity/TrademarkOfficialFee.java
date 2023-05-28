@@ -24,4 +24,6 @@ public class TrademarkOfficialFee {
     private Date dueDate;
     private String billUrl;
     private String remark;
+    @TableField(value = "officialFee_name")
+    private String officialFeeName;
 }
