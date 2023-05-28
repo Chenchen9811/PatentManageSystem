@@ -12,8 +12,8 @@ public class AddUserRequest {
     private String userName;
     @NotBlank(message = "工号不能为空")
     private String userCode;
-    @NotEmpty(message = "角色名字不能为空")
-    private List<String> roleName;
+    @NotBlank(message = "角色名字不能为空")
+    private String roleName;
     @NotBlank(message = "密码不能为空")
     private String password;
     private String phone;

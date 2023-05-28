@@ -144,15 +144,14 @@ public class UserServiceImpl implements UserService {
             user.setPassword(request.getPassword());
             user.setPhone(request.getPhone());
             userMapper.insert(user);
-            for (String roleName : request.getRoleName()) {
-                UserRole userRole = new UserRole();
-                // 获取角色id
-                Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("role_name", roleName));
-                userRole.setRoleId(role.getId());
-                userRole.setUserId(userRole.getUserId());
-                userRole.setCreateUser(hostHolder.getUser().getId());
-                userRoleMapper.insert(userRole);
-            }
+            UserRole userRole = new UserRole();
+            // 获取角色id
+            String roleName = request.getRoleName();
+            Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("role_name", roleName));
+            userRole.setRoleId(role.getId());
+            userRole.setUserId(userRole.getUserId());
+            userRole.setCreateUser(hostHolder.getUser().getId());
+            userRoleMapper.insert(userRole);
             return CommonResult.success(null, "新增用户成功");
         } catch (Exception e) {
             e.printStackTrace();
