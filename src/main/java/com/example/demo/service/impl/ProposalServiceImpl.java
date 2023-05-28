@@ -91,7 +91,7 @@ public class ProposalServiceImpl implements ProposalService {
             proposal = new Proposal();
             proposal.setProposalCode(request.getProposalCode());
             proposal.setProposalName(request.getProposalName());
-            proposal.setProposalType(CommonUtil.judgeProposalType(request.getPatentType()));
+            proposal.setProposalType(CommonUtil.getProposalTypeCode(request.getPatentType()));
             proposal.setProposerName(request.getProposerName());
             proposal.setProposalDate(new Timestamp(System.currentTimeMillis()));
             proposal.setSubstance(request.getDetailText());
@@ -100,6 +100,7 @@ public class ProposalServiceImpl implements ProposalService {
             proposal.setProposerId(proposer.getId());
             proposal.setDepartmentId(proposer.getDepartmentId());
             proposal.setProposerCode(proposer.getUserCode());
+            proposal.setProposalType(CommonUtil.getProposalStatusCode("在审"));
             proposalMapper.insert(proposal);
             List<NewProposalRequest.InventorVo> inventorList = request.getListOfInventor();
             Collections.sort(inventorList, new Comparator<NewProposalRequest.InventorVo>() {

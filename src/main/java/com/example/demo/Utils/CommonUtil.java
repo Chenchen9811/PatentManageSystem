@@ -107,21 +107,45 @@ public class CommonUtil implements Constants {
             return new java.sql.Date(format.parse(date).getTime());
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("转换有异常>>>>>>>"+e.getMessage());
+            log.error("转换有异常>>>>>>>" + e.getMessage());
             return null;
         }
     }
 
-    public static Integer judgeProposalType(String type) {
+    public static Integer getProposalTypeCode(String type) {
         switch (type) {
-            case "发明专利" : return 0;
-            case "实用新型专利" : return 1;
-            case "外观设计专利" : return 2;
-            case "软著" : return 3;
-            case "商标" : return 4;
-            default: return  5;
+            case "发明专利":
+                return 0;
+            case "实用新型专利":
+                return 1;
+            case "外观设计专利":
+                return 2;
+            case "软著":
+                return 3;
+            case "商标":
+                return 4;
+            default:
+                return 5;
         }
     }
+
+    public static Integer getProposalStatusCode(String proposalStatus) {
+        switch (proposalStatus) {
+            case "全部":
+                return 0;
+            case "在审":
+                return 1;
+            case "通过":
+                return 2;
+            case "不通过":
+                return 3;
+            case "补充文件":
+                return 4;
+            default:
+                return 5;
+        }
+    }
+
 
     public static String getFileUrl(String fileName) {
         return UPLOAD_PATH + File.separator + fileName;
@@ -145,7 +169,7 @@ public class CommonUtil implements Constants {
     }
 
     public static Long generateId() {
-        return (System.currentTimeMillis() + 8*3600*1000) * 10000 + 621355968000000000L;
+        return (System.currentTimeMillis() + 8 * 3600 * 1000) * 10000 + 621355968000000000L;
     }
 
     public static int getRfidThoughModbus(short[] origin) {
