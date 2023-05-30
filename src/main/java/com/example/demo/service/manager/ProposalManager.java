@@ -70,6 +70,7 @@ public class ProposalManager {
                     wrapper.between(Proposal::getProposalDate, kv.getValue(), endDate);
                     break;
                 }
+                default:break;
             }
         }
         

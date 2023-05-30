@@ -13,7 +13,7 @@ public class Review {
     private Long proposalId;
     private Long reviewerId;
     @TableField(value = "currentreview_state")
-    private String currentReviewState;
+//    private String currentReviewState;
     private String result;
     private String suggestion;
     private Timestamp reviewDate;

@@ -209,7 +209,6 @@ public class ProposalServiceImpl implements ProposalService {
             Review review = new Review();
             Proposal proposal = proposalMapper.selectOne(new LambdaQueryWrapper<Proposal>().eq(Proposal::getProposalCode, request.getProposalCode()));
             review.setProposalId(proposal.getId());
-            review.setCurrentReviewState(request.getResult());
             review.setSuggestion(request.getSuggestion());
             review.setReviewerId(hostHolder.getUser().getId());
             review.setResult(request.getResult().equals(ReviewStatus.FAILED.getCode()) ? ReviewStatus.FAILED.getMessage() : ReviewStatus.PASSED.getMessage());
