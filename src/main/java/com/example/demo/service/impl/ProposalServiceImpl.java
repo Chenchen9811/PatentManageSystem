@@ -81,7 +81,7 @@ public class ProposalServiceImpl implements ProposalService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CommonResult newProposal(NewProposalRequest request) throws Exception{
+    public CommonResult newProposal(NewProposalRequest request) throws Exception {
         try {
             // 校验重复
             Proposal proposal = proposalMapper.selectOne(new QueryWrapper<Proposal>().eq("proposal_name", request.getProposerName()));
@@ -98,19 +98,14 @@ public class ProposalServiceImpl implements ProposalService {
             // 获取提案人信息
             User proposer = userService.findUserByUserName(request.getProposerName());
             proposal.setProposerId(proposer.getId());
-            proposal.setDepartmentId(proposer.getDepartmentId());
             proposal.setProposerCode(proposer.getUserCode());
+            proposal.setDepartmentId(proposer.getDepartmentId());
             proposal.setProposalState(CommonUtil.getProposalStatusCode("在审"));
             proposalMapper.insert(proposal);
             List<NewProposalRequest.InventorVo> inventorList = request.getListOfInventor();
-            Collections.sort(inventorList, new Comparator<NewProposalRequest.InventorVo>() {
-                @Override
-                public int compare(NewProposalRequest.InventorVo o1, NewProposalRequest.InventorVo o2) {
-                    return Integer.valueOf(o1.getRate()) - Integer.valueOf(o2.getRate());
-                }
-            });
+            inventorList.sort(Comparator.comparingInt(o -> Integer.parseInt(o.getRate())));
             int len = inventorList.size();
-            for (int i = 0; i < len; i ++) {
+            for (int i = 0; i < len; i++) {
                 NewProposalRequest.InventorVo inventorVo = inventorList.get(i);
                 User user = userService.findUserByUserName(inventorVo.getInventorName());
                 Inventor inventor = new Inventor();
@@ -146,11 +141,11 @@ public class ProposalServiceImpl implements ProposalService {
             for (GetProposalRequest1.Criteria.KV kv : items) {
                 String key = kv.getKey();
                 switch (key) {
-                    case "inventorCode" : {
+                    case "inventorCode": {
                         inventorWrapper.eq(Inventor::getInventorCode, kv.getValue());
                         break;
                     }
-                    case "inventorName" : {
+                    case "inventorName": {
                         inventorWrapper.eq(Inventor::getInventorName, kv.getValue());
                         break;
                     }
@@ -199,7 +194,7 @@ public class ProposalServiceImpl implements ProposalService {
             List<Department> departmentList = departmentService.getAllDepartments();
             return CommonResult.success(departmentList.stream()
                     .map(Department::getDepartmentName)
-                    .collect(Collectors.toList()),"查找成功!");
+                    .collect(Collectors.toList()), "查找成功!");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -217,7 +212,7 @@ public class ProposalServiceImpl implements ProposalService {
             review.setCurrentReviewState(request.getResult());
             review.setSuggestion(request.getSuggestion());
             review.setReviewerId(hostHolder.getUser().getId());
-            review.setResult(request.getResult().equals(ReviewStatus.FAILED.getCode())? ReviewStatus.FAILED.getMessage() : ReviewStatus.PASSED.getMessage());
+            review.setResult(request.getResult().equals(ReviewStatus.FAILED.getCode()) ? ReviewStatus.FAILED.getMessage() : ReviewStatus.PASSED.getMessage());
             review.setReviewDate(new Timestamp(System.currentTimeMillis()));
             reviewMapper.insert(review);
             return CommonResult.success(null, "添加审批结果成功");
