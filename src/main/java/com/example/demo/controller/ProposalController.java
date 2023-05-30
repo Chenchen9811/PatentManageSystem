@@ -100,4 +100,6 @@ public class ProposalController {
             return CommonResult.failed(e.getMessage());
         }
     }
+
+
 }

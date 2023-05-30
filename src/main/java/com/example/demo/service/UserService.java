@@ -49,4 +49,6 @@ public interface UserService {
 
     CommonResult getRoleList();
 
+    CommonResult getPermissionList();
+
 }

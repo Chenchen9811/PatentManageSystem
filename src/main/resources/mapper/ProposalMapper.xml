@@ -11,7 +11,6 @@
             r.id,
             r.proposal_id,
             r.reviewer_id,
-            r.currentreview_state,
             r.result,
             r.suggestion
         from t_review r

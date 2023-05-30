@@ -167,7 +167,16 @@ public class UserController implements Constants, Message {
         }
     }
 
-
+    @ResponseBody
+    @GetMapping("/getPermissionList")
+    public CommonResult getPermissionList() {
+        try {
+            return userService.getPermissionList();
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 
 
 }

@@ -53,6 +53,19 @@ public class UserServiceImpl implements UserService {
     @Resource
     private UserRoleMapper userRoleMapper;
 
+    @Override
+    public CommonResult getPermissionList() {
+        try {
+            List<Permission> permissionList = permissionMapper.selectList(new LambdaQueryWrapper<>());
+            Map<String, List<String>> map = new HashMap<>();
+            map.put("permissionList", permissionList.stream().map(Permission::getPermissionName).collect(Collectors.toList()));
+            return CommonResult.success(map, "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
 
     @Override
     public CommonResult getRoleList() {
