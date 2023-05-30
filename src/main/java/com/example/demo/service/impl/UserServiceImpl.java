@@ -131,12 +131,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Permission> findPermissionByRoleId(Long roleId) {
-        List<RolePermission> rolePermissionList = rolePermissionMapper.selectList(new QueryWrapper<RolePermission>().eq("role_id", roleId));
-        List<Permission> list = new ArrayList<>();
-        for (RolePermission rp : rolePermissionList) {
-            list.add(permissionMapper.selectById(rp.getPermissionId()));
-        }
-        return list;
+        return permissionMapper.selectBatchIds(rolePermissionMapper.selectList(
+                new QueryWrapper<RolePermission>().eq("role_id", roleId).eq("del_flag", "N"))
+                .stream().map(RolePermission::getPermissionId).collect(Collectors.toList()));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -362,11 +359,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public CommonResult deleteRole(String roleName) throws Exception {
         try {
-            UpdateWrapper<Role> updateWrapper = new UpdateWrapper<>();
+            UpdateWrapper<Role> roleUpdateWrapper = new UpdateWrapper<>();
             Role role = this.findRoleByRoleName(roleName);
-            updateWrapper.eq("role_name", roleName);
+            roleUpdateWrapper.eq("role_name", roleName);
             role.setDelFlag("Y");
-            roleMapper.update(role, updateWrapper);
+            roleMapper.update(role, roleUpdateWrapper);
+            List<RolePermission> rolePermissionList = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>().eq(RolePermission::getRoleId, role));
+            for (RolePermission rolePermission : rolePermissionList) {
+                rolePermission.setDelFlag("Y");
+                rolePermissionMapper.updateById(rolePermission);
+            }
+//
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
