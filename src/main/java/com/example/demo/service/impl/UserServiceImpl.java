@@ -364,7 +364,7 @@ public class UserServiceImpl implements UserService {
             roleUpdateWrapper.eq("role_name", roleName);
             role.setDelFlag("Y");
             roleMapper.update(role, roleUpdateWrapper);
-            List<RolePermission> rolePermissionList = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>().eq(RolePermission::getRoleId, role));
+            List<RolePermission> rolePermissionList = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>().eq(RolePermission::getRoleId, role.getId()));
             for (RolePermission rolePermission : rolePermissionList) {
                 rolePermission.setDelFlag("Y");
                 rolePermissionMapper.updateById(rolePermission);
