@@ -89,11 +89,10 @@ public class TrademarkController {
     }
 
     @ResponseBody
-    @DeleteMapping("/deleteBonus")
-    public CommonResult deleteBonus(@RequestParam("trademarkCode") String trademarkCode,
-                                    @RequestParam("inventorName") String inventorName) {
+    @DeleteMapping("/deleteBonus/{id}")
+    public CommonResult deleteBonus(@PathVariable("id") String id) {
         try {
-            return trademarkService.deleteBonus(trademarkCode, inventorName);
+            return trademarkService.deleteBonus(id);
         } catch (Exception e) {
             e.printStackTrace();
             return CommonResult.failed(e.getMessage());

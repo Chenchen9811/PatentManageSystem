@@ -247,12 +247,9 @@ public class TrademarkServiceImpl implements TrademarkService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CommonResult deleteBonus(String trademarkCode, String inventorName) {
+    public CommonResult deleteBonus(String bonusId) {
         try {
-            Trademark trademark = this.findTrademarkByCode(trademarkCode);
-            return bonusMapper.delete(new LambdaQueryWrapper<TrademarkBonus>()
-                    .eq(TrademarkBonus::getTrademarkId, trademark.getId())
-                    .eq(TrademarkBonus::getInventorName, inventorName)) == 0 ?
+            return bonusMapper.deleteById(Long.parseLong(bonusId)) == 0 ?
                     CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();

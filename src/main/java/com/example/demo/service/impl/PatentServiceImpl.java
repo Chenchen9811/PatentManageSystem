@@ -156,11 +156,9 @@ public class PatentServiceImpl implements PatentService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CommonResult deleteBonus(String patentCode, String inventorName) {
+    public CommonResult deleteBonus(String bonusId) {
         try {
-            return bonusMapper.delete(new LambdaQueryWrapper<PatentBonus>()
-                    .eq(PatentBonus::getPatentId, this.findPatentByCode(patentCode).getId())
-                    .eq(PatentBonus::getInventorName, inventorName)) == 0 ? CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
+            return bonusMapper.deleteById(Long.parseLong(bonusId)) == 0 ? CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

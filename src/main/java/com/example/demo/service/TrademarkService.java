@@ -35,7 +35,7 @@ public interface TrademarkService {
 
     CommonResult getBonus(GetTrademarkBonusRequest request);
 
-    CommonResult deleteBonus(String trademarkCode, String inventorName);
+    CommonResult deleteBonus(String bonusId);
 
     CommonResult newOfficialFee(NewTrademarkOfficialFeeRequest request);
 

@@ -223,12 +223,11 @@ public class PatentController {
     }
 
     @ResponseBody
-    @DeleteMapping("/deleteBonus")
-    public CommonResult deleteBonus(@RequestParam("patentCode") String patentCode,
-                                    @RequestParam("inventorName") String inventorName) {
+    @DeleteMapping("/deleteBonus/{id}")
+    public CommonResult deleteBonus(@PathVariable("id") String id) {
         CommonResult result = null;
         try {
-            result = patentService.deleteBonus(patentCode, inventorName);
+            result = patentService.deleteBonus(id);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
