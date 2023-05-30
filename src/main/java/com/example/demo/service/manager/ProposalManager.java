@@ -54,7 +54,7 @@ public class ProposalManager {
                     break;
                 }
                 case "departmentName": {
-                    if (Integer.parseInt(kv.getValue()) == 0) break;
+                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
                     Department department = departmentService.findDepartmentByDepartmentName(kv.getValue());
                     wrapper.eq(Proposal::getDepartmentId, department.getId());
                     break;

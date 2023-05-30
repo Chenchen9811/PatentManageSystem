@@ -12,5 +12,5 @@ public class AddReviewRequest {
     @NotBlank(message = "审批意见不能为空")
     public String suggestion;
     @NotNull(message = "审批结论不能为空")
-    public Integer result;
+    public String result;
 }
