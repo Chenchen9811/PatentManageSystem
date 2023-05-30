@@ -62,8 +62,8 @@ public class ProposalManager {
                 case "startDate": {
                     String endDate = null;
                     for (GetProposalRequest1.Criteria.KV kV : items) {
-                        if (kv.getKey().equals("endDate")) {
-                            endDate = kv.getValue();
+                        if (kV.getKey().equals("endDate")) {
+                            endDate = kV.getValue();
                             break;
                         }
                     }
