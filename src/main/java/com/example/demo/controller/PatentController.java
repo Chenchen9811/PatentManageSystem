@@ -210,7 +210,7 @@ public class PatentController {
     }
 
     @ResponseBody
-    @GetMapping("/getBonusList")
+    @PostMapping("/getBonusList")
     public CommonResult getBonus(@Valid @RequestBody GetPatentBonusListRequest request, BindingResult bindingResult) {
         CommonResult result = null;
         try {
