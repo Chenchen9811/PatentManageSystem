@@ -298,6 +298,7 @@ public class UserServiceImpl implements UserService {
             role = new Role();
             role.setRoleCode(request.getRoleCode());
             role.setRoleName(request.getRoleName());
+            role.setDelFlag("N");
             roleMapper.insert(role);
             // 给角色配置权限
             List<String> permissionNameList = request.getPermission();
