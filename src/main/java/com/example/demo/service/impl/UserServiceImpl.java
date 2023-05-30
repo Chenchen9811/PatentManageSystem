@@ -332,11 +332,13 @@ public class UserServiceImpl implements UserService {
             for (Role role : roleList) {
                 RoleVo roleVo = new RoleVo();
                 roleVo.setRoleName(role.getRoleName());
-                roleVo.setPermission(this.findPermissionByRoleId(role.getId()).stream().map(Permission::getPermissionName)
-                        .collect(Collectors.toList()));
+                List<Permission> permissionList = this.findPermissionByRoleId(role.getId());
+                roleVo.setPermission(permissionList.stream().map(Permission::getPermissionName).collect(Collectors.toList()));
                 roleVoList.add(roleVo);
             }
+            log.info("roleListSize:{}", roleList.size());
             rolePermissionMap.put("roleList", roleVoList);
+
             return CommonResult.success(rolePermissionMap, "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
