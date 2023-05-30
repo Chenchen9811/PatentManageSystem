@@ -332,6 +332,7 @@ public class UserServiceImpl implements UserService {
             for (Role role : roleList) {
                 RoleVo roleVo = new RoleVo();
                 roleVo.setRoleName(role.getRoleName());
+                roleVo.setRoleCode(role.getRoleCode());
                 List<Permission> permissionList = this.findPermissionByRoleId(role.getId());
                 roleVo.setPermission(permissionList.stream().map(Permission::getPermissionName).collect(Collectors.toList()));
                 roleVoList.add(roleVo);

@@ -11,5 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 public class RoleVo {
     private String roleName;
+    private String roleCode;
     private List<String> permission;
 }
