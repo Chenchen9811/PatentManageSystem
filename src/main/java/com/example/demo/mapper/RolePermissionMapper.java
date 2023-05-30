@@ -5,6 +5,6 @@ import com.example.demo.entity.RolePermission;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface RolePermissionMapper extends BaseMapper<RolePermission> {
+public interface RolePermissionMapper extends ExpandBaseMapper<RolePermission> {
 
 }

@@ -12,6 +12,6 @@ public class AddRoleRequest {
     private String roleName;
     @NotBlank(message = "角色编号不能为空")
     private String roleCode;
-    @NotBlank(message = "角色权限不能为空")
-    private String permissionName;
+    @NotNull(message = "角色权限不能为空")
+    private List<String> permission;
 }

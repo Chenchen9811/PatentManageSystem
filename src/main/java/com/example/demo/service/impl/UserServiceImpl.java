@@ -292,33 +292,28 @@ public class UserServiceImpl implements UserService {
         try {
             // 校验重复
             Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("role_name", request.getRoleName()));
-            Permission permission = permissionMapper.selectOne(new QueryWrapper<Permission>().eq("permission_name", request.getPermissionName()));
             if (null != role) {
                 return CommonResult.failed("该角色已存在");
-            }
-            if (null != permission) {
-                return CommonResult.failed("该权限已存在");
             }
             role = new Role();
             role.setRoleCode(request.getRoleCode());
             role.setRoleName(request.getRoleName());
             roleMapper.insert(role);
-            permission = new Permission();
-            permission.setCreateUser(hostHolder.getUser().getId());
-            permission.setPermissionName(request.getPermissionName());
-            permission.setPermissionCode(CommonUtil.generatePermissionCode());
-            permission.setCreateTime(new Timestamp(System.currentTimeMillis()));
-            permission.setDelFlag("N");
-            permissionMapper.insert(permission);
-            // role_permission表中添加映射记录
-            RolePermission rolePermission = new RolePermission();
-            rolePermission.setRoleId(role.getId());
-            rolePermission.setPermissionId(permission.getId());
-            rolePermission.setCreateUser(hostHolder.getUser().getId());
-            rolePermission.setCreateTime(new Timestamp(System.currentTimeMillis()));
-            rolePermission.setDelFlag("N");
-            rolePermissionMapper.insert(rolePermission);
-            return CommonResult.success(null, "添加角色成功");
+            // 给角色配置权限
+            List<String> permissionNameList = request.getPermission();
+            List<Permission> permissionList = permissionMapper.selectList(new LambdaQueryWrapper<Permission>().in(Permission::getPermissionName, permissionNameList));
+            List<RolePermission> rolePermissionList = new ArrayList<>();
+            for (Permission permission : permissionList) {
+                RolePermission rolePermission = new RolePermission();
+                rolePermission.setRoleId(role.getId());
+                rolePermission.setPermissionId(permission.getId());
+                rolePermission.setCreateUser(hostHolder.getUser().getId());
+                rolePermission.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                rolePermission.setDelFlag("N");
+                rolePermissionList.add(rolePermission);
+            }
+            return rolePermissionMapper.insertBatchSomeColumn(rolePermissionList) != 0?
+                    CommonResult.success(null, "添加角色成功") : CommonResult.failed("添加角色失败");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
