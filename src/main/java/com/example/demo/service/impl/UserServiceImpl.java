@@ -336,7 +336,8 @@ public class UserServiceImpl implements UserService {
                         .collect(Collectors.toList()));
                 roleVoList.add(roleVo);
             }
-            return CommonResult.success(rolePermissionMap.put("roleList", roleVoList), "查找成功");
+            rolePermissionMap.put("roleList", roleVoList);
+            return CommonResult.success(rolePermissionMap, "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
