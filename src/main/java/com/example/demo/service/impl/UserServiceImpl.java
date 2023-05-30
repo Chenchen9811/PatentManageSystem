@@ -333,6 +333,7 @@ public class UserServiceImpl implements UserService {
             if (items.size() != 0) {
                 wrapper.eq(Role::getRoleName, items.get(0).getValue());
             }
+            wrapper.eq(Role::getDelFlag, "N");
             List<Role> roleList = roleMapper.selectList(wrapper);
             // 查询角色对应的权限
             Map<String, List<RoleVo>> rolePermissionMap = new HashMap<>();
