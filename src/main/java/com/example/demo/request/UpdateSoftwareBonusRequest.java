@@ -10,7 +10,7 @@ public class UpdateSoftwareBonusRequest {
     private String softwareName;
     private String bonusType;
     private String releaseStatus;
-    private String bonusAmount;
+//    private String bonusAmount;
     private String inventorName;
     private String actualRelease;
 }

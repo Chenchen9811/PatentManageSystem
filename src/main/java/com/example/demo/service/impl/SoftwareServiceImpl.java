@@ -67,7 +67,7 @@ public class SoftwareServiceImpl implements SoftwareService {
         try {
             SoftwareBonus bonus = this.findBonusById(request.getBonusId());
             bonus.setSoftwareId(this.findSoftwareByCode(request.getSoftwareCode()).getId());
-            bonus.setBonusAmount(request.getBonusAmount());
+//            bonus.setBonusAmount(request.getBonusAmount());
             bonus.setBonusType(request.getBonusType());
             bonus.setReleaseStatus(request.getReleaseStatus());
             bonus.setActualRelease(request.getActualRelease());
