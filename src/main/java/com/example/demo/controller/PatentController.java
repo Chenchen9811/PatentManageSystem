@@ -210,13 +210,11 @@ public class PatentController {
     }
 
     @ResponseBody
-    @GetMapping("/getBonus")
-    public CommonResult getBonus(@RequestParam("patentCode") String patentCode,
-                                 @RequestParam("pageIndex") Integer pageIndex,
-                                 @RequestParam("pageSize") Integer pageSize) {
+    @GetMapping("/getBonusList")
+    public CommonResult getBonus(@Valid @RequestBody GetPatentBonusListRequest request, BindingResult bindingResult) {
         CommonResult result = null;
         try {
-            result = patentService.getBonus(patentCode, pageIndex, pageSize);
+            result = patentService.getBonus(request);
             return result;
         } catch (Exception e) {
             e.printStackTrace();

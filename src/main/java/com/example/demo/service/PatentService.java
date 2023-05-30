@@ -53,7 +53,7 @@ public interface PatentService {
 
     CommonResult newBonus(NewPatentBonusRequest request);
 
-    CommonResult getBonus(String patentCode, Integer pageIndex, Integer pageSize);
+    CommonResult getBonus(GetPatentBonusListRequest request);
 
     CommonResult deleteBonus(String patentCode, String inventorName);
 

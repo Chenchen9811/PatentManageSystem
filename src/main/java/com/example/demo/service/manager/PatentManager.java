@@ -22,7 +22,57 @@ public class PatentManager {
     @Resource
     private PatentMapper patentMapper;
 
+    public LambdaQueryWrapper<PatentBonus> getBonusWrapper(GetPatentBonusListRequest request) {
+        LambdaQueryWrapper<PatentBonus> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "bonusAmount": {
+                    wrapper.eq(PatentBonus::getBonusAmount, kv.getValue());
+                    break;
+                }
+                case "bonusType": {
+                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    wrapper.eq(PatentBonus::getBonusType, kv.getValue());
+                    break;
+                }
+                case "releaseStatus": {
+                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    wrapper.eq(PatentBonus::getReleaseStatus, kv.getValue());
+                    break;
+                }
+                case "inventorName": {
+                    wrapper.eq(PatentBonus::getInventorName, kv.getValue());
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
 
+
+    public LambdaQueryWrapper<Patent> getPatentWrapper(GetPatentBonusListRequest request) {
+        LambdaQueryWrapper<Patent> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "patentName" : {
+                    wrapper.eq(Patent::getPatentName, kv.getValue());
+                    break;
+                }
+                case "patentCode" : {
+                    wrapper.eq(Patent::getPatentCode, kv.getValue());
+                    break;
+                }
+                case "patentType" : {
+                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    wrapper.eq(Patent::getPatentType, kv.getValue());
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
 
 
     public LambdaQueryWrapper<PatentFile> getFileWrapper(GetPatentFileInfoRequest request) {

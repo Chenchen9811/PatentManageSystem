@@ -164,22 +164,35 @@ public class PatentServiceImpl implements PatentService {
     }
 
     @Override
-    public CommonResult getBonus(String patentCode, Integer pageIndex, Integer pageSize) {
+    public CommonResult getBonus(GetPatentBonusListRequest request) {
         try {
             List<PatentBonus> bonusList = null;
-            if (StringUtils.isNotBlank(patentCode)) {
-                Patent patent = this.findPatentByCode(patentCode);
-                bonusList = bonusMapper.selectList(new LambdaQueryWrapper<PatentBonus>()
-                        .eq(PatentBonus::getPatentId, patent.getId())
-                        .orderByAsc(PatentBonus::getRanking));
-            } else {
-                bonusList = bonusMapper.selectList(new LambdaQueryWrapper<PatentBonus>()
-                        .orderByAsc(PatentBonus::getPatentId, PatentBonus::getRanking));
+            List<Patent> patentList = null;
+            LambdaQueryWrapper<Patent> patentWrapper = patentManager.getPatentWrapper(request);
+            patentList = patentMapper.selectList(patentWrapper);
+            if (patentList.size() == 0) {
+                return CommonResult.failed("没有符合条件的专利");
+            }
+            LambdaQueryWrapper<PatentBonus> bonusWrapper = patentManager.getBonusWrapper(request);
+            bonusList = bonusMapper.selectList(bonusWrapper);
+            if (bonusList.size() == 0) {
+                return CommonResult.failed("没有符合条件的专利奖金");
+            }
+            // 专利奖金对应的专利id
+            Set<Long> patentIds = new HashSet<>();
+            for (PatentBonus bonus : bonusList) {
+                patentIds.add(bonus.getPatentId());
+            }
+            // 取交集
+            patentList.removeIf(patent -> !patentIds.contains(patent.getId()));
+            Map<Long, Patent> patentMap = new HashMap<>();
+            for (Patent patent : patentList) {
+                patentMap.put(patent.getId(), patent);
             }
             return CommonResult.success(PageInfoUtil.getPageInfo(
                     bonusList.stream().map(bonus -> {
                         GetPatentBonusResponse response = new GetPatentBonusResponse();
-                        Patent patent = this.findPatentById(bonus.getPatentId());
+                        Patent patent = patentMap.get(bonus.getPatentId());
                         response.setPatentBonusId(bonus.getId());
                         response.setBonusAmount(bonus.getBonusAmount());
                         response.setRanking(bonus.getRanking());
@@ -190,7 +203,7 @@ public class PatentServiceImpl implements PatentService {
                         response.setReleaseStatus(bonus.getReleaseStatus());
                         response.setInventorName(bonus.getInventorName());
                         return response;
-                    }).collect(Collectors.toList()), pageIndex, pageSize), "查找成功");
+                    }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize()), "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
