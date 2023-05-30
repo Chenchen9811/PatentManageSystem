@@ -79,4 +79,15 @@ public class AgencyController {
             return CommonResult.failed(e.getMessage());
         }
     }
+
+    @ResponseBody
+    @GetMapping("/getAgencyList")
+    public CommonResult getAgencyList() {
+        try {
+            return agencyService.getAgencyList();
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 }

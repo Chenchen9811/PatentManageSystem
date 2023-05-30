@@ -20,4 +20,7 @@ public interface AgencyService {
     CommonResult updateAgency(UpdateAgencyRequest request);
 
     CommonResult deleteAgency(String agencyCode);
+
+    CommonResult getAgencyList();
+
 }

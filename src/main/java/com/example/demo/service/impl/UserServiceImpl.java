@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public CommonResult getRoleList() {
         try {
-            List<Role> roleList = roleMapper.selectList(new LambdaQueryWrapper<>());
+            List<Role> roleList = roleMapper.selectList(new LambdaQueryWrapper<Role>().eq(Role::getDelFlag, "N"));
             Map<String, List<String>> map = new HashMap<>();
             map.put("roleNameList", roleList.stream().map(Role::getRoleName).collect(Collectors.toList()));
             return CommonResult.success(map, "查找成功");

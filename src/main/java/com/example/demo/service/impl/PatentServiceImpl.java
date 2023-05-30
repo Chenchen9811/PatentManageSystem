@@ -218,18 +218,26 @@ public class PatentServiceImpl implements PatentService {
         try {
             // 验重
             Patent patent = this.findPatentByCode(request.getPatentCode());
+            if (null == patent) {
+                return CommonResult.failed("不存在该专利，请核对专利编号是否正确");
+            }
             List<PatentBonus> bonusList = this.findBonusByPatentId(patent.getId());
+            List<NewPatentBonusRequest.inventor> inventorList = request.getInventorList();
+            Set<String> inventorNames = inventorList.stream().map(NewPatentBonusRequest.inventor::getInventorName).collect(Collectors.toSet());
             if (bonusList.size() != 0) {
-                return CommonResult.failed("该专利已存在奖金");
+                StringBuilder repeatNames = new StringBuilder();
+                boolean isRepeat = false;
+                for (PatentBonus patentBonus : bonusList) {
+                    if (inventorNames.contains(patentBonus.getInventorName())) {
+                        isRepeat = true;
+                        repeatNames.append(patentBonus.getInventorName() + ",");
+                    }
+                }
+                if (isRepeat) {
+                    return CommonResult.failed(repeatNames.toString() + "已存在奖金");
+                }
             }
             bonusList = new ArrayList<>();
-            List<NewPatentBonusRequest.inventor> inventorList = request.getInventorList();
-            Collections.sort(inventorList, new Comparator<NewPatentBonusRequest.inventor>() {
-                @Override
-                public int compare(NewPatentBonusRequest.inventor o1, NewPatentBonusRequest.inventor o2) {
-                    return Integer.parseInt(o2.getActualRelease()) - Integer.parseInt(o1.getActualRelease());
-                }
-            });
             int size = inventorList.size();
             for (int i = 0; i < size; i++) {
                 NewPatentBonusRequest.inventor inventor = inventorList.get(i);
@@ -243,7 +251,6 @@ public class PatentServiceImpl implements PatentService {
                 patentBonus.setRanking(i + 1);
                 bonusList.add(patentBonus);
             }
-
             return bonusMapper.insertBatchSomeColumn(bonusList) == 0 ?
                     CommonResult.failed("新增失败") :
                     CommonResult.success(null, "新增成功");

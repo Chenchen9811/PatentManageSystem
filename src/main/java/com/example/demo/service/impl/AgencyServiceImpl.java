@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +36,21 @@ public class AgencyServiceImpl implements AgencyService {
     @Override
     public Agency findAgencyByCode(String agencyCode) {
         return agencyMapper.selectOne(new LambdaQueryWrapper<Agency>().eq(Agency::getAgencyCode, agencyCode));
+    }
+
+
+    @Override
+    public CommonResult getAgencyList() {
+        try {
+            List<Agency> agencyList = agencyMapper.selectList(new LambdaQueryWrapper<>());
+            Map<String, List<String>> map = new HashMap<>();
+            map.put("agencyNameList", agencyList.stream().map(Agency::getAgencyName).collect(Collectors.toList()));
+            return CommonResult.success(map, "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
