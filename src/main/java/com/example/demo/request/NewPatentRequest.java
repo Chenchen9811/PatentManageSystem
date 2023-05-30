@@ -24,7 +24,7 @@ public class NewPatentRequest {
     private String currentProgram;
     @NotBlank(message = "部门名字不能为空")
     private String departmentName;
-    private List<Inventor> inventorList;
+    private List<Inventor> listOfInventor;
 
 
 

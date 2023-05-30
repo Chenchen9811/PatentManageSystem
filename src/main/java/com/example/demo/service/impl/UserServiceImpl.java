@@ -288,7 +288,7 @@ public class UserServiceImpl implements UserService {
     public CommonResult addRole(AddRoleRequest request) throws Exception {
         try {
             // 校验重复
-            Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("role_name", request.getRoleName()));
+            Role role = roleMapper.selectOne(new QueryWrapper<Role>().eq("role_name", request.getRoleName()).last("for update"));
             if (null != role) {
                 return CommonResult.failed("该角色已存在");
             }

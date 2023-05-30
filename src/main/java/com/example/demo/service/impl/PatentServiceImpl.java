@@ -196,7 +196,7 @@ public class PatentServiceImpl implements PatentService {
                     bonusList.stream().map(bonus -> {
                         GetPatentBonusResponse response = new GetPatentBonusResponse();
                         Patent patent = patentMap.get(bonus.getPatentId());
-                        response.setPatentBonusId(bonus.getId());
+                        response.setPatentBonusId(String.valueOf(bonus.getId()));
                         response.setBonusAmount(bonus.getBonusAmount());
                         response.setRanking(bonus.getRanking());
                         response.setPatentCode(patent.getPatentCode());
@@ -580,13 +580,13 @@ public class PatentServiceImpl implements PatentService {
             patent.setCurrentProgram(request.getCurrentProgram());
             patent.setDepartmentId(department.getId());
             patentMapper.insert(patent);
-            List<NewPatentRequest.Inventor> inventorList = request.getInventorList();
-            Collections.sort(inventorList, new Comparator<NewPatentRequest.Inventor>() {
-                @Override
-                public int compare(NewPatentRequest.Inventor o1, NewPatentRequest.Inventor o2) {
-                    return Integer.valueOf(o1.getRate()) - Integer.valueOf(o2.getRate());
-                }
-            });
+            List<NewPatentRequest.Inventor> inventorList = request.getListOfInventor();
+//            Collections.sort(inventorList, new Comparator<NewPatentRequest.Inventor>() {
+//                @Override
+//                public int compare(NewPatentRequest.Inventor o1, NewPatentRequest.Inventor o2) {
+//                    return Integer.valueOf(o1.getRate()) - Integer.valueOf(o2.getRate());
+//                }
+//            });
             int size = inventorList.size();
             for (int i = 0; i < size; i++) {
                 PatentInventor patentInventor = new PatentInventor();

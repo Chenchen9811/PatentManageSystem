@@ -302,6 +302,7 @@ public class TrademarkServiceImpl implements TrademarkService {
                         response.setActualRelease(bonus.getActualRelease());
                         response.setReleaseStatus(bonus.getReleaseStatus());
                         response.setTrademarkName(trademark.getTrademarkName());
+                        response.setTrademarkId(String.valueOf(trademark.getId()));
                         return response;
                     }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize()), "查找成功");
         } catch (Exception e) {

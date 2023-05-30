@@ -13,4 +13,5 @@ public class GetTrademarkBonusResponse {
     private Integer ranking;
     private String actualRelease;
     private String trademarkName;
+    private String trademarkId;
 }

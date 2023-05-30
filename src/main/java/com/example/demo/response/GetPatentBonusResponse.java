@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class GetPatentBonusResponse {
-    private Long patentBonusId;
+    private String patentBonusId;
     private String patentCode;
     private String patentType;
     private String bonusType;
