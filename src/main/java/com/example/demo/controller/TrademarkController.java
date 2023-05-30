@@ -156,5 +156,15 @@ public class TrademarkController {
     }
 
 
+    @ResponseBody
+    @PostMapping("/updateBonus")
+    public CommonResult updateBonus(@RequestBody UpdateTrademarkBonusRequest request) {
+        try {
+            return trademarkService.updateBonus(request);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 
 }

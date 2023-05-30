@@ -134,14 +134,19 @@ public class PatentServiceImpl implements PatentService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CommonResult updateBonus(NewPatentBonusRequest request) {
+    public CommonResult updateBonus(UpdatePatentBonusRequest request) {
         try {
-            Patent patent = this.findPatentByCode(request.getPatentCode());
-            List<PatentBonus> bonusList = this.findBonusByPatentId(patent.getId());
-            if (0 != bonusList.size()) {
-                bonusMapper.deleteBatchIds(bonusList.stream().map(PatentBonus::getId).collect(Collectors.toList()));
-            }
-            return this.newBonus(request);
+//            Patent patent = this.findPatentByCode(request.getPatentCode());
+//            List<PatentBonus> bonusList = this.findBonusByPatentId(patent.getId());
+//            if (0 != bonusList.size()) {
+//                bonusMapper.deleteBatchIds(bonusList.stream().map(PatentBonus::getId).collect(Collectors.toList()));
+//            }
+            PatentBonus bonus = bonusMapper.selectOne(new LambdaQueryWrapper<PatentBonus>().eq(PatentBonus::getId, Long.parseLong(request.getBonusId())));
+            bonus.setActualRelease(request.getActualRelease());
+            bonus.setReleaseStatus(request.getReleaseStatus());
+            bonus.setBonusType(request.getBonusType());
+            bonus.setInventorName(request.getInventorName());
+            return bonusMapper.updateById(bonus) == 0 ? CommonResult.failed("编辑失败") : CommonResult.success(null, "编辑成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -517,8 +522,8 @@ public class PatentServiceImpl implements PatentService {
         try {
 //            LambdaQueryWrapper<Patent> wrapper = patentManager.getWrapperByGetPatentRequest(request);
             Map<String, Object> map = patentManager.getWrapper(request);
-            LambdaQueryWrapper<Patent> wrapper = (LambdaQueryWrapper<Patent>)map.get("patentWrapper");
-            LambdaQueryWrapper<PatentInventor> patentInventorWrapper = (LambdaQueryWrapper<PatentInventor>)map.get("patentInventorWrapper");
+            LambdaQueryWrapper<Patent> wrapper = (LambdaQueryWrapper<Patent>) map.get("patentWrapper");
+            LambdaQueryWrapper<PatentInventor> patentInventorWrapper = (LambdaQueryWrapper<PatentInventor>) map.get("patentInventorWrapper");
             List<Patent> patentList = patentMapper.selectList(wrapper);
             Set<Long> patentIds = new HashSet<>();
             for (Patent patent : patentList) {

@@ -57,7 +57,7 @@ public interface PatentService {
 
     CommonResult deleteBonus(String patentCode, String inventorName);
 
-    CommonResult updateBonus(NewPatentBonusRequest request);
+    CommonResult updateBonus(UpdatePatentBonusRequest request);
 
     CommonResult newFileInfo(NewPatentFileInfoRequest request);
 

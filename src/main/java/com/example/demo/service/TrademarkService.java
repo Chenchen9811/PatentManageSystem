@@ -46,4 +46,6 @@ public interface TrademarkService {
     CommonResult newFileInfo(NewTrademarkFileInfoRequest request);
 
     CommonResult getFileInfo(GetTrademarkFileInfoRequest request);
+
+    CommonResult updateBonus(UpdateTrademarkBonusRequest request);
 }

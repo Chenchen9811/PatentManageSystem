@@ -238,7 +238,7 @@ public class PatentController {
 
     @ResponseBody
     @PostMapping("/updateBonus")
-    public CommonResult updateBonus(@Valid @RequestBody NewPatentBonusRequest request, BindingResult bindingResult) {
+    public CommonResult updateBonus(@Valid @RequestBody UpdatePatentBonusRequest request, BindingResult bindingResult) {
         CommonResult result = null;
         try {
             result = patentService.updateBonus(request);

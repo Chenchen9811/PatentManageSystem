@@ -62,6 +62,23 @@ public class TrademarkServiceImpl implements TrademarkService {
     private ProposalService proposalService;
 
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult updateBonus(UpdateTrademarkBonusRequest request) {
+        try {
+            TrademarkBonus bonus = bonusMapper.selectOne(new LambdaQueryWrapper<TrademarkBonus>().eq(TrademarkBonus::getId, Long.parseLong(request.getBonusId())));
+            bonus.setBonusType(request.getBonusType());
+            bonus.setActualRelease(request.getActualRelease());
+            bonus.setInventorName(request.getInventorName());
+            bonus.setActualRelease(request.getActualRelease());
+            return bonusMapper.updateById(bonus) == 0 ? CommonResult.failed("编辑失败") : CommonResult.success(null, "编辑成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
     @Override
     public CommonResult getFileInfo(GetTrademarkFileInfoRequest request) {
         try {
@@ -251,12 +268,12 @@ public class TrademarkServiceImpl implements TrademarkService {
             List<Criteria.KV> items = request.getCriteria().getItems();
             for (Criteria.KV kv : items) {
                 switch (kv.getKey()) {
-                    case "trademarkCode" : {
+                    case "trademarkCode": {
                         Trademark trademark = this.findTrademarkByCode(request.getTrademarkCode());
                         wrapper.eq(TrademarkBonus::getTrademarkId, trademark.getId());
                         break;
                     }
-                    case "inventorName" : {
+                    case "inventorName": {
                         wrapper.eq(TrademarkBonus::getInventorName, kv.getValue());
                         break;
                     }
