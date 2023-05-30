@@ -354,7 +354,7 @@ public class UserServiceImpl implements UserService {
         try {
             UpdateWrapper<Role> updateWrapper = new UpdateWrapper<>();
             Role role = this.findRoleByRoleName(roleName);
-            updateWrapper.eq("roleName", roleName);
+            updateWrapper.eq("role_name", roleName);
             role.setDelFlag("Y");
             roleMapper.update(role, updateWrapper);
         } catch (Exception e) {
