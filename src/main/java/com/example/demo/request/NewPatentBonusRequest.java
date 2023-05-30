@@ -13,7 +13,7 @@ public class NewPatentBonusRequest {
     private String bonusType;
     private String releaseStatus;
     private String bonusAmount;
-    private List<inventor> inventorList;
+    private List<inventor> listOfInventor;
 
 
     @Data
