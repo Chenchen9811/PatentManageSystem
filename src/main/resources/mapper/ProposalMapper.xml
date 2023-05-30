@@ -12,7 +12,8 @@
             r.proposal_id,
             r.reviewer_id,
             r.result,
-            r.suggestion
+            r.suggestion,
+            r.review_date
         from t_review r
         left JOIN t_proposal p on p.id = r.proposal_id
         where p.proposal_code = #{proposalCode}

@@ -232,8 +232,13 @@ public class ProposalServiceImpl implements ProposalService {
             }
             User reviewer = userService.findUserByUserId(review.getReviewerId());
             Role reviewerRole = userService.findRoleByUserId(reviewer.getId());
-            return CommonResult.success(new ReviewVo(reviewer.getUserName(), reviewerRole.getRoleName(),
-                    review.getReviewDate().toString(), review.getResult()), "查找成功");
+            ReviewVo reviewVo = new ReviewVo();
+//            if (review.getReviewDate() == null) log.error("reviewDateNull");
+            reviewVo.setReviewDate(CommonUtil.getYmdbyTimeStamp(review.getReviewDate()));
+            reviewVo.setReviewResult(review.getResult());
+            reviewVo.setReviewerRoleName(reviewerRole.getRoleName());
+            reviewVo.setReviewerName(reviewer.getUserName());
+            return CommonResult.success(reviewVo, "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

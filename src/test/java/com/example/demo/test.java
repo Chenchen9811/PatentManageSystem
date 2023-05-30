@@ -38,6 +38,9 @@ public class test {
     @Resource
     private SoftwareBonusMapper softwareBonusMapper;
 
+
+
+
     @Test
     public void testMapper() {
 //        Proposal proposal = new Proposal();
@@ -53,7 +56,8 @@ public class test {
 //        Review review = proposalMapper.findReviewByProposalCode("1");
 //        System.out.println(review);
 //        System.out.println(trademarkMapper.findTrademarkByInventorName("admin").toString());
-        System.out.println(softwareBonusMapper.selectList(new LambdaQueryWrapper<SoftwareBonus>()));
+//        System.out.println(softwareBonusMapper.selectList(new LambdaQueryWrapper<SoftwareBonus>()));
+        System.out.println(proposalMapper.findReviewByProposalCode("aaaa").toString());
     }
 
 
