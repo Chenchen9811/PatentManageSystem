@@ -574,8 +574,8 @@ public class PatentServiceImpl implements PatentService {
             patent.setApplicationCode(request.getApplicationCode());
             patent.setApplicationDate(CommonUtil.stringDateToTimeStamp(request.getApplicationDate()));
 //            patent.setApplicationDate(new Timestamp(System.currentTimeMillis()));
-            patent.setGrantCode(request.getGrantCode());
-            patent.setGrantDate(CommonUtil.stringDateToTimeStamp(request.getGrantDate()));
+            patent.setGrantCode(request.getGrantCode() == null ? null : request.getGrantCode());
+            patent.setGrantDate(request.getGrantDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getGrantDate()));
 //            patent.setGrantDate(new Timestamp(System.currentTimeMillis()));
             patent.setCurrentProgram(request.getCurrentProgram());
             patent.setDepartmentId(department.getId());

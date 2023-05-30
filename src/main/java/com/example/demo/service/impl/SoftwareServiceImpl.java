@@ -420,8 +420,8 @@ public class SoftwareServiceImpl implements SoftwareService {
             software.setProposalDate(request.getProposalDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getProposalDate()));
             software.setFinishDate(request.getFinishDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getFinishDate()));
             software.setPublishDate(request.getPublishDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getPublishDate()));
-            softwareMapper.insert(software);
-            return CommonResult.success(null, "添加软著成功");
+            ;
+            return softwareMapper.insert(software) != 0 ? CommonResult.success(null, "添加软著成功") : CommonResult.failed("添加软著失败");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

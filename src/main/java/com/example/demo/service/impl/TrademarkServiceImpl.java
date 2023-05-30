@@ -276,13 +276,6 @@ public class TrademarkServiceImpl implements TrademarkService {
                     }
                 }
             }
-//            if (StringUtils.isNotBlank(request.getTrademarkCode())) {
-//                Trademark trademark = this.findTrademarkByCode(request.getTrademarkCode());
-//                wrapper.eq(TrademarkBonus::getTrademarkId, trademark.getId());
-//            }
-//            if (StringUtils.isNotBlank(request.getInventorName())) {
-//                wrapper.eq(TrademarkBonus::getInventorName, request.getInventorName());
-//            }
             List<TrademarkBonus> bonusList = bonusMapper.selectList(wrapper);
             Map<Long, Trademark> map = new HashMap<>();
             List<Trademark> trademarks = trademarkMapper.selectBatchIds(bonusList.stream().map(TrademarkBonus::getTrademarkId).distinct().collect(Collectors.toList()));
@@ -421,14 +414,14 @@ public class TrademarkServiceImpl implements TrademarkService {
             trademark.setAgency(request.getAgency());
             trademark.setDepartmentId(department.getId());
             trademark.setTrademarkDesign("xxx");
-            if (StringUtils.isNotBlank(request.getApplyDate())) {
-                trademark.setApplyDate(CommonUtil.stringDateToTimeStamp(request.getApplyDate()));
-            }
-            if (StringUtils.isNotBlank(request.getGrantDate())) {
-                trademark.setGrantDate(CommonUtil.stringDateToTimeStamp(request.getGrantDate()));
-            }
-            trademarkMapper.insert(trademark);
-            return CommonResult.success(null, "添加商标成功");
+//            if (StringUtils.isNotBlank(request.getApplyDate())) {
+//                trademark.setApplyDate(CommonUtil.stringDateToTimeStamp(request.getApplyDate()));
+//            }
+//            if (StringUtils.isNotBlank(request.getGrantDate())) {
+//                trademark.setGrantDate(CommonUtil.stringDateToTimeStamp(request.getGrantDate()));
+//            }
+            ;
+            return trademarkMapper.insert(trademark) != 0 ? CommonResult.success(null, "添加商标成功") : CommonResult.failed("删除商标失败");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

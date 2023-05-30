@@ -18,8 +18,8 @@ public class NewTrademarkRequest {
     private String trademarkType;
     private String rightStatus;
     private String currentStatus;
-    private String applyDate;
-    private String grantDate;
+//    private String applyDate;
+//    private String grantDate;
     private String copyRightCode;
     private String agency;
     private String departmentName;
