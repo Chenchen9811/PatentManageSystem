@@ -222,7 +222,7 @@ public class PatentServiceImpl implements PatentService {
                 return CommonResult.failed("不存在该专利，请核对专利编号是否正确");
             }
             List<PatentBonus> bonusList = this.findBonusByPatentId(patent.getId());
-            List<NewPatentBonusRequest.inventor> inventorList = request.getInventorList();
+            List<NewPatentBonusRequest.inventor> inventorList = request.getListOfInventor();
             Set<String> inventorNames = inventorList.stream().map(NewPatentBonusRequest.inventor::getInventorName).collect(Collectors.toSet());
             if (bonusList.size() != 0) {
                 StringBuilder repeatNames = new StringBuilder();
