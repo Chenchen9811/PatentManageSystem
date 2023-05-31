@@ -233,6 +233,8 @@ public class SoftwareServiceImpl implements SoftwareService {
                 response.setUploaderName(uploader.getUserName());
                 response.setProposerName(proposal.getProposerName());
                 response.setFileId(String.valueOf(file.getId()));
+                response.setSoftwareCode(software.getSoftwareCode());
+                response.setSoftwareName(software.getSoftwareName());
                 return response;
             }).collect(Collectors.toList());
             return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");

@@ -12,4 +12,7 @@ public class GetSoftwareFileInfoResponse {
     private String rightRange;
     private String uploaderName;
     private String fileId;
+    private String softwareName;
+    private String softwareCode;
+
 }
