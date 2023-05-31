@@ -15,4 +15,5 @@ public class GetTrademarkFileInfoResponse {
     private String uploaderName;
     private String fileType;
     private String fileId;
+    private String trademarkName;
 }

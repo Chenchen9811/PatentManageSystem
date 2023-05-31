@@ -11,4 +11,6 @@ public class GetPatentFileInfoResponse {
     private String uploadDate;
     private String fileStatus;
     private String fileId;
+    private String patentName;
+    private String patentType;
 }
