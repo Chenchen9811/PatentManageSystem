@@ -534,15 +534,27 @@ public class PatentServiceImpl implements PatentService {
                 return CommonResult.failed("查找失败，没有相关发明人");
             }
 //            List<Long> ids = patentInventors.stream().map(PatentInventor::getPatentId).collect(Collectors.toList());
+            Map<Long, List<PatentInventor>> inventorMap = new HashMap<>();
             for (PatentInventor patentInventor : patentInventors) {
                 if (!patentIds.contains(patentInventor.getPatentId())) {
                     patentList.remove(patentInventor);
+                } else {
+                    if (inventorMap.containsKey(patentInventor.getPatentId())) {
+                        List<PatentInventor> list = inventorMap.get(patentInventor.getPatentId());
+                        list.add(patentInventor);
+                        inventorMap.put(patentInventor.getPatentId(), list);
+                    } else {
+                        List<PatentInventor> list = new ArrayList<>();
+                        list.add(patentInventor);
+                        inventorMap.put(patentInventor.getPatentId(), list);
+                    }
                 }
             }
             List<GetPatentResponse> responseList = new ArrayList<>();
             for (Patent patent : patentList) {
                 GetPatentResponse response = new GetPatentResponse();
-                List<PatentInventor> inventorList = patentInventorMapper.selectList(new LambdaQueryWrapper<PatentInventor>().eq(PatentInventor::getPatentId, patent.getId()));
+//                List<PatentInventor> inventorList = patentInventorMapper.selectList(new LambdaQueryWrapper<PatentInventor>().eq(PatentInventor::getPatentId, patent.getId()));
+                List<PatentInventor> inventorList = inventorMap.get(patent.getId());
                 response.setPatentCode(patent.getPatentCode());
                 response.setPatentType(patent.getPatentType());
                 response.setPatentName(patent.getPatentName());
