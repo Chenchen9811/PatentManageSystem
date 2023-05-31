@@ -14,5 +14,6 @@ public class GetSoftwareFileInfoResponse {
     private String fileId;
     private String softwareName;
     private String softwareCode;
-
+    private String fileType;
+    private String uploadDate;
 }
