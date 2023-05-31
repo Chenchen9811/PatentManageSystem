@@ -371,12 +371,17 @@ public class SoftwareServiceImpl implements SoftwareService {
         try {
             LambdaQueryWrapper<Software> wrapper = softwareManager.getWrapper(request);
             List<Software> softwareList = softwareMapper.selectList(wrapper);
+            List<User> inventorList = userService.findUserListByIds(softwareList.stream().map(Software::getInventorId).distinct().collect(Collectors.toList()));
+            Map<Long, User> inventorMap = new HashMap<>();
+            for (User inventor : inventorList) {
+                inventorMap.put(inventor.getId(), inventor);
+            }
             return CommonResult.success(PageInfoUtil.getPageInfo(softwareList.stream().map(software -> {
                         GetSoftwareResponse response = new GetSoftwareResponse();
                         response.setSoftwareName(software.getSoftwareName());
                         response.setSoftwareCode(software.getSoftwareCode());
                         response.setVersion(software.getVersion());
-                        response.setInventorName(userService.findUserByUserId(software.getInventorId()).getUserName());
+                        response.setInventorName(inventorMap.get(software.getInventorId()).getUserName());
                         response.setDevelopWay(software.getDevelopWay());
                         response.setRegisterCode(software.getRegisterCode());
                         response.setCertificateCode(software.getCertificateCode());

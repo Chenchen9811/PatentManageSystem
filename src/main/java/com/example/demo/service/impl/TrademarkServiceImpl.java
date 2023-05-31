@@ -375,6 +375,11 @@ public class TrademarkServiceImpl implements TrademarkService {
         try {
             LambdaQueryWrapper<Trademark> wrapper = trademarkManager.getWrapper(request);
             List<Trademark> trademarkList = trademarkMapper.selectList(wrapper);
+            List<User> inventorList = userService.findUserListByIds(trademarkList.stream().map(Trademark::getInventorId).distinct().collect(Collectors.toList()));
+            Map<Long, User> inventorMap = new HashMap<>();
+            for (User inventor : inventorList) {
+                inventorMap.put(inventor.getId(), inventor);
+            }
             return CommonResult.success(PageInfoUtil.getPageInfo(trademarkList.stream().map(trademark -> {
                 GetTrademarkResponse response = new GetTrademarkResponse();
                 response.setTrademarkCode(trademark.getTrademarkCode());
@@ -383,7 +388,7 @@ public class TrademarkServiceImpl implements TrademarkService {
                 response.setCurrentStatus(trademark.getCurrentStatus());
                 response.setCopyRightCode(trademark.getCopyRightCode());
                 response.setRightStatus(trademark.getRightStatus());
-                response.setInventorName(userService.findUserByUserId(trademark.getInventorId()).getUserName());
+                response.setInventorName(inventorMap.get(trademark.getInventorId()).getUserName());
                 return response;
             }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize()), "查找成功");
         } catch (Exception e) {

@@ -1,6 +1,7 @@
 package com.example.demo.service.manager;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.example.demo.Utils.HostHolder;
 import com.example.demo.entity.*;
 import com.example.demo.request.Criteria;
 import com.example.demo.request.GetTrademarkFileInfoRequest;
@@ -29,6 +30,9 @@ public class TrademarkManager {
 
     @Resource
     private DepartmentService departmentService;
+
+    @Resource
+    private HostHolder hostHolder;
 
     public LambdaQueryWrapper<TrademarkFile> getFileWrapper(GetTrademarkFileInfoRequest request) {
         LambdaQueryWrapper<TrademarkFile> wrapper = new LambdaQueryWrapper<>();
@@ -216,6 +220,10 @@ public class TrademarkManager {
                     if (kv.getValue().equals("0")) break;
                     Department department = departmentService.findDepartmentByDepartmentName(kv.getValue());
                     wrapper.eq(Trademark::getDepartmentId, department.getId());
+                    break;
+                }
+                case "userId" : {
+                    wrapper.eq(Trademark::getInventorId, hostHolder.getUser().getId());
                     break;
                 }
             }

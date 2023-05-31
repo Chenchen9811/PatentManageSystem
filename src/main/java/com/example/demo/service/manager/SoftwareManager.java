@@ -2,6 +2,7 @@ package com.example.demo.service.manager;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.example.demo.Utils.HostHolder;
 import com.example.demo.entity.*;
 import com.example.demo.mapper.SoftwareMapper;
 import com.example.demo.request.*;
@@ -25,6 +26,9 @@ public class SoftwareManager {
 
     @Resource
     private DepartmentService departmentService;
+
+    @Resource
+    private HostHolder hostHolder;
 
     public LambdaQueryWrapper<SoftwareBonus> getBonusWrapper(GetSoftwareBonusRequest request) {
         LambdaQueryWrapper<SoftwareBonus> wrapper = new LambdaQueryWrapper<>();
@@ -250,6 +254,10 @@ public class SoftwareManager {
                     if (kv.getValue().equals("0")) break;
                     Department department = departmentService.findDepartmentByDepartmentName(kv.getValue());
                     wrapper.eq(Software::getDepartmentId, department.getId());
+                    break;
+                }
+                case "userId" : {
+                    wrapper.eq(Software::getInventorId, hostHolder.getUser().getId());
                     break;
                 }
             }

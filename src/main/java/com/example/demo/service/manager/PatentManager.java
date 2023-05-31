@@ -3,6 +3,7 @@ package com.example.demo.service.manager;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.example.demo.Utils.CommonUtil;
+import com.example.demo.Utils.HostHolder;
 import com.example.demo.entity.*;
 import com.example.demo.mapper.PatentMapper;
 import com.example.demo.request.*;
@@ -25,6 +26,9 @@ public class PatentManager {
 
     @Resource
     private DepartmentService departmentService;
+
+    @Resource
+    private HostHolder hostHolder;
 
     public LambdaQueryWrapper<PatentBonus> getBonusWrapper(GetPatentBonusListRequest request) {
         LambdaQueryWrapper<PatentBonus> wrapper = new LambdaQueryWrapper<>();
@@ -240,6 +244,10 @@ public class PatentManager {
                     if (kv.getValue().equals("0")) break;
                     Department department = departmentService.findDepartmentByDepartmentName(kv.getKey());
                     patentWrapper.eq(Patent::getDepartmentId, department.getId());
+                    break;
+                }
+                case "userId" : {
+                    patentInventorWrapper.eq(PatentInventor::getInventorId, hostHolder.getUser().getId());
                     break;
                 }
                 default:break;
