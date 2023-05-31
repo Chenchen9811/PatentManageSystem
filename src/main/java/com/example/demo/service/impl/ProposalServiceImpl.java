@@ -10,6 +10,9 @@ import com.example.demo.common.ProposalStatus;
 import com.example.demo.common.ProposalType;
 import com.example.demo.common.ReviewStatus;
 import com.example.demo.entity.*;
+import com.example.demo.mapper.ProposalFileMapper;
+import com.example.demo.request.GetProposalFileRequest;
+import com.example.demo.response.GetProposalFileResponse;
 import com.example.demo.response.ProposalVo1;
 import com.example.demo.response.ReviewVo;
 import com.example.demo.mapper.InventorMapper;
@@ -30,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,6 +62,9 @@ public class ProposalServiceImpl implements ProposalService {
     @Resource
     private ReviewMapper reviewMapper;
 
+    @Resource
+    private ProposalFileMapper fileMapper;
+
     @Override
     public Proposal findProposalByProposerName(String proposerName) {
         return proposalMapper.selectOne(new LambdaQueryWrapper<Proposal>().eq(Proposal::getProposerName, proposerName));
@@ -79,6 +86,47 @@ public class ProposalServiceImpl implements ProposalService {
         }
     }
 
+    @Override
+    public CommonResult getFileList(GetProposalFileRequest request) {
+        try {
+            LambdaQueryWrapper<Proposal> proposalWrapper = proposalManager.getWrapper(request);
+            LambdaQueryWrapper<ProposalFile> fileWrapper = proposalManager.getFileWrapper(request);
+            List<Proposal> proposalList = proposalMapper.selectList(proposalWrapper);
+            if (proposalList.size() == 0) {
+                return CommonResult.failed("没找到相关提案");
+            }
+            List<ProposalFile> fileList = fileMapper.selectList(fileWrapper);
+            if (fileList.size() == 0) {
+                return CommonResult.failed("没找到提案文件");
+            }
+            Set<Long> proposalIds = proposalList.stream().map(Proposal::getId).collect(Collectors.toSet());
+            fileList.removeIf(file -> !proposalIds.contains(file.getProposalId()));
+            if (fileList.size() == 0) {
+                return CommonResult.failed("没找到与所查提案相关的提案文件");
+            }
+            Map<Long, Proposal> proposalMap = proposalList.stream().collect(Collectors.toMap(Proposal::getId, proposal -> proposal));
+            Map<Long, User> userMap = userService.findUserListByIds(fileList.stream().map(ProposalFile::getUploaderId).distinct().collect(Collectors.toList()))
+                    .stream().collect(Collectors.toMap(User::getId, user -> user));
+            List<GetProposalFileResponse> responseList = fileList.stream().map(file -> {
+                GetProposalFileResponse response = new GetProposalFileResponse();
+                Proposal proposal = proposalMap.get(file.getProposalId());
+                User uploader = userMap.get(file.getUploaderId());
+                response.setProposalCode(proposal.getProposalCode());
+                response.setProposalState(CommonUtil.getProposalStatusString(proposal.getProposalState()));
+                response.setProposalName(proposal.getProposalName());
+                response.setProposalType(CommonUtil.getProposalTypeString(proposal.getProposalType()));
+                response.setUploadDate(file.getUploadDate().toString());
+                response.setUploaderName(uploader.getUserName());
+                return response;
+            }).collect(Collectors.toList());
+            return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult newProposal(NewProposalRequest request) throws Exception {
@@ -89,12 +137,14 @@ public class ProposalServiceImpl implements ProposalService {
                 return CommonResult.failed("提案已存在");
             }
             proposal = new Proposal();
+            Department department = departmentService.findDepartmentByDepartmentName(request.getDepartmentName());
             proposal.setProposalCode(request.getProposalCode());
             proposal.setProposalName(request.getProposalName());
             proposal.setProposalType(CommonUtil.getProposalTypeCode(request.getPatentType()));
             proposal.setProposerName(request.getProposerName());
             proposal.setProposalDate(new Timestamp(System.currentTimeMillis()));
             proposal.setSubstance(request.getDetailText());
+            proposal.setDepartmentId(department.getId());
             // 获取提案人信息
             User proposer = userService.findUserByUserName(request.getProposerName());
             proposal.setProposerId(proposer.getId());
@@ -102,12 +152,24 @@ public class ProposalServiceImpl implements ProposalService {
             proposal.setDepartmentId(proposer.getDepartmentId());
             proposal.setProposalState(CommonUtil.getProposalStatusCode("在审"));
             proposalMapper.insert(proposal);
+            // 提案文件
+            ProposalFile proposalFile = new ProposalFile();
+            proposalFile.setProposalId(proposal.getId());
+            proposalFile.setUploaderId(hostHolder.getUser().getId());
+            proposalFile.setUploadDate(new Date(System.currentTimeMillis()));
+            proposalFile.setFileUrl(CommonUtil.getFileUrl(request.getFileName()));
+            proposalFile.setFileName(request.getFileName());
+            fileMapper.insert(proposalFile);
             List<NewProposalRequest.InventorVo> inventorList = request.getListOfInventor();
-            inventorList.sort(Comparator.comparingInt(o -> Integer.parseInt(o.getRate())));
+//            inventorList.sort(Comparator.comparingInt(o -> Integer.parseInt(o.getRate())));
+            Map<String, User> userMap = userService.findUserListByNames(inventorList.stream()
+                            .map(NewProposalRequest.InventorVo::getInventorName).collect(Collectors.toList()))
+                    .stream().collect(Collectors.toMap(User::getUserName, user -> user));
             int len = inventorList.size();
+            List<Inventor> inventors = new ArrayList<>();
             for (int i = 0; i < len; i++) {
                 NewProposalRequest.InventorVo inventorVo = inventorList.get(i);
-                User user = userService.findUserByUserName(inventorVo.getInventorName());
+                User user = userMap.get(inventorVo.getInventorName());
                 Inventor inventor = new Inventor();
                 inventor.setProposalId(proposal.getId());
                 inventor.setContribute(new BigDecimal("0." + inventorVo.getRate()));
@@ -117,8 +179,9 @@ public class ProposalServiceImpl implements ProposalService {
                 inventor.setInventorId(user.getId());
                 inventor.setInventorCode(user.getUserCode());
                 inventor.setInventorName(user.getUserName());
-                inventorMapper.insert(inventor);
+                inventors.add(inventor);
             }
+            inventorMapper.insertBatchSomeColumn(inventors);
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();
@@ -251,5 +314,8 @@ public class ProposalServiceImpl implements ProposalService {
         return proposalMapper.selectBatchIds(proposalIds);
     }
 
-
+    @Override
+    public Proposal findProposalByProposalCode(String proposalCode) {
+        return proposalMapper.selectOne(new LambdaQueryWrapper<Proposal>().eq(Proposal::getProposalCode, proposalCode));
+    }
 }

@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.common.CommonResult;
 import com.example.demo.entity.Proposal;
 import com.example.demo.request.AddReviewRequest;
+import com.example.demo.request.GetProposalFileRequest;
 import com.example.demo.request.GetProposalRequest1;
 import com.example.demo.request.NewProposalRequest;
 
@@ -23,7 +24,11 @@ public interface ProposalService {
 
     Proposal findProposalByProposalId(Long proposalId);
 
+    Proposal findProposalByProposalCode(String proposalCode);
+
     CommonResult getCode(String typeName);
 
     List<Proposal> findProposalListByIds(List<Long> proposalIds);
+
+    CommonResult getFileList(GetProposalFileRequest request);
 }

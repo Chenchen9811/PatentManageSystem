@@ -48,4 +48,6 @@ public interface TrademarkService {
     CommonResult getFileInfo(GetTrademarkFileInfoRequest request);
 
     CommonResult updateBonus(UpdateTrademarkBonusRequest request);
+
+    CommonResult deleteFile(String fileId);
 }

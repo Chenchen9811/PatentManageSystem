@@ -64,6 +64,17 @@ public class SoftwareServiceImpl implements SoftwareService {
     @Resource
     private DepartmentService departmentService;
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult deleteFile(String fileId) {
+        try {
+            return fileMapper.deleteById(Long.valueOf(fileId)) == 0 ? CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
 
     @Override
     public CommonResult updateBonus(UpdateSoftwareBonusRequest request) {

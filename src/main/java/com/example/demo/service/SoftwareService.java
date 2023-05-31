@@ -47,4 +47,6 @@ public interface SoftwareService {
     CommonResult deleteBonus(String id);
 
     CommonResult updateBonus(UpdateSoftwareBonusRequest request);
+
+    CommonResult deleteFile(String fileId);
 }

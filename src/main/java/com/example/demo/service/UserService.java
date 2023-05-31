@@ -33,6 +33,8 @@ public interface UserService {
 
     List<User> findUserListByIds(List<Long> userIds);
 
+    List<User> findUserListByNames(List<String> userNames);
+
     CommonResult addUser(AddUserRequest request) throws Exception;
 
     CommonResult updateUser(UpdateUserRequest result) throws Exception;

@@ -63,6 +63,18 @@ public class PatentServiceImpl implements PatentService {
     @Resource
     private PatentFileMapper fileMapper;
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult deleteFile(String fileId) {
+        try {
+            return fileMapper.deleteById(Long.valueOf(fileId)) == 0 ? CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
 
     @Override
     public CommonResult getFileInfo(GetPatentFileInfoRequest request) {
@@ -540,15 +552,15 @@ public class PatentServiceImpl implements PatentService {
                 if (!patentIds.contains(patentInventor.getPatentId())) {
                     patentList.remove(patentInventor);
                 } else {
-                    if (inventorMap.containsKey(patentInventor.getPatentId())) {
-                        List<PatentInventor> list = inventorMap.get(patentInventor.getPatentId());
-                        list.add(patentInventor);
-                        inventorMap.put(patentInventor.getPatentId(), list);
-                    } else {
-                        List<PatentInventor> list = new ArrayList<>();
-                        list.add(patentInventor);
-                        inventorMap.put(patentInventor.getPatentId(), list);
-                    }
+                    List<PatentInventor> list;
+                    list = inventorMap.containsKey(patentInventor.getPatentId())? inventorMap.get(patentInventor.getPatentId()) : new ArrayList<>();
+//                    if (inventorMap.containsKey(patentInventor.getPatentId())) {
+//                        list = inventorMap.get(patentInventor.getPatentId());
+//                    } else {
+//                        list = new ArrayList<>();
+//                    }
+                    list.add(patentInventor);
+                    inventorMap.put(patentInventor.getPatentId(), list);
                 }
             }
             List<GetPatentResponse> responseList = new ArrayList<>();

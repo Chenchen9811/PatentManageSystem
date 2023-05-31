@@ -64,6 +64,18 @@ public class TrademarkServiceImpl implements TrademarkService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
+    public CommonResult deleteFile(String fileId) {
+        try {
+            return fileMapper.deleteById(Long.valueOf(fileId)) == 0 ? CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
     public CommonResult updateBonus(UpdateTrademarkBonusRequest request) {
         try {
             TrademarkBonus bonus = bonusMapper.selectOne(new LambdaQueryWrapper<TrademarkBonus>().eq(TrademarkBonus::getId, Long.parseLong(request.getBonusId())));

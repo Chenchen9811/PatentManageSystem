@@ -20,6 +20,9 @@ public class NewProposalRequest {
     private String patentType;
     private List<InventorVo> listOfInventor;
     private String detailText;
+    private String departmentName;
+    private String fileName;
+
 
     @Data
     public static class InventorVo {

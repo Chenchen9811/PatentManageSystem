@@ -162,4 +162,15 @@ public class SoftwareController {
             return CommonResult.failed(e.getMessage());
         }
     }
+
+    @ResponseBody
+    @DeleteMapping("/deleteFile/{id}")
+    public CommonResult deleteFile(@PathVariable("id") String fileId) {
+        try {
+            return softwareService.deleteFile(fileId);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 }

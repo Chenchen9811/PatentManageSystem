@@ -3,9 +3,15 @@ package com.example.demo.service.manager;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.demo.entity.Department;
 import com.example.demo.entity.Proposal;
+import com.example.demo.entity.ProposalFile;
+import com.example.demo.entity.User;
 import com.example.demo.mapper.DepartmentMapper;
+import com.example.demo.request.Criteria;
+import com.example.demo.request.GetProposalFileRequest;
 import com.example.demo.request.GetProposalRequest1;
 import com.example.demo.service.DepartmentService;
+import com.example.demo.service.ProposalService;
+import com.example.demo.service.UserService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -21,17 +27,71 @@ public class ProposalManager {
     @Resource
     private DepartmentService departmentService;
 
+    @Resource
+    private ProposalService proposalService;
+
+    @Resource
+    private UserService userService;
+
+    public LambdaQueryWrapper<ProposalFile> getFileWrapper(GetProposalFileRequest request) {
+        LambdaQueryWrapper<ProposalFile> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "fileName": {
+                    wrapper.eq(ProposalFile::getFileName, kv.getValue());
+                    break;
+                }
+                case "uploaderName": {
+                    User user = userService.findUserByUserName(kv.getValue());
+                    wrapper.eq(ProposalFile::getUploaderId, user.getId());
+                    break;
+                }
+                case "uploadDateBegin": {
+                    String endDate = null;
+                    for (Criteria.KV kV : items) {
+                        if (kv.getKey().equals("uploadDateEnd")) {
+                            endDate = kv.getValue();
+                            break;
+                        }
+                    }
+                    wrapper.between(ProposalFile::getUploadDate, kv.getValue(), endDate);
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
+
+    public LambdaQueryWrapper<Proposal> getWrapper(GetProposalFileRequest request) {
+        LambdaQueryWrapper<Proposal> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "proposalCode": {
+                    wrapper.eq(Proposal::getProposalCode, kv.getValue());
+                    break;
+                }
+                case "proposalName": {
+                    wrapper.eq(Proposal::getProposalName, kv.getValue());
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
+
     public LambdaQueryWrapper<Proposal> buildWrapperByRequest1(GetProposalRequest1 request) {
         LambdaQueryWrapper<Proposal> wrapper = new LambdaQueryWrapper<>();
         List<GetProposalRequest1.Criteria.KV> items = request.getCriteria().getItems();
         for (GetProposalRequest1.Criteria.KV kv : items) {
             String key = kv.getKey();
             switch (key) {
-                case "proposalCode" : {
+                case "proposalCode": {
                     wrapper.eq(Proposal::getProposalCode, kv.getValue());
                     break;
                 }
-                case "proposalName" : {
+                case "proposalName": {
                     wrapper.eq(Proposal::getProposalName, kv.getValue());
                     break;
                 }
@@ -70,10 +130,11 @@ public class ProposalManager {
                     wrapper.between(Proposal::getProposalDate, kv.getValue(), endDate);
                     break;
                 }
-                default:break;
+                default:
+                    break;
             }
         }
-        
+
 //        if (StringUtils.isNotBlank(request.getCriteria().getItems().getProposalCode()) {
 //            wrapper.eq(Proposal::getProposalCode, request.getCriteria().getItems().getProposalCode());
 //        }

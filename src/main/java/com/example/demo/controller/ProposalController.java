@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.common.CommonResult;
 import com.example.demo.request.AddReviewRequest;
+import com.example.demo.request.GetProposalFileRequest;
 import com.example.demo.request.GetProposalRequest1;
 import com.example.demo.request.NewProposalRequest;
 import com.example.demo.service.ProposalService;
@@ -101,5 +102,16 @@ public class ProposalController {
         }
     }
 
+    @ResponseBody
+    @PostMapping("/getFileList")
+    public CommonResult getFileList(@RequestBody GetProposalFileRequest request) {
+        try {
+            return proposalService.getFileList(request);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+
+    }
 
 }

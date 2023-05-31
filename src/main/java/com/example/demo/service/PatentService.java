@@ -62,4 +62,6 @@ public interface PatentService {
     CommonResult newFileInfo(NewPatentFileInfoRequest request);
 
     CommonResult getFileInfo(GetPatentFileInfoRequest request);
+
+    CommonResult deleteFile(String fileId);
 }

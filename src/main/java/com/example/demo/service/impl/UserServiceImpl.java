@@ -382,4 +382,9 @@ public class UserServiceImpl implements UserService {
     public List<User> findUserListByIds(List<Long> userIds) {
         return userMapper.selectBatchIds(userIds);
     }
+
+    @Override
+    public List<User> findUserListByNames(List<String> userNames) {
+        return userMapper.selectList(new LambdaQueryWrapper<User>().in(User::getUserName, userNames));
+    }
 }
