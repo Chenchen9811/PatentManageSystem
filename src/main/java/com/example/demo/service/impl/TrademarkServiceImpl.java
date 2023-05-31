@@ -132,6 +132,7 @@ public class TrademarkServiceImpl implements TrademarkService {
                 response.setUploadDate(file.getUploadDate().toString());
                 response.setUploaderName(uploader.getUserName());
                 response.setFileType(file.getFileType());
+                response.setFileId(String.valueOf(file.getId()));
                 return response;
             }).collect(Collectors.toList());
             return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");

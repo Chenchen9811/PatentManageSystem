@@ -36,12 +36,12 @@ public class ProposalManager {
                     break;
                 }
                 case "proposalType": {
-                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    if (kv.getValue().equals("0")) break;
                     wrapper.eq(Proposal::getProposalType, kv.getValue());
                     break;
                 }
                 case "proposalState": {
-                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    if (kv.getValue().equals("0")) break;
                     wrapper.eq(Proposal::getProposalState, kv.getValue());
                     break;
                 }
@@ -54,7 +54,7 @@ public class ProposalManager {
                     break;
                 }
                 case "departmentName": {
-                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    if (kv.getValue().equals("0")) break;
                     Department department = departmentService.findDepartmentByDepartmentName(kv.getValue());
                     wrapper.eq(Proposal::getDepartmentId, department.getId());
                     break;

@@ -11,4 +11,5 @@ public class GetSoftwareFileInfoResponse {
     private String developWay;
     private String rightRange;
     private String uploaderName;
+    private String fileId;
 }

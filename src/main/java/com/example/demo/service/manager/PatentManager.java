@@ -36,12 +36,12 @@ public class PatentManager {
                     break;
                 }
                 case "bonusType": {
-                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    if (kv.getValue().equals("0")) break;
                     wrapper.eq(PatentBonus::getBonusType, kv.getValue());
                     break;
                 }
                 case "releaseStatus": {
-                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    if (kv.getValue().equals("0")) break;
                     wrapper.eq(PatentBonus::getReleaseStatus, kv.getValue());
                     break;
                 }
@@ -69,7 +69,7 @@ public class PatentManager {
                     break;
                 }
                 case "patentType" : {
-                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    if (kv.getValue().equals("0")) break;
                     wrapper.eq(Patent::getPatentType, kv.getValue());
                     break;
                 }
@@ -91,7 +91,7 @@ public class PatentManager {
         for (Criteria.KV kv : items) {
             switch (kv.getKey()) {
                 case "fileType": {
-                    if (Integer.parseInt(kv.getValue()) == 0) break;
+                    if (kv.getValue().equals("0")) break;
                     wrapper.eq(PatentFile::getFileType, kv.getValue());
                     break;
                 }
@@ -214,7 +214,7 @@ public class PatentManager {
                     break;
                 }
                 case "patentType" : {
-                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    if (kv.getValue().equals("0")) break;
                     patentWrapper.eq(Patent::getPatentType, kv.getValue());
                     break;
                 }
@@ -223,12 +223,12 @@ public class PatentManager {
                     break;
                 }
                 case "currentProgram" : {
-                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    if (kv.getValue().equals("0")) break;
                     patentWrapper.eq(Patent::getCurrentProgram, kv.getValue());
                     break;
                 }
                 case "rightStatus" : {
-                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    if (kv.getValue().equals("0")) break;
                     patentWrapper.eq(Patent::getRightStatus, kv.getValue());
                     break;
                 }
@@ -237,7 +237,7 @@ public class PatentManager {
                     break;
                 }
                 case "departmentName" : {
-                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
+                    if (kv.getValue().equals("0")) break;
                     Department department = departmentService.findDepartmentByDepartmentName(kv.getKey());
                     patentWrapper.eq(Patent::getDepartmentId, department.getId());
                     break;

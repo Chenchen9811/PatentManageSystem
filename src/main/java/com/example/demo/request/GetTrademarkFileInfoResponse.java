@@ -14,4 +14,5 @@ public class GetTrademarkFileInfoResponse {
     private String copyRightCode;
     private String uploaderName;
     private String fileType;
+    private String fileId;
 }

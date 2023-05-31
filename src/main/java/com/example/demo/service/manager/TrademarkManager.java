@@ -6,6 +6,7 @@ import com.example.demo.request.Criteria;
 import com.example.demo.request.GetTrademarkFileInfoRequest;
 import com.example.demo.request.GetTrademarkOfficialFeeRequest;
 import com.example.demo.request.GetTrademarkRequest;
+import com.example.demo.service.DepartmentService;
 import com.example.demo.service.TrademarkService;
 import com.example.demo.service.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,9 @@ public class TrademarkManager {
     @Resource
     private TrademarkService trademarkService;
 
+    @Resource
+    private DepartmentService departmentService;
+
     public LambdaQueryWrapper<TrademarkFile> getFileWrapper(GetTrademarkFileInfoRequest request) {
         LambdaQueryWrapper<TrademarkFile> wrapper = new LambdaQueryWrapper<>();
         List<Criteria.KV> items = request.getCriteria().getItems();
@@ -33,7 +37,7 @@ public class TrademarkManager {
         for (Criteria.KV kv : items) {
             switch (kv.getKey()) {
                 case "fileType": {
-                    if (Integer.parseInt(kv.getValue()) == 0) break;
+                    if (kv.getValue().equals("0")) break;
                     wrapper.eq(TrademarkFile::getFileType, kv.getValue());
                     break;
                 }
@@ -195,6 +199,7 @@ public class TrademarkManager {
                     break;
                 }
                 case "currentStatus": {
+                    if (kv.getValue().equals("0")) break;
                     wrapper.eq(Trademark::getCurrentStatus, kv.getValue());
                     break;
                 }
@@ -203,7 +208,14 @@ public class TrademarkManager {
                     break;
                 }
                 case "agency": {
+                    if (kv.getValue().equals("0")) break;
                     wrapper.eq(Trademark::getAgency, kv.getValue());
+                    break;
+                }
+                case "departmentName" : {
+                    if (kv.getValue().equals("0")) break;
+                    Department department = departmentService.findDepartmentByDepartmentName(kv.getValue());
+                    wrapper.eq(Trademark::getDepartmentId, department.getId());
                     break;
                 }
             }

@@ -61,6 +61,9 @@ public class SoftwareServiceImpl implements SoftwareService {
     @Resource
     private SoftwareBonusMapper bonusMapper;
 
+    @Resource
+    private DepartmentService departmentService;
+
 
     @Override
     public CommonResult updateBonus(UpdateSoftwareBonusRequest request) {
@@ -218,6 +221,7 @@ public class SoftwareServiceImpl implements SoftwareService {
                 response.setRightRange(software.getRightRange());
                 response.setUploaderName(uploader.getUserName());
                 response.setProposerName(proposal.getProposerName());
+                response.setFileId(String.valueOf(file.getId()));
                 return response;
             }).collect(Collectors.toList());
             return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
@@ -379,11 +383,11 @@ public class SoftwareServiceImpl implements SoftwareService {
                         response.setArchiveCode(software.getArchiveCode());
                         response.setRightStatus(software.getRightStatus());
                         response.setRightRange(software.getRightRange());
-                        response.setFinishDate(CommonUtil.getYmdbyTimeStamp(software.getFinishDate()));
-                        response.setApplicationDate(CommonUtil.getYmdbyTimeStamp(software.getApplicationDate()));
-                        response.setCertificateDate(CommonUtil.getYmdbyTimeStamp(software.getCertificateDate()));
-                        response.setPublishDate(CommonUtil.getYmdbyTimeStamp(software.getPublishDate()));
-                        response.setArchiveDate(CommonUtil.getYmdbyTimeStamp(software.getArchiveDate()));
+                        response.setFinishDate(software.getFinishDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getFinishDate()));
+                        response.setApplicationDate(software.getApplicationDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getApplicationDate()));
+                        response.setCertificateDate(software.getCertificateDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getCertificateDate()));
+                        response.setPublishDate(software.getPublishDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getPublishDate()));
+                        response.setArchiveDate(software.getArchiveDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getArchiveDate()));
                         return response;
                     }).collect(Collectors.toList()),
                     request.getPageIndex(), request.getPageSize()), "查找成功");
@@ -403,6 +407,7 @@ public class SoftwareServiceImpl implements SoftwareService {
                 return CommonResult.failed("该软著已存在");
             }
             software = new Software();
+            Department department = departmentService.findDepartmentByDepartmentName(request.getDepartmentName());
             software.setSoftwareName(request.getSoftwareName());
             software.setSoftwareCode(request.getSoftwareCode());
             software.setInventorId(userService.findUserByUserName(request.getInventorName()).getId());
@@ -420,6 +425,7 @@ public class SoftwareServiceImpl implements SoftwareService {
             software.setProposalDate(request.getProposalDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getProposalDate()));
             software.setFinishDate(request.getFinishDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getFinishDate()));
             software.setPublishDate(request.getPublishDate() == null ? null : CommonUtil.stringDateToTimeStamp(request.getPublishDate()));
+            software.setDepartmentId(department.getId());
             return softwareMapper.insert(software) != 0 ? CommonResult.success(null, "添加软著成功") : CommonResult.failed("添加软著失败");
         } catch (Exception e) {
             e.printStackTrace();

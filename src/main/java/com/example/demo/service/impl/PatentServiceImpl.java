@@ -95,6 +95,7 @@ public class PatentServiceImpl implements PatentService {
                 response.setPatentCode(patent.getPatentCode());
                 response.setUploaderName(uploader.getUserName());
                 response.setUploadDate(file.getUploadDate().toString());
+                response.setFileId(String.valueOf(file.getId()));
                 return response;
             }).collect(Collectors.toList());
 

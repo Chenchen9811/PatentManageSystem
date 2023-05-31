@@ -10,4 +10,5 @@ public class GetPatentFileInfoResponse {
     private String fileName;
     private String uploadDate;
     private String fileStatus;
+    private String fileId;
 }
