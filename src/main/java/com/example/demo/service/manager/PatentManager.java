@@ -214,6 +214,7 @@ public class PatentManager {
                     break;
                 }
                 case "patentType" : {
+                    if (Integer.valueOf(kv.getKey()).equals(0)) break;
                     patentWrapper.eq(Patent::getPatentType, kv.getValue());
                     break;
                 }
@@ -222,10 +223,12 @@ public class PatentManager {
                     break;
                 }
                 case "currentProgram" : {
+                    if (Integer.valueOf(kv.getKey()).equals(0)) break;
                     patentWrapper.eq(Patent::getCurrentProgram, kv.getValue());
                     break;
                 }
                 case "rightStatus" : {
+                    if (Integer.valueOf(kv.getKey()).equals(0)) break;
                     patentWrapper.eq(Patent::getRightStatus, kv.getValue());
                     break;
                 }
