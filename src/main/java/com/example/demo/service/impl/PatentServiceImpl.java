@@ -546,11 +546,11 @@ public class PatentServiceImpl implements PatentService {
                 response.setPatentCode(patent.getPatentCode());
                 response.setPatentType(patent.getPatentType());
                 response.setPatentName(patent.getPatentName());
-                response.setApplicationCode(patent.getApplicationCode());
-                response.setApplicationDate(patent.getApplicationDate().toString());
-                response.setGrantCode(patent.getGrantCode());
-                response.setGrantDate(patent.getGrantDate().toString());
-                response.setRightStatus(patent.getRightStatus());
+                response.setApplicationCode(patent.getApplicationCode() == null? null : patent.getApplicationCode());
+                response.setApplicationDate(patent.getApplicationDate() == null? null : CommonUtil.getYmdbyTimeStamp(patent.getApplicationDate()));
+                response.setGrantCode(patent.getGrantCode() == null ? null : patent.getGrantCode());
+                response.setGrantDate(patent.getGrantDate() == null ? null : CommonUtil.getYmdbyTimeStamp(patent.getGrantDate()));
+                response.setRightStatus(patent.getRightStatus() == null ? null : patent.getRightStatus());
                 response.setCurrentProgram(patent.getCurrentProgram());
                 response.setInventorNameList(inventorList.stream().map(PatentInventor::getInventorName).collect(Collectors.toList()));
                 responseList.add(response);
