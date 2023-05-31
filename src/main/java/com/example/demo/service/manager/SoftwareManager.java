@@ -82,8 +82,16 @@ public class SoftwareManager {
 
     public LambdaQueryWrapper<Software> getWrapper(GetSoftwareFileInfoRequest request) {
         LambdaQueryWrapper<Software> wrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(request.getSoftwareCode())) {
-            wrapper.eq(Software::getSoftwareCode, request.getSoftwareCode());
+//        if (StringUtils.isNotBlank(request.getSoftwareCode())) {
+//            wrapper.eq(Software::getSoftwareCode, request.getSoftwareCode());
+//        }
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "softwareName": {
+                    wrapper.eq(Software::getSoftwareName, kv.getValue());
+                }
+            }
         }
         return wrapper;
     }

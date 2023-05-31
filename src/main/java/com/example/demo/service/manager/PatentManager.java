@@ -117,7 +117,7 @@ public class PatentManager {
                 }
             }
         }
-         wrapper.eq(PatentFile::getFileType, request.getFileType());
+//         wrapper.eq(PatentFile::getFileType, request.getFileType());
         return wrapper;
     }
 

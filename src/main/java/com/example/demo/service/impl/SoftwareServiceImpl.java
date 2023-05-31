@@ -196,7 +196,7 @@ public class SoftwareServiceImpl implements SoftwareService {
             List<SoftwareFile> fileList = null;
             List<User> uploaderList = null;
             // 查询满足条件的softwareList
-//            softwareList = softwareMapper.selectList(wrapper);
+            softwareList = softwareMapper.selectList(wrapper);
             if (softwareList.size() == 0) return CommonResult.failed("查找不到相关软著");
             // 查询满足File条件的softwareFileList
             LambdaQueryWrapper<SoftwareFile> fileWrapper = softwareManager.getFileWrapper(request);
