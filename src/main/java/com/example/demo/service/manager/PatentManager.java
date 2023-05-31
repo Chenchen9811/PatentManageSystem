@@ -6,6 +6,7 @@ import com.example.demo.Utils.CommonUtil;
 import com.example.demo.entity.*;
 import com.example.demo.mapper.PatentMapper;
 import com.example.demo.request.*;
+import com.example.demo.service.DepartmentService;
 import com.example.demo.service.PatentService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ public class PatentManager {
 
     @Resource
     private PatentMapper patentMapper;
+
+    @Resource
+    private DepartmentService departmentService;
 
     public LambdaQueryWrapper<PatentBonus> getBonusWrapper(GetPatentBonusListRequest request) {
         LambdaQueryWrapper<PatentBonus> wrapper = new LambdaQueryWrapper<>();
@@ -217,36 +221,6 @@ public class PatentManager {
                     patentWrapper.eq(Patent::getPatentCode, kv.getValue());
                     break;
                 }
-                case "applicationCode" : {
-                    patentWrapper.eq(Patent::getApplicationCode, kv.getValue());
-                    break;
-                }
-                case "applicationBeginDate" : {
-                    String endDate = null;
-                    for (Criteria.KV kV : items) {
-                        if (kV.getKey().equals("applicationEndDate")) {
-                            endDate = kV.getValue();
-                        }
-                        break;
-                    }
-                    patentWrapper.between(Patent::getApplicationDate, kv.getValue(), endDate);
-                    break;
-                }
-                case "grantCode" : {
-                    patentWrapper.eq(Patent::getGrantCode, kv.getValue());
-                    break;
-                }
-                case "grantBeginDate" : {
-                    String endDate = null;
-                    for (Criteria.KV kV : items) {
-                        if (kV.getKey().equals("grantEndDate")) {
-                            endDate = kV.getValue();
-                        }
-                        break;
-                    }
-                    patentWrapper.between(Patent::getGrantDate, kv.getValue(), endDate);
-                    break;
-                }
                 case "currentProgram" : {
                     patentWrapper.eq(Patent::getCurrentProgram, kv.getValue());
                     break;
@@ -259,6 +233,13 @@ public class PatentManager {
                     patentInventorWrapper.eq(PatentInventor::getInventorName, request.getInventorName());
                     break;
                 }
+                case "departmentName" : {
+                    if (Integer.valueOf(kv.getKey()).equals(0)) break;
+                    Department department = departmentService.findDepartmentByDepartmentName(kv.getKey());
+                    patentWrapper.eq(Patent::getDepartmentId, department.getId());
+                    break;
+                }
+                default:break;
             }
         }
         Map<String, Object> map = new HashMap<>();
@@ -279,12 +260,6 @@ public class PatentManager {
         if (StringUtils.isNotBlank(request.getPatentType())) {
             wrapper.eq(Patent::getPatentType, request.getPatentType());
         }
-        if (StringUtils.isNotBlank(request.getApplicationCode())) {
-            wrapper.eq(Patent::getApplicationCode, request.getApplicationCode());
-        }
-        if (StringUtils.isNotBlank(request.getGrantCode())) {
-            wrapper.eq(Patent::getGrantCode, request.getGrantCode());
-        }
         if (StringUtils.isNotBlank(request.getAgency())) {
             wrapper.eq(Patent::getAgency, request.getAgency());
         }
@@ -293,12 +268,6 @@ public class PatentManager {
         }
         if (StringUtils.isNotBlank(request.getRightStatus())) {
             wrapper.eq(Patent::getRightStatus, request.getRightStatus());
-        }
-        if (StringUtils.isNotBlank(request.getApplicationBeginDate()) && StringUtils.isNotBlank(request.getApplicationEndDate())) {
-            wrapper.between(Patent::getApplicationDate, request.getApplicationBeginDate(), request.getApplicationEndDate());
-        }
-        if (StringUtils.isNotBlank(request.getGrantStartDate()) && StringUtils.isNotBlank(request.getGrantEndDate())) {
-            wrapper.between(Patent::getGrantDate, request.getGrantStartDate(), request.getGrantEndDate());
         }
         return wrapper;
     }

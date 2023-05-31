@@ -518,19 +518,25 @@ public class PatentServiceImpl implements PatentService {
     @Override
     public CommonResult getPatent(GetPatentRequest request) throws Exception {
         try {
-//            LambdaQueryWrapper<Patent> wrapper = patentManager.getWrapperByGetPatentRequest(request);
             Map<String, Object> map = patentManager.getWrapper(request);
             LambdaQueryWrapper<Patent> wrapper = (LambdaQueryWrapper<Patent>) map.get("patentWrapper");
             LambdaQueryWrapper<PatentInventor> patentInventorWrapper = (LambdaQueryWrapper<PatentInventor>) map.get("patentInventorWrapper");
             List<Patent> patentList = patentMapper.selectList(wrapper);
+            if (patentList.size() == 0) {
+                return CommonResult.failed("查找失败，没有查询到相关专利");
+            }
             Set<Long> patentIds = new HashSet<>();
             for (Patent patent : patentList) {
                 patentIds.add(patent.getId());
             }
             List<PatentInventor> patentInventors = patentInventorMapper.selectList(patentInventorWrapper);
+            if (patentInventors.size() == 0) {
+                return CommonResult.failed("查找失败，没有相关发明人");
+            }
+//            List<Long> ids = patentInventors.stream().map(PatentInventor::getPatentId).collect(Collectors.toList());
             for (PatentInventor patentInventor : patentInventors) {
                 if (!patentIds.contains(patentInventor.getPatentId())) {
-                    patentList.add(patentMapper.selectOne(new LambdaQueryWrapper<Patent>().eq(Patent::getId, patentInventor.getPatentId())));
+                    patentList.remove(patentInventor);
                 }
             }
             List<GetPatentResponse> responseList = new ArrayList<>();
