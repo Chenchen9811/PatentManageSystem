@@ -237,7 +237,7 @@ public class PatentManager {
                     break;
                 }
                 case "departmentName" : {
-                    if (Integer.valueOf(kv.getKey()).equals(0)) break;
+                    if (Integer.valueOf(kv.getValue()).equals(0)) break;
                     Department department = departmentService.findDepartmentByDepartmentName(kv.getKey());
                     patentWrapper.eq(Patent::getDepartmentId, department.getId());
                     break;
