@@ -117,6 +117,7 @@ public class ProposalServiceImpl implements ProposalService {
                 response.setProposalType(CommonUtil.getProposalTypeString(proposal.getProposalType()));
                 response.setUploadDate(file.getUploadDate().toString());
                 response.setUploaderName(uploader.getUserName());
+                response.setFileName(file.getFileName());
                 return response;
             }).collect(Collectors.toList());
             return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
