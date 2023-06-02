@@ -181,24 +181,56 @@ public class SoftwareManager {
         return wrapper;
     }
 
+    public LambdaQueryWrapper<Software> getSoftwareWrapper(GetSoftwareOfficialFeeRequest request) {
+        LambdaQueryWrapper<Software> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "softwareCode" : {
+                    wrapper.eq(Software::getSoftwareCode, kv.getValue());
+                    break;
+                }
+                case "softwareName" : {
+                    wrapper.eq(Software::getSoftwareName, kv.getValue());
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
 
-    public LambdaQueryWrapper<SoftwareOfficialFee> getWrapper(GetSoftwareOfficialFeeRequest request) {
+
+    public LambdaQueryWrapper<SoftwareOfficialFee> getFeeWrapper(GetSoftwareOfficialFeeRequest request) {
         LambdaQueryWrapper<SoftwareOfficialFee> wrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(request.getOfficialFeeName())) {
-            wrapper.eq(SoftwareOfficialFee::getOfficialFeeName, request.getOfficialFeeName());
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "feeName" : {
+                    wrapper.eq(SoftwareOfficialFee::getOfficialFeeName, kv.getValue());
+                    break;
+                }
+                case "officialFeeStatus" : {
+                    if (kv.getValue().equals("0")) break;
+                    wrapper.eq(SoftwareOfficialFee::getPayStatus, kv.getValue());
+                    break;
+                }
+            }
         }
-        if (StringUtils.isNotBlank(request.getDueDateBegin()) && StringUtils.isNotBlank(request.getDueDateEnd())) {
-            wrapper.between(SoftwareOfficialFee::getDueDate, request.getDueDateBegin(), request.getDueDateEnd());
-        }
-        if (StringUtils.isNotBlank(request.getActualPayDateBegin()) && StringUtils.isNotBlank(request.getActualPayDateEnd())) {
-            wrapper.between(SoftwareOfficialFee::getActualPayDate, request.getActualPayDateBegin(), request.getActualPayDateEnd());
-        }
-        if (StringUtils.isNotBlank(request.getDueAmount())) {
-            wrapper.eq(SoftwareOfficialFee::getDueAmount, request.getDueAmount());
-        }
-        if (StringUtils.isNotBlank(request.getActualAmount())) {
-            wrapper.eq(SoftwareOfficialFee::getActualAmount, request.getActualAmount());
-        }
+//        if (StringUtils.isNotBlank(request.getOfficialFeeName())) {
+//            wrapper.eq(SoftwareOfficialFee::getOfficialFeeName, request.getOfficialFeeName());
+//        }
+//        if (StringUtils.isNotBlank(request.getDueDateBegin()) && StringUtils.isNotBlank(request.getDueDateEnd())) {
+//            wrapper.between(SoftwareOfficialFee::getDueDate, request.getDueDateBegin(), request.getDueDateEnd());
+//        }
+//        if (StringUtils.isNotBlank(request.getActualPayDateBegin()) && StringUtils.isNotBlank(request.getActualPayDateEnd())) {
+//            wrapper.between(SoftwareOfficialFee::getActualPayDate, request.getActualPayDateBegin(), request.getActualPayDateEnd());
+//        }
+//        if (StringUtils.isNotBlank(request.getDueAmount())) {
+//            wrapper.eq(SoftwareOfficialFee::getDueAmount, request.getDueAmount());
+//        }
+//        if (StringUtils.isNotBlank(request.getActualAmount())) {
+//            wrapper.eq(SoftwareOfficialFee::getActualAmount, request.getActualAmount());
+//        }
         return wrapper;
     }
 

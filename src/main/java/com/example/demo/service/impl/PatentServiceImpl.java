@@ -381,9 +381,9 @@ public class PatentServiceImpl implements PatentService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CommonResult deleteOfficialFee(String officialFeeName) throws Exception {
+    public CommonResult deleteOfficialFee(String id) throws Exception {
         try {
-            return patentOfficialFeeMapper.delete(new LambdaQueryWrapper<PatentOfficialFee>().eq(PatentOfficialFee::getOfficialFeeName, officialFeeName)) == 0 ?
+            return patentOfficialFeeMapper.delete(new LambdaQueryWrapper<PatentOfficialFee>().eq(PatentOfficialFee::getId, Long.valueOf(id))) == 0 ?
                     CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();
@@ -396,11 +396,16 @@ public class PatentServiceImpl implements PatentService {
     @Override
     public CommonResult updateOfficialFee(UpdatePatentOfficialFeeRequest request) throws Exception {
         try {
-            PatentOfficialFee officialFee = patentOfficialFeeMapper.selectOne(new LambdaQueryWrapper<PatentOfficialFee>().eq(PatentOfficialFee::getOfficialFeeCode, request.getOfficialFeeCode()));
-            officialFee = patentManager.getUpdatedOfficialFee(request, officialFee);
-            LambdaUpdateWrapper<PatentOfficialFee> updateWrapper = new LambdaUpdateWrapper<>();
-            updateWrapper.eq(PatentOfficialFee::getOfficialFeeCode, request.getOfficialFeeCode());
-            return patentOfficialFeeMapper.update(officialFee, updateWrapper) == 0 ? CommonResult.failed("修改失败") : CommonResult.success(null, "修改成功");
+            PatentOfficialFee officialFee = patentOfficialFeeMapper.selectById(Long.valueOf(request.getId()));
+//            officialFee = patentManager.getUpdatedOfficialFee(request, officialFee);
+            officialFee.setOfficialFeeStatus(request.getOfficialFeeStatus());
+            officialFee.setOfficialFeeName(request.getFeeName());
+            officialFee.setDueAmount(request.getDueAmount());
+            officialFee.setActualPayDate(CommonUtil.stringDateToTimeStamp(request.getActualPayDate()));
+            officialFee.setDueDate(CommonUtil.stringDateToTimeStamp(request.getDueDate()));
+            officialFee.setRemark(request.getRemark());
+            officialFee.setActualAmount(request.getActualPay());
+            return patentOfficialFeeMapper.updateById(officialFee) == 0 ? CommonResult.failed("修改失败") : CommonResult.success(null, "修改成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -411,28 +416,37 @@ public class PatentServiceImpl implements PatentService {
     @Override
     public CommonResult getOfficialFee(GetPatentOfficialFeeRequest request) throws Exception {
         try {
-            LambdaQueryWrapper<Patent> wrapper = patentManager.getWrapper(request);
+            LambdaQueryWrapper<Patent> wrapper = patentManager.getPatentWrapper(request);
             List<Patent> patentList = patentMapper.selectList(wrapper);
-            List<Criteria.KV> items = request.getCriteria().getItems();
-            for (Criteria.KV kv : items) {
-                if (kv.getKey().equals("proposerName")) {
-                    Proposal proposal = proposalService.findProposalByProposerName(request.getProposerName());
-                    patentList.stream().filter(patent -> patent.getProposalId().equals(proposal.getId())).collect(Collectors.toList());
-                    break;
-                }
+            if (patentList.size() == 0) {
+                return CommonResult.failed("查找失败，没有找到相关专利");
             }
-//            if (StringUtils.isNotBlank(request.getProposerName())) {
-//                Proposal proposal = proposalService.findProposalByProposerName(request.getProposerName());
-//                patentList.stream().filter(patent -> patent.getProposalId().equals(proposal.getId())).collect(Collectors.toList());
-//            }
+            LambdaQueryWrapper<PatentOfficialFee> feeWrapper = patentManager.getFeeWrapper(request);
+            List<PatentOfficialFee> feeList = patentOfficialFeeMapper.selectList(feeWrapper);
+            if (feeList.size() == 0) {
+                return CommonResult.failed("查找失败，没有找到相关专利官费");
+            }
+            Set<Long> patentIds = patentList.stream().map(Patent::getId).collect(Collectors.toSet());
+            feeList.removeIf(fee -> !patentIds.contains(fee.getPatentId()));
+            if (feeList.size() == 0) {
+                return CommonResult.failed("查找失败，没有满足条件的专利官费");
+            }
+            Map<Long, Patent> patentMap = patentList.stream().collect(Collectors.toMap(Patent::getId, patent -> patent));
+
             return CommonResult.success(PageInfoUtil.getPageInfo(
-                    patentList.stream().map(patent -> {
+                    feeList.stream().map(fee -> {
                         GetPatentOfficialFeeResponse response = new GetPatentOfficialFeeResponse();
+                        Patent patent = patentMap.get(fee.getPatentId());
                         response.setPatentCode(patent.getPatentCode());
                         response.setPatentName(patent.getPatentName());
-                        response.setTotalFee(patent.getTotalFee());
-                        Proposal proposal = proposalService.findProposalByProposalId(patent.getProposalId());
-                        response.setProposerName(proposal == null ? null : proposal.getProposerName());
+                        response.setTotalAmount(patent.getTotalFee());
+                        response.setFeeName(fee.getOfficialFeeName());
+                        response.setDueAmount(fee.getDueAmount());
+                        response.setDueDate(CommonUtil.getYmdbyTimeStamp(fee.getDueDate()));
+                        response.setOfficialFeeStatus(fee.getOfficialFeeStatus());
+                        response.setActualPay(fee.getActualAmount());
+                        response.setActualPayDate(CommonUtil.getYmdbyTimeStamp(fee.getActualPayDate()));
+                        response.setId(String.valueOf(fee.getId()));
                         return response;
                     }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize()), "查找成功");
         } catch (Exception e) {
@@ -447,22 +461,21 @@ public class PatentServiceImpl implements PatentService {
     public CommonResult newOfficialFee(NewPatentOfficialFeeRequest request) throws Exception {
         try {
             // 验重
-            PatentOfficialFee officialFee = this.findPatentOfficialFeeByName(request.getOfficialFeeName());
+            PatentOfficialFee officialFee = this.findPatentOfficialFeeByName(request.getFeeName());
             if (null != officialFee) {
                 return CommonResult.failed("该官费已存在");
             }
             officialFee = new PatentOfficialFee();
-            officialFee.setOfficialFeeName(request.getOfficialFeeName());
+            officialFee.setOfficialFeeName(request.getFeeName());
             officialFee.setOfficialFeeCode(CommonUtil.generateCode("POfficialFee"));
             officialFee.setPatentId(this.findPatentByName(request.getPatentName()).getId());
             officialFee.setDueAmount(request.getDueAmount());
-            officialFee.setActualAmount(request.getActualAmount());
+            officialFee.setActualAmount(request.getActualPay());
             officialFee.setDueDate(CommonUtil.stringDateToTimeStamp(request.getDueDate()));
             officialFee.setActualPayDate(CommonUtil.stringDateToTimeStamp(request.getActualPayDate()));
-            officialFee.setRemark(request.getRemark());
+            officialFee.setRemark(request.getRemark() == null ? null : request.getRemark());
             officialFee.setOfficialFeeStatus(request.getOfficialFeeStatus());
-            patentOfficialFeeMapper.insert(officialFee);
-            return CommonResult.success(null, "添加专利官费成功");
+            return patentOfficialFeeMapper.insert(officialFee) != 0 ? CommonResult.success(null, "添加专利官费成功") : CommonResult.failed("添加专利官费失败");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -556,7 +569,7 @@ public class PatentServiceImpl implements PatentService {
                     patentList.remove(patentInventor);
                 } else {
                     List<PatentInventor> list;
-                    list = inventorMap.containsKey(patentInventor.getPatentId())? inventorMap.get(patentInventor.getPatentId()) : new ArrayList<>();
+                    list = inventorMap.containsKey(patentInventor.getPatentId()) ? inventorMap.get(patentInventor.getPatentId()) : new ArrayList<>();
 //                    if (inventorMap.containsKey(patentInventor.getPatentId())) {
 //                        list = inventorMap.get(patentInventor.getPatentId());
 //                    } else {
@@ -574,8 +587,8 @@ public class PatentServiceImpl implements PatentService {
                 response.setPatentCode(patent.getPatentCode());
                 response.setPatentType(patent.getPatentType());
                 response.setPatentName(patent.getPatentName());
-                response.setApplicationCode(patent.getApplicationCode() == null? null : patent.getApplicationCode());
-                response.setApplicationDate(patent.getApplicationDate() == null? null : CommonUtil.getYmdbyTimeStamp(patent.getApplicationDate()));
+                response.setApplicationCode(patent.getApplicationCode() == null ? null : patent.getApplicationCode());
+                response.setApplicationDate(patent.getApplicationDate() == null ? null : CommonUtil.getYmdbyTimeStamp(patent.getApplicationDate()));
                 response.setGrantCode(patent.getGrantCode() == null ? null : patent.getGrantCode());
                 response.setGrantDate(patent.getGrantDate() == null ? null : CommonUtil.getYmdbyTimeStamp(patent.getGrantDate()));
                 response.setRightStatus(patent.getRightStatus() == null ? null : patent.getRightStatus());

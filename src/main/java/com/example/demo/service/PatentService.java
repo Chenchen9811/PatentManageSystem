@@ -39,7 +39,7 @@ public interface PatentService {
 
     CommonResult updateOfficialFee(UpdatePatentOfficialFeeRequest request) throws Exception;
 
-    CommonResult deleteOfficialFee(String officialFeeName) throws Exception;
+    CommonResult deleteOfficialFee(String id) throws Exception;
 
     CommonResult newAnnualFee(NewPatenAnnualFeeRequest request);
 

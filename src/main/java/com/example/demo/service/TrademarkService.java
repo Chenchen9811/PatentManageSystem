@@ -41,7 +41,7 @@ public interface TrademarkService {
 
     CommonResult getOfficialFee(GetTrademarkOfficialFeeRequest request);
 
-    CommonResult deleteOfficialFee(Long officialFeeId);
+    CommonResult deleteOfficialFee(String id);
 
     CommonResult newFileInfo(NewTrademarkFileInfoRequest request);
 
@@ -50,4 +50,6 @@ public interface TrademarkService {
     CommonResult updateBonus(UpdateTrademarkBonusRequest request);
 
     CommonResult deleteFile(String fileId);
+
+    CommonResult updateOfficialFee(UpdateTrademarkOfficialFeeRequest request);
 }

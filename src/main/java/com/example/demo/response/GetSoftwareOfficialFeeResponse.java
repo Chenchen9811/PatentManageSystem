@@ -9,11 +9,16 @@ import java.sql.Date;
 @Data
 public class GetSoftwareOfficialFeeResponse {
     private String officialFeeCode;
-    private String officialFeeName;
     private String dueAmount;
-    private String actualAmount;
+    private String actualPay;
     private String payStatus;
     private String dueDate;
     private String actualPayDate;
     private String remark;
+    private String softwareCode;
+    private String softwareName;
+    private String id;
+    private String totalAmount;
+    private String officialFeeStatus;
+    private String feeName;
 }

@@ -64,6 +64,26 @@ public class TrademarkServiceImpl implements TrademarkService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
+    public CommonResult updateOfficialFee(UpdateTrademarkOfficialFeeRequest request) {
+        try {
+            TrademarkOfficialFee officialFee = officialFeeMapper.selectById(Long.valueOf(request.getId()));
+            officialFee.setOfficialFeeStatus(request.getOfficialFeeStatus());
+            officialFee.setDueAmount(request.getDueAmount());
+            officialFee.setActualPay(request.getActualPay());
+            officialFee.setDueDate(CommonUtil.stringToDate(request.getDueDate()));
+            officialFee.setActualPayDate(CommonUtil.stringToDate(request.getActualPayDate()));
+            officialFee.setRemark(request.getRemark());
+            officialFee.setOfficialFeeName(request.getFeeName());
+            return officialFeeMapper.updateById(officialFee) != 0 ? CommonResult.success(null, "编辑成功") : CommonResult.failed("编辑失败");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
     public CommonResult deleteFile(String fileId) {
         try {
             return fileMapper.deleteById(Long.valueOf(fileId)) == 0 ? CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
@@ -184,9 +204,9 @@ public class TrademarkServiceImpl implements TrademarkService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CommonResult deleteOfficialFee(Long officialFeeId) {
+    public CommonResult deleteOfficialFee(String id) {
         try {
-            return officialFeeMapper.deleteById(officialFeeId) == 0 ?
+            return officialFeeMapper.deleteById(Long.valueOf(id)) == 0 ?
                     CommonResult.failed("删除失败") : CommonResult.success(null, "删除成功");
         } catch (Exception e) {
             e.printStackTrace();
@@ -238,15 +258,16 @@ public class TrademarkServiceImpl implements TrademarkService {
         try {
             Trademark trademark = this.findTrademarkByCode(request.getTrademarkCode());
             TrademarkOfficialFee officialFee = new TrademarkOfficialFee();
-            officialFee.setOfficialFeeCode(request.getOfficialFeeCode());
+//            officialFee.setOfficialFeeCode(request.getOfficialFeeCode());
             officialFee.setTrademarkId(trademark.getId());
+
             officialFee.setActualPay(request.getActualPay());
             officialFee.setDueAmount(request.getDueAmount());
             officialFee.setDueDate(CommonUtil.stringToDate(request.getDueDate()));
             officialFee.setActualPay(request.getActualPay());
             officialFee.setActualPayDate(CommonUtil.stringToDate(request.getActualPayDate()));
             officialFee.setOfficialFeeStatus(request.getOfficialFeeStatus());
-            officialFee.setOfficialFeeName(request.getOfficialFeeName());
+            officialFee.setOfficialFeeName(request.getFeeName());
             if (StringUtils.isNotBlank(request.getRemark())) {
                 officialFee.setRemark(request.getRemark());
             }

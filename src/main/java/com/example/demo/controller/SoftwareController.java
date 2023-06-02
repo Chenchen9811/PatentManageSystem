@@ -76,7 +76,7 @@ public class SoftwareController {
     }
 
     @ResponseBody
-    @PostMapping ("/getOfficialFee")
+    @PostMapping ("/getOfficialFeeList")
     public CommonResult getOfficialFee(@Valid @RequestBody GetSoftwareOfficialFeeRequest request, BindingResult bindingResult) {
         try {
             return softwareService.getOfficialFee(request);
@@ -87,15 +87,28 @@ public class SoftwareController {
     }
 
     @ResponseBody
-    @DeleteMapping("/deleteOfficialFee")
-    public CommonResult deleteOfficialFee(@RequestParam("officialFeeCode") String officialFeeCode) {
+    @DeleteMapping("/deleteOfficialFee/{id}")
+    public CommonResult deleteOfficialFee(@PathVariable("id") String id) {
         try {
-            return softwareService.deleteOfficialFee(officialFeeCode);
+            return softwareService.deleteOfficialFee(id);
         } catch (Exception e) {
             e.printStackTrace();
             return CommonResult.failed(e.getMessage());
         }
     }
+
+    @ResponseBody
+    @PostMapping("/updateOfficialFee")
+    public CommonResult updateOfficialFee(@RequestBody UpdateSoftwareOfficialFeeRequest request) {
+        try {
+            return softwareService.updateOfficialFee(request);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+
 
     @ResponseBody
     @PostMapping("/newFileInfo")

@@ -38,6 +38,10 @@ public class AgencyServiceImpl implements AgencyService {
         return agencyMapper.selectOne(new LambdaQueryWrapper<Agency>().eq(Agency::getAgencyCode, agencyCode));
     }
 
+    @Override
+    public List<Agency> findAgencyListByIds(List<Long> ids) {
+        return agencyMapper.selectBatchIds(ids);
+    }
 
     @Override
     public CommonResult getAgencyList() {

@@ -34,7 +34,7 @@ public interface SoftwareService {
 
     CommonResult getOfficialFee(GetSoftwareOfficialFeeRequest request);
 
-    CommonResult deleteOfficialFee(String officialFeeCode) throws Exception;
+    CommonResult deleteOfficialFee(String id) throws Exception;
 
     CommonResult newFileInfo(NewSoftwareFileInfoRequest request);
 
@@ -49,4 +49,6 @@ public interface SoftwareService {
     CommonResult updateBonus(UpdateSoftwareBonusRequest request);
 
     CommonResult deleteFile(String fileId);
+
+    CommonResult updateOfficialFee(UpdateSoftwareOfficialFeeRequest request);
 }

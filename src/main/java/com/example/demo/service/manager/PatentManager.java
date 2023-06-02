@@ -30,6 +30,25 @@ public class PatentManager {
     @Resource
     private HostHolder hostHolder;
 
+    public LambdaQueryWrapper<PatentOfficialFee> getFeeWrapper(GetPatentOfficialFeeRequest request) {
+        LambdaQueryWrapper<PatentOfficialFee> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "feeName" : {
+                    wrapper.eq(PatentOfficialFee::getOfficialFeeName, kv.getValue());
+                    break;
+                }
+                case "officialFeeStatus" : {
+                    if (kv.getValue().equals("0")) break;
+                    wrapper.eq(PatentOfficialFee::getOfficialFeeStatus, kv.getValue());
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
+
     public LambdaQueryWrapper<PatentBonus> getBonusWrapper(GetPatentBonusListRequest request) {
         LambdaQueryWrapper<PatentBonus> wrapper = new LambdaQueryWrapper<>();
         List<Criteria.KV> items = request.getCriteria().getItems();
@@ -146,27 +165,27 @@ public class PatentManager {
 
 
     public PatentOfficialFee getUpdatedOfficialFee(UpdatePatentOfficialFeeRequest request, PatentOfficialFee officialFee) {
-        if (StringUtils.isNotBlank(request.getOfficialFeeName())) {
-            officialFee.setOfficialFeeName(request.getOfficialFeeName());
-        }
-        if (StringUtils.isNotBlank(request.getOfficialFeeStatus())) {
-            officialFee.setOfficialFeeStatus(request.getOfficialFeeStatus());
-        }
-        if (StringUtils.isNotBlank(request.getPayerName())) {
-            officialFee.setPayerName(request.getPayerName());
-        }
-        if (StringUtils.isNotBlank(request.getDueAmount())) {
-            officialFee.setDueAmount(request.getDueAmount());
-        }
-        if (StringUtils.isNotBlank(request.getActualAmount())) {
-            officialFee.setActualAmount(request.getActualAmount());
-        }
-        if (StringUtils.isNotBlank(request.getDueDate())) {
-            officialFee.setDueDate(CommonUtil.stringDateToTimeStamp(request.getDueDate()));
-        }
-        if (StringUtils.isNotBlank(request.getActualPayDate())) {
-            officialFee.setActualPayDate(CommonUtil.stringDateToTimeStamp(request.getActualPayDate()));
-        }
+//        if (StringUtils.isNotBlank(request.getOfficialFeeName())) {
+//            officialFee.setOfficialFeeName(request.getOfficialFeeName());
+//        }
+//        if (StringUtils.isNotBlank(request.getOfficialFeeStatus())) {
+//            officialFee.setOfficialFeeStatus(request.getOfficialFeeStatus());
+//        }
+//        if (StringUtils.isNotBlank(request.getPayerName())) {
+//            officialFee.setPayerName(request.getPayerName());
+//        }
+//        if (StringUtils.isNotBlank(request.getDueAmount())) {
+//            officialFee.setDueAmount(request.getDueAmount());
+//        }
+//        if (StringUtils.isNotBlank(request.getActualAmount())) {
+//            officialFee.setActualAmount(request.getActualAmount());
+//        }
+//        if (StringUtils.isNotBlank(request.getDueDate())) {
+//            officialFee.setDueDate(CommonUtil.stringDateToTimeStamp(request.getDueDate()));
+//        }
+//        if (StringUtils.isNotBlank(request.getActualPayDate())) {
+//            officialFee.setActualPayDate(CommonUtil.stringDateToTimeStamp(request.getActualPayDate()));
+//        }
         return officialFee;
     }
 
@@ -184,7 +203,7 @@ public class PatentManager {
         return wrapper;
     }
 
-    public LambdaQueryWrapper<Patent> getWrapper(GetPatentOfficialFeeRequest request) {
+    public LambdaQueryWrapper<Patent> getPatentWrapper(GetPatentOfficialFeeRequest request) {
         LambdaQueryWrapper<Patent> wrapper = new LambdaQueryWrapper<>();
         List<Criteria.KV> items = request.getCriteria().getItems();
         for (Criteria.KV kv : items) {
@@ -197,10 +216,11 @@ public class PatentManager {
                     wrapper.eq(Patent::getPatentName, kv.getValue());
                     break;
                 }
-                case "totalFee" : {
+                case "totalAmount" : {
                     wrapper.eq(Patent::getTotalFee, kv.getValue());
                     break;
                 }
+
             }
         }
         return wrapper;

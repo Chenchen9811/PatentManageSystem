@@ -114,11 +114,11 @@ public class PatentController {
     }
 
     @ResponseBody
-    @DeleteMapping("/deleteOfficialFee")
-    public CommonResult deleteOfficialFee(@RequestParam("officialFeeName") String officialFeeName) {
+    @DeleteMapping("/deleteOfficialFee/{id}")
+    public CommonResult deleteOfficialFee(@PathVariable("id") String id) {
         CommonResult result = null;
         try {
-            result = patentService.deleteOfficialFee(officialFeeName);
+            result = patentService.deleteOfficialFee(id);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
@@ -280,4 +280,5 @@ public class PatentController {
             return CommonResult.failed(e.getMessage());
         }
     }
+
 }

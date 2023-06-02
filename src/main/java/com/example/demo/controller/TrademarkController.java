@@ -4,6 +4,7 @@ import com.example.demo.common.CommonResult;
 import com.example.demo.request.*;
 import com.example.demo.service.TrademarkService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -111,6 +112,19 @@ public class TrademarkController {
     }
 
     @ResponseBody
+    @PostMapping("/updateOfficialFee")
+    public CommonResult updateOfficialFee(@RequestBody UpdateTrademarkOfficialFeeRequest request) {
+        try {
+            return trademarkService.updateOfficialFee(request);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+
+
+    @ResponseBody
     @PostMapping("/getOfficialFeeList")
     public CommonResult getOfficialFee(@Valid @RequestBody GetTrademarkOfficialFeeRequest request, BindingResult bindingResult) {
         try {
@@ -122,10 +136,10 @@ public class TrademarkController {
     }
 
     @ResponseBody
-    @DeleteMapping("/deleteOfficialFee")
-    public CommonResult deleteOfficialFee(@RequestParam("officialFeeId") Long officialFeeId) {
+    @DeleteMapping("/deleteOfficialFee/{id}")
+    public CommonResult deleteOfficialFee(@PathVariable("id") String id) {
         try {
-            return trademarkService.deleteOfficialFee(officialFeeId);
+            return trademarkService.deleteOfficialFee(id);
         } catch (Exception e) {
             e.printStackTrace();
             return CommonResult.failed(e.getMessage());

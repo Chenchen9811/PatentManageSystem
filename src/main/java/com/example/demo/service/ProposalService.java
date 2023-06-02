@@ -22,6 +22,8 @@ public interface ProposalService {
 
     Proposal findProposalByProposerName(String proposerName);
 
+    Proposal findProposalByProposalName(String proposalName);
+
     Proposal findProposalByProposalId(Long proposalId);
 
     Proposal findProposalByProposalCode(String proposalCode);

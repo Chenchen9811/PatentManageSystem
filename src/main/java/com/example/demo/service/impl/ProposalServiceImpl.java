@@ -319,4 +319,9 @@ public class ProposalServiceImpl implements ProposalService {
     public Proposal findProposalByProposalCode(String proposalCode) {
         return proposalMapper.selectOne(new LambdaQueryWrapper<Proposal>().eq(Proposal::getProposalCode, proposalCode));
     }
+
+    @Override
+    public Proposal findProposalByProposalName(String proposalName) {
+        return proposalMapper.selectOne(new LambdaQueryWrapper<Proposal>().eq(Proposal::getProposalName, proposalName));
+    }
 }

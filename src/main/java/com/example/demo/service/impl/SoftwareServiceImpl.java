@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,6 +60,27 @@ public class SoftwareServiceImpl implements SoftwareService {
 
     @Resource
     private DepartmentService departmentService;
+
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public CommonResult updateOfficialFee(UpdateSoftwareOfficialFeeRequest request) {
+        try {
+            SoftwareOfficialFee fee = officialFeeMapper.selectById(Long.valueOf(request.getId()));
+            fee.setOfficialFeeName(request.getFeeName());
+            fee.setPayStatus(request.getOfficialFeeStatus());
+            fee.setDueAmount(request.getDueAmount());
+            fee.setActualAmount(request.getActualPay());
+            fee.setDueDate(CommonUtil.stringToDate(request.getDueDate()));
+            fee.setActualPayDate(CommonUtil.stringToDate(request.getActualPayDate()));
+            fee.setRemark(request.getRemark());
+            return officialFeeMapper.updateById(fee) == 0 ? CommonResult.failed("编辑失败") : CommonResult.success(null, "编辑成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -275,10 +293,10 @@ public class SoftwareServiceImpl implements SoftwareService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public CommonResult deleteOfficialFee(String officialFeeCode) {
+    public CommonResult deleteOfficialFee(String id) {
         try {
             // 验证是否存在
-            SoftwareOfficialFee officialFee = this.findOfficialFeeByCode(officialFeeCode);
+            SoftwareOfficialFee officialFee = officialFeeMapper.selectById(Long.valueOf(id));
             if (null == officialFee) {
                 return CommonResult.failed("要删除的官费不存在");
             }
@@ -293,21 +311,97 @@ public class SoftwareServiceImpl implements SoftwareService {
     @Override
     public CommonResult getOfficialFee(GetSoftwareOfficialFeeRequest request) {
         try {
-            LambdaQueryWrapper<SoftwareOfficialFee> wrapper = softwareManager.getWrapper(request);
+            LambdaQueryWrapper<Software> softwareWrapper = softwareManager.getSoftwareWrapper(request);
+            List<Software> softwareList = softwareMapper.selectList(softwareWrapper);
+            if (softwareList.size() == 0) {
+                return CommonResult.failed("查找失败，没有找到相关软著信息");
+            }
+            LambdaQueryWrapper<SoftwareOfficialFee> wrapper = softwareManager.getFeeWrapper(request);
             List<SoftwareOfficialFee> officialFeeList = officialFeeMapper.selectList(wrapper);
-            List<GetSoftwareOfficialFeeResponse> list = officialFeeList.stream().map(fee -> {
+            if (officialFeeList.size() == 0) {
+                return CommonResult.failed("查找失败，没有找到相关软著奖金信息");
+            }
+            Set<Long> softwareIds = softwareList.stream().map(Software::getId).collect(Collectors.toSet());
+            officialFeeList.removeIf(fee -> !softwareIds.contains(fee.getSoftwareId()));
+            if (officialFeeList.size() == 0) {
+                return CommonResult.failed("查找失败，没有找到满足条件的软著奖金信息");
+            }
+            Map<Long, Long> totalAmountMap = new HashMap<>();
+            for (SoftwareOfficialFee fee : officialFeeList) {
+                totalAmountMap.merge(fee.getSoftwareId(), Long.parseLong(fee.getActualAmount()), Long::sum);
+            }
+            Map<Long, Software> softwareMap = softwareList.stream().collect(Collectors.toMap(Software::getId, software -> software));
+            List<Criteria.KV> items = request.getCriteria().getItems();
+            Long totalAmount = null;
+            for (Criteria.KV kv : items) {
+                if (kv.getKey().equals("totalAmount")) {
+                    totalAmount = Long.parseLong(kv.getValue());
+                    break;
+                }
+            }
+            if (null != totalAmount) {
+                Long softwareId = null;
+                boolean isTotalExist = false;
+                Collection<Long> values = totalAmountMap.values();
+                for (Long total : values) {
+                    if (total.equals(totalAmount)) {
+                        isTotalExist = true;
+                        // 查找总金额对上的softwareId
+                        for (Object key : totalAmountMap.keySet()) {
+                            if (totalAmountMap.get(key).equals(totalAmount)) {
+                                softwareId = (Long) key;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (isTotalExist) {
+                    Long finalSoftwareId = softwareId;
+                    officialFeeList.removeIf(fee -> !fee.getSoftwareId().equals(finalSoftwareId));
+                    List<GetSoftwareOfficialFeeResponse> responseList = officialFeeList.stream().map(fee -> {
+                        GetSoftwareOfficialFeeResponse response = new GetSoftwareOfficialFeeResponse();
+                        Software software = softwareMap.get(fee.getSoftwareId());
+                        Long total = totalAmountMap.get(finalSoftwareId);
+                        response.setFeeName(fee.getOfficialFeeName());
+                        response.setDueDate(fee.getDueAmount());
+                        response.setActualPay(fee.getActualAmount());
+                        response.setOfficialFeeStatus(fee.getPayStatus());
+                        response.setSoftwareCode(software.getSoftwareCode());
+                        response.setSoftwareName(software.getSoftwareName());
+                        response.setActualPayDate(fee.getActualPayDate().toString());
+                        response.setRemark(fee.getRemark());
+                        response.setTotalAmount(String.valueOf(total));
+                        response.setId(String.valueOf(fee.getId()));
+                        response.setDueAmount(fee.getDueAmount());
+                        response.setPayStatus(fee.getPayStatus());
+                        response.setOfficialFeeCode(fee.getOfficialFeeCode());
+                        return response;
+                    }).collect(Collectors.toList());
+                    return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
+                }
+                return CommonResult.failed("查找失败，没有找到符合总金额的软著官费");
+            }
+            List<GetSoftwareOfficialFeeResponse> responseList = officialFeeList.stream().map(fee -> {
                 GetSoftwareOfficialFeeResponse response = new GetSoftwareOfficialFeeResponse();
-                response.setOfficialFeeCode(fee.getOfficialFeeCode());
-                response.setOfficialFeeName(fee.getOfficialFeeName());
-                response.setActualAmount(fee.getActualAmount());
-                response.setDueAmount(fee.getDueAmount());
-                response.setDueDate(fee.getDueDate().toString());
+                Software software = softwareMap.get(fee.getSoftwareId());
+                Long total = totalAmountMap.get(fee.getSoftwareId());
+                response.setFeeName(fee.getOfficialFeeName());
+                response.setDueDate(fee.getDueAmount());
+                response.setActualPay(fee.getActualAmount());
+                response.setOfficialFeeStatus(fee.getPayStatus());
+                response.setSoftwareCode(software.getSoftwareCode());
+                response.setSoftwareName(software.getSoftwareName());
                 response.setActualPayDate(fee.getActualPayDate().toString());
-                response.setPayStatus(fee.getPayStatus());
                 response.setRemark(fee.getRemark());
+                response.setTotalAmount(String.valueOf(total));
+                response.setId(String.valueOf(fee.getId()));
+                response.setDueAmount(fee.getDueAmount());
+                response.setPayStatus(fee.getPayStatus());
+                response.setOfficialFeeCode(fee.getOfficialFeeCode());
                 return response;
             }).collect(Collectors.toList());
-            return CommonResult.success(PageInfoUtil.getPageInfo(list, request.getPageIndex(), request.getPageSize()), "查找成功");
+            return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -325,16 +419,20 @@ public class SoftwareServiceImpl implements SoftwareService {
                 return CommonResult.failed("该软著官费已存在");
             }
             Software software = this.findSoftwareByCode(request.getSoftwareCode());
+            if (software == null) {
+                return CommonResult.failed("没有相关软著信息");
+            }
             officialFee = new SoftwareOfficialFee();
-            officialFee.setOfficialFeeName(request.getOfficialFeeName());
+            officialFee.setOfficialFeeName(request.getFeeName());
             officialFee.setOfficialFeeCode(CommonUtil.generateCode("SoftwareOFee"));
-            officialFee.setActualAmount(request.getActualAmount());
+            officialFee.setPayStatus(request.getOfficialFeeStatus());
+            officialFee.setActualAmount(request.getActualPay());
             officialFee.setDueAmount(request.getDueAmount());
             officialFee.setActualPayDate(CommonUtil.stringToDate(request.getActualPayDate()));
             officialFee.setDueDate(CommonUtil.stringToDate(request.getDueDate()));
             officialFee.setSoftwareId(software.getId());
             officialFee.setRemark(request.getRemark());
-            officialFee.setPayStatus(request.getPayStatus());
+//            officialFee.setPayStatus(request.getPayStatus());
             return officialFeeMapper.insert(officialFee) != 0 ?
                     CommonResult.success(null, "新增软著官费成功") : CommonResult.failed("新增软著官费失败");
         } catch (Exception e) {
