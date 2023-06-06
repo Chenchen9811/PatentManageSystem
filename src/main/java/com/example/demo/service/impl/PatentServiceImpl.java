@@ -328,21 +328,39 @@ public class PatentServiceImpl implements PatentService {
     }
 
     @Override
-    public CommonResult getAnnualFee(String patentName, Integer pageIndex, Integer pageSize) {
+    public CommonResult getAnnualFee(GetPatentAnnualFeeRequest request) {
         try {
-            Patent patent = this.findPatentByName(patentName);
-            List<PatentAnnualFee> annualFeeList = annualFeeMapper.selectList(new LambdaQueryWrapper<PatentAnnualFee>().eq(PatentAnnualFee::getPatentId, patent.getId()));
+//            Patent patent = this.findPatentByName(patentName);
+            List<Patent> patentList = patentMapper.selectList(patentManager.getWrapper(request));
+            if (patentList.size() == 0) {
+                return CommonResult.failed("查找失败，没有符合条件的专利");
+            }
+            List<PatentAnnualFee> annualFeeList = annualFeeMapper.selectList(patentManager.getFeeWrapper(request));
+            if (annualFeeList.size() == 0) {
+                return CommonResult.failed("查找失败，没有符合条件的专利年费");
+            }
+            List<Long> patentIds = patentList.stream().map(Patent::getId).collect(Collectors.toList());
+            annualFeeList.removeIf(annualFee -> !patentIds.contains(annualFee.getPatentId()));
+            if (annualFeeList.size() == 0) {
+                return CommonResult.failed("查找失败，没有符合相关条件的专利年费");
+            }
+            Map<Long, Patent> patentMap = patentList.stream().collect(Collectors.toMap(Patent::getId, patent -> patent));
             return CommonResult.success(PageInfoUtil.getPageInfo(
                     annualFeeList.stream().map(annualFee -> {
                         GetPatentAnnualFeeResponse response = new GetPatentAnnualFeeResponse();
-                        response.setActualAmount(annualFee.getActualAmount());
+                        Patent patent = patentMap.get(annualFee.getPatentId());
+                        response.setActualPay(annualFee.getActualAmount());
                         response.setDueAmount(annualFee.getDueAmount());
                         response.setDueDate(CommonUtil.getYmdbyTimeStamp(annualFee.getDueDate()));
-                        response.setYear(annualFee.getYear());
-                        response.setPayStatus(annualFee.getPayStatus());
+                        response.setAnnual(annualFee.getYear());
+                        response.setFeeStatus(annualFee.getPayStatus());
                         response.setActualPayDate(CommonUtil.getYmdbyTimeStamp(annualFee.getActualPayDate()));
+                        response.setPatentCode(patent.getPatentCode());
+                        response.setPatentName(patent.getPatentName());
+                        response.setRemark(annualFee.getRemark());
+                        response.setId(String.valueOf(annualFee.getId()));
                         return response;
-                    }).collect(Collectors.toList()), pageIndex, pageSize), "查找成功");
+                    }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize()), "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

@@ -140,13 +140,11 @@ public class PatentController {
     }
 
     @ResponseBody
-    @GetMapping("/getAnnualFee")
-    public CommonResult getAnnualFee(@RequestParam("patentName") String patentName,
-                                     @RequestParam("pageIndex") Integer pageIndex,
-                                     @RequestParam("pageSize") Integer pageSize) {
+    @PostMapping("/getAnnualFee")
+    public CommonResult getAnnualFee(@RequestParam GetPatentAnnualFeeRequest request) {
         CommonResult result = null;
         try {
-            result = patentService.getAnnualFee(patentName, pageIndex, pageSize);
+            result = patentService.getAnnualFee(request);
             return result;
         } catch (Exception e) {
             e.printStackTrace();

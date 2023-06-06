@@ -43,7 +43,7 @@ public interface PatentService {
 
     CommonResult newAnnualFee(NewPatenAnnualFeeRequest request);
 
-    CommonResult getAnnualFee(String patentName, Integer pageIndex, Integer pageSize);
+    CommonResult getAnnualFee(GetPatentAnnualFeeRequest request);
 
     CommonResult getAnnualFeeCode(String patentCode, String year);
 

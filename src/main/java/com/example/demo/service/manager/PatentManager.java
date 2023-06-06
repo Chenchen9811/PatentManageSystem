@@ -30,6 +30,45 @@ public class PatentManager {
     @Resource
     private HostHolder hostHolder;
 
+    public LambdaQueryWrapper<Patent> getWrapper(GetPatentAnnualFeeRequest request) {
+        LambdaQueryWrapper<Patent> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "patentCode" : {
+                    wrapper.eq(Patent::getPatentCode, kv.getValue());
+                    break;
+                }
+                case "patentName" : {
+                    wrapper.eq(Patent::getPatentName, kv.getValue());
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
+
+
+
+    public LambdaQueryWrapper<PatentAnnualFee> getFeeWrapper(GetPatentAnnualFeeRequest request) {
+        LambdaQueryWrapper<PatentAnnualFee> wrapper = new LambdaQueryWrapper<>();
+        List<Criteria.KV> items = request.getCriteria().getItems();
+        for (Criteria.KV kv : items) {
+            switch (kv.getKey()) {
+                case "annual" : {
+                    wrapper.eq(PatentAnnualFee::getYear, kv.getValue());
+                    break;
+                }
+                case "feeStatus" : {
+                    if (kv.getValue().equals("0")) break;
+                    wrapper.eq(PatentAnnualFee::getPayStatus, kv.getValue());
+                    break;
+                }
+            }
+        }
+        return wrapper;
+    }
+
     public LambdaQueryWrapper<PatentOfficialFee> getFeeWrapper(GetPatentOfficialFeeRequest request) {
         LambdaQueryWrapper<PatentOfficialFee> wrapper = new LambdaQueryWrapper<>();
         List<Criteria.KV> items = request.getCriteria().getItems();
