@@ -501,7 +501,7 @@ public class PatentServiceImpl implements PatentService {
                     }).collect(Collectors.toList());
                     return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
                 }
-                return CommonResult.failed("查找失败，没有找到符合总金额的软著官费");
+                return CommonResult.failed("查找失败，没有找到符合总金额的专利官费");
             }
             return CommonResult.success(PageInfoUtil.getPageInfo(
                     feeList.stream().map(fee -> {
