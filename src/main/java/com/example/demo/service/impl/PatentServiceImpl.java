@@ -450,11 +450,42 @@ public class PatentServiceImpl implements PatentService {
                 return CommonResult.failed("查找失败，没有满足条件的专利官费");
             }
             Map<Long, Patent> patentMap = patentList.stream().collect(Collectors.toMap(Patent::getId, patent -> patent));
-
-            return CommonResult.success(PageInfoUtil.getPageInfo(
-                    feeList.stream().map(fee -> {
+            Map<Long, Long> totalAmountMap = new HashMap<>();
+            for (PatentOfficialFee fee : feeList) {
+                totalAmountMap.merge(fee.getPatentId(), Long.parseLong(fee.getActualAmount()), Long::sum);
+            }
+            List<Criteria.KV> items = request.getCriteria().getItems();
+            Long totalAmount = null;
+            for (Criteria.KV kv : items) {
+                if (kv.getKey().equals("totalAmount")) {
+                    totalAmount = Long.parseLong(kv.getValue());
+                    break;
+                }
+            }
+            if (null != totalAmount) {
+                Long patentId = null;
+                boolean isTotalExist = false;
+                Collection<Long> values = totalAmountMap.values();
+                for (Long total : values) {
+                    if (total.equals(totalAmount)) {
+                        isTotalExist = true;
+                        // 查找总金额对上的softwareId
+                        for (Object key : totalAmountMap.keySet()) {
+                            if (totalAmountMap.get(key).equals(totalAmount)) {
+                                patentId = (Long) key;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (isTotalExist) {
+                    Long finalPatentId = patentId;
+                    feeList.removeIf(fee -> !fee.getPatentId().equals(finalPatentId));
+                    List<GetPatentOfficialFeeResponse> responseList = feeList.stream().map(fee -> {
                         GetPatentOfficialFeeResponse response = new GetPatentOfficialFeeResponse();
                         Patent patent = patentMap.get(fee.getPatentId());
+                        Long total = totalAmountMap.get(finalPatentId);
                         response.setPatentCode(patent.getPatentCode());
                         response.setPatentName(patent.getPatentName());
                         response.setTotalAmount(patent.getTotalFee());
@@ -465,6 +496,29 @@ public class PatentServiceImpl implements PatentService {
                         response.setActualPay(fee.getActualAmount());
                         response.setActualPayDate(CommonUtil.getYmdbyTimeStamp(fee.getActualPayDate()));
                         response.setId(String.valueOf(fee.getId()));
+                        response.setTotalAmount(String.valueOf(total));
+                        return response;
+                    }).collect(Collectors.toList());
+                    return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
+                }
+                return CommonResult.failed("查找失败，没有找到符合总金额的软著官费");
+            }
+            return CommonResult.success(PageInfoUtil.getPageInfo(
+                    feeList.stream().map(fee -> {
+                        GetPatentOfficialFeeResponse response = new GetPatentOfficialFeeResponse();
+                        Patent patent = patentMap.get(fee.getPatentId());
+                        Long total = totalAmountMap.get(fee.getPatentId());
+                        response.setPatentCode(patent.getPatentCode());
+                        response.setPatentName(patent.getPatentName());
+                        response.setTotalAmount(patent.getTotalFee());
+                        response.setFeeName(fee.getOfficialFeeName());
+                        response.setDueAmount(fee.getDueAmount());
+                        response.setDueDate(CommonUtil.getYmdbyTimeStamp(fee.getDueDate()));
+                        response.setOfficialFeeStatus(fee.getOfficialFeeStatus());
+                        response.setActualPay(fee.getActualAmount());
+                        response.setActualPayDate(CommonUtil.getYmdbyTimeStamp(fee.getActualPayDate()));
+                        response.setId(String.valueOf(fee.getId()));
+                        response.setTotalAmount(String.valueOf(total));
                         return response;
                     }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize()), "查找成功");
         } catch (Exception e) {
