@@ -141,7 +141,7 @@ public class PatentController {
 
     @ResponseBody
     @PostMapping("/getAnnualFee")
-    public CommonResult getAnnualFee(@RequestParam GetPatentAnnualFeeRequest request) {
+    public CommonResult getAnnualFee(@RequestBody GetPatentAnnualFeeRequest request) {
         CommonResult result = null;
         try {
             result = patentService.getAnnualFee(request);
