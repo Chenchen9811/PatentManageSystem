@@ -154,7 +154,8 @@ public class ProposalServiceImpl implements ProposalService {
                 proposer.setDelFlag("N");
                 proposer.setPassword("123456");
                 proposer.setDepartmentId(hostHolder.getUser().getDepartmentId());
-                
+                proposer.setUserCode(CommonUtil.generateCode("U"));
+                userService.insertUser(proposer);
             }
             proposal.setProposerId(proposer.getId());
             proposal.setProposerCode(proposer.getUserCode());
@@ -171,14 +172,23 @@ public class ProposalServiceImpl implements ProposalService {
             fileMapper.insert(proposalFile);
             List<NewProposalRequest.InventorVo> inventorList = request.getListOfInventor();
 //            inventorList.sort(Comparator.comparingInt(o -> Integer.parseInt(o.getRate())));
-            Map<String, User> userMap = userService.findUserListByNames(inventorList.stream()
-                            .map(NewProposalRequest.InventorVo::getInventorName).collect(Collectors.toList()))
-                    .stream().collect(Collectors.toMap(User::getUserName, user -> user));
+//            Map<String, User> userMap = userService.findUserListByNames(inventorList.stream()
+//                            .map(NewProposalRequest.InventorVo::getInventorName).collect(Collectors.toList()))
+//                    .stream().collect(Collectors.toMap(User::getUserName, user -> user));
             int len = inventorList.size();
             List<Inventor> inventors = new ArrayList<>();
             for (int i = 0; i < len; i++) {
                 NewProposalRequest.InventorVo inventorVo = inventorList.get(i);
-                User user = userMap.get(inventorVo.getInventorName());
+                User user = userService.findUserByUserName(inventorVo.getInventorName());
+                if (null == user) {
+                    user = new User();
+                    user.setUserName(request.getProposerName());
+                    user.setDelFlag("N");
+                    user.setPassword("123456");
+                    user.setDepartmentId(hostHolder.getUser().getDepartmentId());
+                    user.setUserCode(CommonUtil.generateCode("U"));
+                    userService.insertUser(user);
+                }
                 Inventor inventor = new Inventor();
                 inventor.setProposalId(proposal.getId());
                 inventor.setContribute(new BigDecimal("0." + inventorVo.getRate()));

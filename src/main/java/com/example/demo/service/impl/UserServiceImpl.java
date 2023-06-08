@@ -387,4 +387,9 @@ public class UserServiceImpl implements UserService {
     public List<User> findUserListByNames(List<String> userNames) {
         return userMapper.selectList(new LambdaQueryWrapper<User>().in(User::getUserName, userNames));
     }
+
+    @Override
+    public Integer insertUser(User user) {
+        return userMapper.insert(user);
+    }
 }
