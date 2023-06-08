@@ -288,21 +288,26 @@ public class ProposalServiceImpl implements ProposalService {
 
     @Override
     public CommonResult getReview(String proposalCode) throws Exception {
-
         try {
-            Review review = proposalMapper.findReviewByProposalCode(proposalCode);
-            if (null == review) {
+            List<Review> reviewList = proposalMapper.findReviewListByProposalCode(proposalCode);
+            if (reviewList.size() == 0) {
                 return CommonResult.failed("没有相关审批结果");
             }
-            User reviewer = userService.findUserByUserId(review.getReviewerId());
-            Role reviewerRole = userService.findRoleByUserId(reviewer.getId());
-            ReviewVo reviewVo = new ReviewVo();
-//            if (review.getReviewDate() == null) log.error("reviewDateNull");
-            reviewVo.setReviewDate(CommonUtil.getYmdbyTimeStamp(review.getReviewDate()));
-            reviewVo.setReviewResult(review.getResult());
-            reviewVo.setReviewerRoleName(reviewerRole.getRoleName());
-            reviewVo.setReviewerName(reviewer.getUserName());
-            return CommonResult.success(reviewVo, "查找成功");
+            Map<Long, User> reviewerMap = userService.findUserListByIds(reviewList.stream().distinct().map(Review::getReviewerId).collect(Collectors.toList()))
+                    .stream().collect(Collectors.toMap(User::getId, user -> user));
+            List<ReviewVo> reviewVoList = reviewList.stream().map(review -> {
+                User reviewer = reviewerMap.get(review.getReviewerId());
+                Role reviewerRole = userService.findRoleByUserId(reviewer.getId());
+                ReviewVo reviewVo = new ReviewVo();
+                reviewVo.setReviewDate(CommonUtil.getYmdbyTimeStamp(review.getReviewDate()));
+                reviewVo.setReviewResult(review.getResult());
+                reviewVo.setReviewerRoleName(reviewerRole.getRoleName());
+                reviewVo.setReviewerName(reviewer.getUserName());
+                return reviewVo;
+            }).collect(Collectors.toList());
+            Map<String, List<ReviewVo>> map = new HashMap<>();
+            map.put("list", reviewVoList);
+            return CommonResult.success(map, "查找成功");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

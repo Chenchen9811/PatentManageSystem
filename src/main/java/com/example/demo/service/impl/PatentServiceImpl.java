@@ -469,7 +469,7 @@ public class PatentServiceImpl implements PatentService {
                 for (Long total : values) {
                     if (total.equals(totalAmount)) {
                         isTotalExist = true;
-                        // 查找总金额对上的softwareId
+                        // 查找总金额对上的id
                         for (Object key : totalAmountMap.keySet()) {
                             if (totalAmountMap.get(key).equals(totalAmount)) {
                                 patentId = (Long) key;

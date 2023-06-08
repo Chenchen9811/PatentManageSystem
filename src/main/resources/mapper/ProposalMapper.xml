@@ -18,4 +18,17 @@
         left JOIN t_proposal p on p.id = r.proposal_id
         where p.proposal_code = #{proposalCode}
     </select>
+
+    <select id="findReviewListByProposalCode" resultType="com.example.demo.entity.Review">
+        select
+            r.id,
+            r.proposal_id,
+            r.reviewer_id,
+            r.result,
+            r.suggestion,
+            r.review_date
+        from t_review r
+                 left JOIN t_proposal p on p.id = r.proposal_id
+        where p.proposal_code = #{proposalCode}
+    </select>
 </mapper>

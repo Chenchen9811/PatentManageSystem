@@ -13,4 +13,5 @@ public class GetBillListResponse {
     private String officialFeeStatus;
     private String actualPay;
     private String remark;
+    private String actualPayDate;
 }

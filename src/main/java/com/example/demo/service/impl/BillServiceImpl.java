@@ -102,6 +102,7 @@ public class BillServiceImpl implements BillService {
                 response.setPayStatus(bill.getPayStatus());
                 response.setActualPay(bill.getActualPayAmount());
                 response.setRemark(bill.getRemark());
+                response.setActualPayDate(bill.getPayDate().toString());
                 return response;
             }).collect(Collectors.toList());
             return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()), "查找成功");
