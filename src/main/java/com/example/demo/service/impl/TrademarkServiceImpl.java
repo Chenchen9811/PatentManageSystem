@@ -423,6 +423,7 @@ public class TrademarkServiceImpl implements TrademarkService {
                 response.setCopyRightCode(trademark.getCopyRightCode());
                 response.setRightStatus(trademark.getRightStatus());
                 response.setInventorName(inventorMap.get(trademark.getInventorId()).getUserName());
+                response.setTrademarkOwner(trademark.getTrademarkOwner());
                 return response;
             }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize()), "查找成功");
         } catch (Exception e) {

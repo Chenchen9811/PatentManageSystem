@@ -11,4 +11,5 @@ public class GetTrademarkResponse {
     private String trademarkType;
     private String rightStatus;
     private String currentStatus;
+    private String trademarkOwner;
 }

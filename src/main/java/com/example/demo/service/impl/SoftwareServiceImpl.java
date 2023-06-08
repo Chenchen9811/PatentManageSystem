@@ -484,6 +484,9 @@ public class SoftwareServiceImpl implements SoftwareService {
         try {
             LambdaQueryWrapper<Software> wrapper = softwareManager.getWrapper(request);
             List<Software> softwareList = softwareMapper.selectList(wrapper);
+            if (softwareList.size() == 0) {
+                return CommonResult.failed("查找失败，没有相关软著信息");
+            }
             List<User> inventorList = userService.findUserListByIds(softwareList.stream().map(Software::getInventorId).distinct().collect(Collectors.toList()));
             Map<Long, User> inventorMap = new HashMap<>();
             for (User inventor : inventorList) {
