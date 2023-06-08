@@ -18,6 +18,7 @@ public interface UserService {
      */
     public Collection<? extends GrantedAuthority> getAuthorities(Long userId);
 
+    Integer insertUser
 
     User findUserByUserId(Long userId);
 

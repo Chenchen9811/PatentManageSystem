@@ -148,6 +148,14 @@ public class ProposalServiceImpl implements ProposalService {
             proposal.setDepartmentId(department.getId());
             // 获取提案人信息
             User proposer = userService.findUserByUserName(request.getProposerName());
+            if (proposer == null) {
+                proposer = new User();
+                proposer.setUserName(request.getProposerName());
+                proposer.setDelFlag("N");
+                proposer.setPassword("123456");
+                proposer.setDepartmentId(hostHolder.getUser().getDepartmentId());
+                
+            }
             proposal.setProposerId(proposer.getId());
             proposal.setProposerCode(proposer.getUserCode());
             proposal.setDepartmentId(proposer.getDepartmentId());
