@@ -441,6 +441,10 @@ public class TrademarkServiceImpl implements TrademarkService {
                 return CommonResult.failed("该商标已存在");
             }
             User user = userService.findUserByUserName(request.getInventorName());
+            if (null == user) {
+                user = CommonUtil.generateUser(request.getInventorName(), hostHolder.getUser().getDepartmentId());
+                userService.insertUser(user);
+            }
             Department department = departmentService.findDepartmentByDepartmentName(request.getDepartmentName());
             trademark = new Trademark();
             trademark.setTrademarkCode(request.getTrademarkCode());

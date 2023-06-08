@@ -2,6 +2,7 @@ package com.example.demo.Utils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.common.Constants;
+import com.example.demo.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -65,7 +66,7 @@ public class CommonUtil implements Constants {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String nowTime = sdf.format(new Date());
         Random random = new Random();
-        int randomNum = random.nextInt(900) + 100;
+        int randomNum = random.nextInt(10000) + 100;
         return str + nowTime + randomNum;
     }
 
@@ -161,6 +162,15 @@ public class CommonUtil implements Constants {
             default:
                 return 5;
         }
+    }
+
+    public static User generateUser(String userName, Long departmentId) {
+        User user = new User();
+        user.setUserCode(CommonUtil.generateCode("U"));
+        user.setUserName(userName);
+        user.setDepartmentId(departmentId);
+        user.setDelFlag("N");
+        return user;
     }
 
     public static String getProposalStatusString(Integer code) {

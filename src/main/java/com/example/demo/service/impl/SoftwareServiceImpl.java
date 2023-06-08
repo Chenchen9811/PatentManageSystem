@@ -528,7 +528,12 @@ public class SoftwareServiceImpl implements SoftwareService {
             Department department = departmentService.findDepartmentByDepartmentName(request.getDepartmentName());
             software.setSoftwareName(request.getSoftwareName());
             software.setSoftwareCode(request.getSoftwareCode());
-            software.setInventorId(userService.findUserByUserName(request.getInventorName()).getId());
+            User user = userService.findUserByUserName(request.getInventorName());
+            if (null == user) {
+                user = CommonUtil.generateUser(request.getInventorName(), hostHolder.getUser().getDepartmentId());
+                userService.insertUser(user);
+            }
+            software.setInventorId(user.getId());
             software.setAgency(request.getAgency());
             software.setVersion(request.getVersion());
             software.setDevelopWay(request.getDevelopWay());
