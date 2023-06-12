@@ -6,6 +6,7 @@ import com.example.demo.entity.SoftwareBonus;
 import com.example.demo.entity.SoftwareFile;
 import com.example.demo.entity.SoftwareOfficialFee;
 import com.example.demo.request.*;
+import com.example.demo.response.GetSoftwareResponse;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public interface SoftwareService {
 
     SoftwareBonus findBonusById(Long id);
 
-    CommonResult getSoftware(GetSoftwareRequest request) throws Exception;
+    List<GetSoftwareResponse> getSoftware(GetSoftwareRequest request) throws Exception;
 
     CommonResult software(Integer pageIndex, Integer pageSize, Integer isDepartment) throws Exception;
 

@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -86,7 +88,7 @@ public class CommonUtil implements Constants {
     }
 
     public static Timestamp stringDateToTimeStamp(String date) {
-        date = date + " 06:00:01";
+        date = date + " 00:00:00";
         Timestamp ts = null;
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         format.setLenient(false);
@@ -191,6 +193,12 @@ public class CommonUtil implements Constants {
     }
 
 
+    public static Long getDistanceDays(Timestamp currentTimeStamp, Timestamp timestamp) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        java.util.Date cur = formatter.parse(CommonUtil.getYmdbyTimeStamp(currentTimeStamp), new ParsePosition(0));
+        java.util.Date pre = formatter.parse(CommonUtil.getYmdbyTimeStamp(timestamp), new ParsePosition(0));
+        return (cur.getTime() - pre.getTime()) / (1000 * 60 * 60 * 24);
+    }
 
 
     public static String getFileUrl(String fileName) {

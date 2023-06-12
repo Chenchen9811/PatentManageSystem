@@ -7,9 +7,9 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class NewPatenAnnualFeeRequest {
     @NotBlank(message = "缴费状态不能为空")
-    private String payStatus;
+    private String feeStatus;
     @NotBlank(message = "年度不能为空")
-    private String year;
+    private String annual;
     @NotBlank(message = "应缴金额不能为空")
     private String dueAmount;
     @NotBlank(message = "实缴金额不能为空")

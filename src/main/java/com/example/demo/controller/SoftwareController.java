@@ -1,14 +1,20 @@
 package com.example.demo.controller;
 
+import com.alibaba.excel.EasyExcel;
+import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
 import com.example.demo.request.*;
+import com.example.demo.response.GetSoftwareResponse;
+import com.example.demo.response.GetTrademarkResponse;
 import com.example.demo.service.SoftwareService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/software")
@@ -39,8 +45,8 @@ public class SoftwareController {
     public CommonResult getSoftware(@Valid @RequestBody GetSoftwareRequest request, BindingResult bindingResult) {
         CommonResult result = null;
         try {
-            result = softwareService.getSoftware(request);
-            return result;
+            List<GetSoftwareResponse> responseList = softwareService.getSoftware(request);
+            return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()));
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -76,7 +82,7 @@ public class SoftwareController {
     }
 
     @ResponseBody
-    @PostMapping ("/getOfficialFeeList")
+    @PostMapping("/getOfficialFeeList")
     public CommonResult getOfficialFee(@Valid @RequestBody GetSoftwareOfficialFeeRequest request, BindingResult bindingResult) {
         try {
             return softwareService.getOfficialFee(request);
@@ -107,7 +113,6 @@ public class SoftwareController {
             return CommonResult.failed(e.getMessage());
         }
     }
-
 
 
     @ResponseBody
@@ -183,6 +188,22 @@ public class SoftwareController {
             return softwareService.deleteFile(fileId);
         } catch (Exception e) {
 //            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/export")
+    public CommonResult export(@RequestBody GetSoftwareRequest request, HttpServletResponse response) {
+        try {
+            List<GetSoftwareResponse> responseList = softwareService.getSoftware(request);
+            response.setContentType("application/vnd.ms-excel");
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-disposition", "attachment;filename=商标信息.xlsx");
+            EasyExcel.write(response.getOutputStream(), GetSoftwareResponse.class).sheet("商标信息").doWrite(responseList);
+            return CommonResult.success(null, "导出成功");
+        } catch (Exception e) {
+            e.printStackTrace();
             return CommonResult.failed(e.getMessage());
         }
     }

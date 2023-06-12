@@ -405,7 +405,7 @@ public class TrademarkServiceImpl implements TrademarkService {
     }
 
     @Override
-    public CommonResult getTrademark(GetTrademarkRequest request) throws Exception {
+    public List<GetTrademarkResponse> getTrademark(GetTrademarkRequest request) throws Exception {
         try {
             LambdaQueryWrapper<Trademark> wrapper = trademarkManager.getWrapper(request);
             List<Trademark> trademarkList = trademarkMapper.selectList(wrapper);
@@ -414,7 +414,7 @@ public class TrademarkServiceImpl implements TrademarkService {
             for (User inventor : inventorList) {
                 inventorMap.put(inventor.getId(), inventor);
             }
-            return CommonResult.success(PageInfoUtil.getPageInfo(trademarkList.stream().map(trademark -> {
+            return trademarkList.stream().map(trademark -> {
                 GetTrademarkResponse response = new GetTrademarkResponse();
                 response.setTrademarkCode(trademark.getTrademarkCode());
                 response.setTrademarkType(trademark.getTrademarkType());
@@ -425,7 +425,7 @@ public class TrademarkServiceImpl implements TrademarkService {
                 response.setInventorName(inventorMap.get(trademark.getInventorId()).getUserName());
                 response.setTrademarkOwner(trademark.getTrademarkOwner());
                 return response;
-            }).collect(Collectors.toList()), request.getPageIndex(), request.getPageSize()), "查找成功");
+            }).collect(Collectors.toList());
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

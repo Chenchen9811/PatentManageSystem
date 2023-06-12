@@ -5,6 +5,7 @@ import com.example.demo.entity.Trademark;
 import com.example.demo.entity.TrademarkBonus;
 import com.example.demo.entity.TrademarkFile;
 import com.example.demo.request.*;
+import com.example.demo.response.GetTrademarkResponse;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public interface TrademarkService {
 
     TrademarkFile findFileByName(String fileName);
 
-    CommonResult getTrademark(GetTrademarkRequest request) throws Exception;
+    List<GetTrademarkResponse> getTrademark(GetTrademarkRequest request) throws Exception;
 
     CommonResult getDepartmentTrademark(Integer pageIndex, Integer pageSize, Integer isDepartment) throws Exception;
 

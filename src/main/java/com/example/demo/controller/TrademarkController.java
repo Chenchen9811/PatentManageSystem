@@ -1,7 +1,11 @@
 package com.example.demo.controller;
 
+import com.alibaba.excel.EasyExcel;
+import com.example.demo.Utils.PageInfoUtil;
 import com.example.demo.common.CommonResult;
+import com.example.demo.entity.PatentExport;
 import com.example.demo.request.*;
+import com.example.demo.response.GetTrademarkResponse;
 import com.example.demo.service.TrademarkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.parameters.P;
@@ -9,7 +13,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/trademark")
@@ -38,8 +44,11 @@ public class TrademarkController {
     public CommonResult getTrademark(@RequestBody GetTrademarkRequest request) {
         CommonResult result = null;
         try {
-            result = trademarkService.getTrademark(request);
-            return result;
+            List<GetTrademarkResponse> responseList = trademarkService.getTrademark(request);
+            if (responseList == null || responseList.size() == 0) {
+                return CommonResult.failed("查找失败");
+            }
+            return CommonResult.success(PageInfoUtil.getPageInfo(responseList, request.getPageIndex(), request.getPageSize()));
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -123,7 +132,6 @@ public class TrademarkController {
     }
 
 
-
     @ResponseBody
     @PostMapping("/getOfficialFeeList")
     public CommonResult getOfficialFee(@Valid @RequestBody GetTrademarkOfficialFeeRequest request, BindingResult bindingResult) {
@@ -191,4 +199,20 @@ public class TrademarkController {
         }
     }
 
+
+    @ResponseBody
+    @PostMapping("/export")
+    public CommonResult export(@RequestBody GetTrademarkRequest request, HttpServletResponse response) throws Exception {
+        try {
+            List<GetTrademarkResponse> responseList = trademarkService.getTrademark(request);
+            response.setContentType("application/vnd.ms-excel");
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-disposition", "attachment;filename=软著信息.xlsx");
+            EasyExcel.write(response.getOutputStream(), GetTrademarkResponse.class).sheet("软著信息").doWrite(responseList);
+            return CommonResult.success(null, "导出成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 }

@@ -480,38 +480,37 @@ public class SoftwareServiceImpl implements SoftwareService {
     }
 
     @Override
-    public CommonResult getSoftware(GetSoftwareRequest request) throws Exception {
+    public List<GetSoftwareResponse> getSoftware(GetSoftwareRequest request) throws Exception {
         try {
             LambdaQueryWrapper<Software> wrapper = softwareManager.getWrapper(request);
             List<Software> softwareList = softwareMapper.selectList(wrapper);
             if (softwareList.size() == 0) {
-                return CommonResult.failed("查找失败，没有相关软著信息");
+                throw new Exception("查找失败，没有相关软著信息");
             }
             List<User> inventorList = userService.findUserListByIds(softwareList.stream().map(Software::getInventorId).distinct().collect(Collectors.toList()));
             Map<Long, User> inventorMap = new HashMap<>();
             for (User inventor : inventorList) {
                 inventorMap.put(inventor.getId(), inventor);
             }
-            return CommonResult.success(PageInfoUtil.getPageInfo(softwareList.stream().map(software -> {
-                        GetSoftwareResponse response = new GetSoftwareResponse();
-                        response.setSoftwareName(software.getSoftwareName());
-                        response.setSoftwareCode(software.getSoftwareCode());
-                        response.setVersion(software.getVersion());
-                        response.setInventorName(inventorMap.get(software.getInventorId()).getUserName());
-                        response.setDevelopWay(software.getDevelopWay());
-                        response.setRegisterCode(software.getRegisterCode());
-                        response.setCertificateCode(software.getCertificateCode());
-                        response.setArchiveCode(software.getArchiveCode());
-                        response.setRightStatus(software.getRightStatus());
-                        response.setRightRange(software.getRightRange());
-                        response.setFinishDate(software.getFinishDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getFinishDate()));
-                        response.setApplicationDate(software.getApplicationDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getApplicationDate()));
-                        response.setCertificateDate(software.getCertificateDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getCertificateDate()));
-                        response.setPublishDate(software.getPublishDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getPublishDate()));
-                        response.setArchiveDate(software.getArchiveDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getArchiveDate()));
-                        return response;
-                    }).collect(Collectors.toList()),
-                    request.getPageIndex(), request.getPageSize()), "查找成功");
+            return softwareList.stream().map(software -> {
+                GetSoftwareResponse response = new GetSoftwareResponse();
+                response.setSoftwareName(software.getSoftwareName());
+                response.setSoftwareCode(software.getSoftwareCode());
+                response.setVersion(software.getVersion());
+                response.setInventorName(inventorMap.get(software.getInventorId()).getUserName());
+                response.setDevelopWay(software.getDevelopWay());
+                response.setRegisterCode(software.getRegisterCode());
+                response.setCertificateCode(software.getCertificateCode());
+                response.setArchiveCode(software.getArchiveCode());
+                response.setRightStatus(software.getRightStatus());
+                response.setRightRange(software.getRightRange());
+                response.setFinishDate(software.getFinishDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getFinishDate()));
+                response.setApplicationDate(software.getApplicationDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getApplicationDate()));
+                response.setCertificateDate(software.getCertificateDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getCertificateDate()));
+                response.setPublishDate(software.getPublishDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getPublishDate()));
+                response.setArchiveDate(software.getArchiveDate() == null ? null : CommonUtil.getYmdbyTimeStamp(software.getArchiveDate()));
+                return response;
+            }).collect(Collectors.toList());
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

@@ -11,10 +11,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.sql.SQLOutput;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -39,8 +41,6 @@ public class test {
     private SoftwareBonusMapper softwareBonusMapper;
 
 
-
-
     @Test
     public void testMapper() {
 //        Proposal proposal = new Proposal();
@@ -57,15 +57,23 @@ public class test {
 //        System.out.println(review);
 //        System.out.println(trademarkMapper.findTrademarkByInventorName("admin").toString());
 //        System.out.println(softwareBonusMapper.selectList(new LambdaQueryWrapper<SoftwareBonus>()));
-        System.out.println(proposalMapper.findReviewByProposalCode("aaaa").toString());
+        Map<Character, Integer> map = new HashMap<>();
+        for (Map.Entry<Character, Integer> entry : map.entrySet())
+            System.out.println(proposalMapper.findReviewByProposalCode("aaaa").toString());
     }
 
 
     @Test
-    public void testDate() {
-        Timestamp timestamp = CommonUtil.stringDateToTimeStamp(new String("2023-05-10"));
-        System.out.println(timestamp.toString());
-        System.out.println(CommonUtil.generateCode("POfficialFee"));
+    public void testDate() throws ParseException {
+//        Timestamp timestamp = CommonUtil.stringDateToTimeStamp(new String("2023-05-10"));
+//        System.out.println(timestamp.toString());
+//        System.out.println(CommonUtil.generateCode("POfficialFee"));
+        Timestamp currentTimeStamp = new Timestamp(System.currentTimeMillis());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        java.util.Date cur = formatter.parse(CommonUtil.getYmdbyTimeStamp(currentTimeStamp), new ParsePosition(0));
+        java.util.Date pre = formatter.parse("2022-6-12", new ParsePosition(0));
+        System.out.println((cur.getTime() - pre.getTime()) / (1000 * 60 * 60 * 24));
     }
 
 }
