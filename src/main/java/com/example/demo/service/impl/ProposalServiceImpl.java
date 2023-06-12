@@ -210,13 +210,12 @@ public class ProposalServiceImpl implements ProposalService {
     }
 
     @Override
-    public CommonResult getProposalList1(GetProposalRequest1 request) throws Exception {
+    public List<ProposalVo1> getProposalList1(GetProposalRequest1 request) throws Exception {
         try {
             LambdaQueryWrapper<Proposal> wrapper = proposalManager.buildWrapperByRequest1(request);
             List<Proposal> proposalList = proposalMapper.selectList(wrapper);
-            Set<Long> proposalIds = new HashSet<>();
-            for (Proposal proposal : proposalList) {
-                proposalIds.add(proposal.getId());
+            if (proposalList.size() == 0) {
+                throw new Exception("查找失败，没有相关提案信息");
             }
             LambdaQueryWrapper<Inventor> inventorWrapper = new LambdaQueryWrapper<>();
             List<GetProposalRequest1.Criteria.KV> items = request.getCriteria().getItems();
@@ -233,21 +232,13 @@ public class ProposalServiceImpl implements ProposalService {
                     }
                 }
             }
-//            if (StringUtils.isNotBlank(request.getCriteria().getItems().getInventorCode())) {
-//                inventorWrapper.eq(Inventor::getInventorCode, request.getCriteria().getItems().getInventorCode());
-//            }
-//            if (StringUtils.isNotBlank(request.getCriteria().getItems().getInventorName())) {
-//                inventorWrapper.eq(Inventor::getInventorName, request.getCriteria().getItems().getInventorName());
-//            }
             List<Inventor> inventors = inventorMapper.selectList(inventorWrapper);
-            for (Inventor inventor : inventors) {
-                if (!proposalIds.contains(inventor.getProposalId())) {
-                    proposalList.add(proposalMapper.selectOne(new LambdaQueryWrapper<Proposal>().eq(Proposal::getId, inventor.getProposalId())));
-                }
+            List<Long> proposalIds = inventors.stream().distinct().map(Inventor::getProposalId).collect(Collectors.toList());
+            proposalList.removeIf(proposal -> !proposalIds.contains(proposal.getId()));
+            if (proposalList.size() == 0) {
+                throw new Exception("查找失败，没有符合条件的提案信息");
             }
-//            PageInfo<Proposal> pageInfo = PageInfoUtil.getPageInfo(proposalList, request.getPageIndex(), request.getPageSize());
-            log.info("pageIndex:{}, pageSize:{}", request.getPageIndex(), request.getPageSize());
-            // Proposal和Inventor转ProposalVo
+//            log.info("pageIndex:{}, pageSize:{}", request.getPageIndex(), request.getPageSize());
             List<ProposalVo1> vo1List = new ArrayList<>();
             for (Proposal proposal : proposalList) {
                 ProposalVo1 vo = new ProposalVo1();
@@ -262,7 +253,7 @@ public class ProposalServiceImpl implements ProposalService {
                 vo.setDepartmentName(departmentService.findDepartmentById(proposal.getDepartmentId()).getDepartmentName());
                 vo1List.add(vo);
             }
-            return CommonResult.success(PageInfoUtil.getPageInfo(vo1List, request.getPageIndex(), request.getPageSize()), "查找成功!");
+            return vo1List;
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

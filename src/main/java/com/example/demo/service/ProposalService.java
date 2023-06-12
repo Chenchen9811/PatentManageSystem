@@ -6,13 +6,14 @@ import com.example.demo.request.AddReviewRequest;
 import com.example.demo.request.GetProposalFileRequest;
 import com.example.demo.request.GetProposalRequest1;
 import com.example.demo.request.NewProposalRequest;
+import com.example.demo.response.ProposalVo1;
 
 import java.util.List;
 
 public interface ProposalService {
     CommonResult newProposal(NewProposalRequest request) throws Exception;
 
-    CommonResult getProposalList1(GetProposalRequest1 request) throws Exception;
+    List<ProposalVo1> getProposalList1(GetProposalRequest1 request) throws Exception;
 
     CommonResult getAllDepartments() throws Exception;
 
